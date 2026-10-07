@@ -1,5 +1,5 @@
 {
- "generated": 1790333532.501731,
+ "generated": 1791410193.9492211,
  "suite": "full/v1",
  "current": "1",
  "hardware": {
@@ -8451,7 +8451,7 @@
       ]
      },
      {
-      "id": "sglang-27b",
+      "id": "pennyroyal",
       "name": "Qwen 3.8 27B \u00b7 SGLang \u00b7 DFlash2 \u00b7 524K",
       "engine": "sglang",
       "quantization": "FP8",
@@ -8474,7 +8474,7 @@
        "source": null
       },
       "run": {
-       "id": "20260911-233400-sglang-27b",
+       "id": "20260911-233400-pennyroyal",
        "suite": "full/v1",
        "kind": "full",
        "finished": 1789222182.509856,
@@ -8891,7 +8891,7 @@
       },
       "history": [
        {
-        "id": "20260911-233400-sglang-27b",
+        "id": "20260911-233400-pennyroyal",
         "suite": "full/v1",
         "effort": "max",
         "finished": 1789222182.509856,
@@ -18014,7 +18014,7 @@
     ]
    },
    {
-    "id": "sglang-27b",
+    "id": "pennyroyal",
     "name": "Qwen 3.8 27B \u00b7 SGLang \u00b7 DFlash2 \u00b7 524K",
     "engine": "sglang",
     "quantization": "FP8",
@@ -18037,7 +18037,7 @@
      "source": null
     },
     "run": {
-     "id": "20260911-233400-sglang-27b",
+     "id": "20260911-233400-pennyroyal",
      "suite": "full/v1",
      "kind": "full",
      "finished": 1789222182.509856,
@@ -18454,7 +18454,7 @@
     },
     "history": [
      {
-      "id": "20260911-233400-sglang-27b",
+      "id": "20260911-233400-pennyroyal",
       "suite": "full/v1",
       "effort": "max",
       "finished": 1789222182.509856,
