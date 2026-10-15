@@ -89,6 +89,12 @@ def injection(profile, effort):
     return {**kwargs, **extra}
 
 
+def reasoning_of(message):
+    """The reasoning a server kept apart from the answer, on a message or a streamed delta: llama.cpp and older vLLM call
+    the field `reasoning_content`, current vLLM `reasoning`."""
+    return getattr(message, "reasoning_content", None) or getattr(message, "reasoning", None) or ""
+
+
 def template_error(error):
     """A conversation the model's own chat template refuses — Gemma's insists on strict user/model alternation, and
     llama.cpp cannot build a parser for anything else. Every item of that shape will be refused the same way, so it
@@ -167,7 +173,7 @@ def build_record(task, item, response, started):
         "prompt_tokens": response.usage.prompt_tokens if response.usage else None,
         "completion_tokens": response.usage.completion_tokens if response.usage else None,
         "content": content,
-        "reasoning": getattr(message, "reasoning_content", None) or "",
+        "reasoning": reasoning_of(message),
     }
     if task == "lcb":
         record.update(prediction=None, score=None)
@@ -324,7 +330,7 @@ class QualityRunner:
             if response.usage:
                 prompt_count += response.usage.prompt_tokens or 0
                 completion_count += response.usage.completion_tokens or 0
-            thought = getattr(message, "reasoning_content", None) or ""
+            thought = reasoning_of(message)
             thoughts.append(thought)
             if not message.tool_calls:
                 reply, finish = message.content or "", choice.finish_reason

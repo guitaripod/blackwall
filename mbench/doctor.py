@@ -59,7 +59,7 @@ async def check_answer(client, profile, effort):
     except Exception as error:
         return outcome("answer", "fail", f"a plain question failed: {error!r}"[:300])
     message = response.choices[0].message
-    content, reasoning = message.content or "", getattr(message, "reasoning_content", None) or ""
+    content, reasoning = message.content or "", engine.reasoning_of(message)
     if "<think>" in content or "</think>" in content:
         return outcome("answer", "fail", "the reasoning comes back inside the answer; start the server with a reasoning "
                                          "parser (llama.cpp --reasoning-format, SGLang --reasoning-parser)")
@@ -82,7 +82,7 @@ async def reasons_when_it_must(client, profile, effort):
         response = await ask(client, profile, effort, [{"role": "user", "content": HARDER_QUESTION}], 1024)
     except Exception:
         return False
-    return bool(getattr(response.choices[0].message, "reasoning_content", None))
+    return bool(engine.reasoning_of(response.choices[0].message))
 
 
 async def check_tool_call(client, profile, effort):
@@ -110,8 +110,8 @@ async def check_tool_result(client, profile, effort, message):
     call_id = call.id or "call_0"
     assistant = {"role": "assistant", "content": message.content or "", "tool_calls": [
         {"id": call_id, "type": "function", "function": {"name": call.function.name, "arguments": call.function.arguments}}]}
-    if getattr(message, "reasoning_content", None):
-        assistant["reasoning_content"] = message.reasoning_content
+    if engine.reasoning_of(message):
+        assistant["reasoning_content"] = engine.reasoning_of(message)
     result = tool_cases.World().call("get_weather", engine.parse_arguments(call.function.arguments))
     messages = [{"role": "system", "content": tool_cases.SYSTEM}, {"role": "user", "content": WEATHER_QUESTION}, assistant,
                 {"role": "tool", "tool_call_id": call_id, "content": json.dumps(result)}]
@@ -202,7 +202,7 @@ async def fingerprint(profile, effort):
     except Exception as error:
         return {"error": repr(error)[:200]}
     message = answer.choices[0].message
-    text = (getattr(message, "reasoning_content", None) or "") + (message.content or "")
+    text = engine.reasoning_of(message) + (message.content or "")
     return {"prompt": FINGERPRINT_PROMPT, "answer": text[:400]}
 
 

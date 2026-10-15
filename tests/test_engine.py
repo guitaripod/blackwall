@@ -8,7 +8,7 @@ import openai
 import pytest
 
 from mbench import engine, tool_cases
-from mbench.engine import QualityRunner, request_kwargs, resolve_effort
+from mbench.engine import QualityRunner, reasoning_of, request_kwargs, resolve_effort
 from mbench.profiles import Profile
 
 
@@ -42,6 +42,14 @@ def test_muse_takes_its_level_as_reasoning_strength():
     assert request_kwargs(muse, "xhigh") == {"extra_body": {"chat_template_kwargs": {"reasoning_strength": "xhigh"}}}
     with pytest.raises(ValueError, match="can't switch thinking off"):
         resolve_effort(muse, "none")
+
+
+def test_reasoning_is_read_under_either_field_name():
+    llama = SimpleNamespace(content="42", reasoning_content="because")
+    vllm = SimpleNamespace(content="42", reasoning="because")
+    plain = SimpleNamespace(content="42")
+    assert reasoning_of(llama) == reasoning_of(vllm) == "because"
+    assert reasoning_of(plain) == ""
 
 
 def test_nemotron_has_a_medium_switch_and_a_full_default():

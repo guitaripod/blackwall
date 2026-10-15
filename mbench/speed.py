@@ -6,7 +6,7 @@ import pandas as pd
 from openai import AsyncOpenAI
 
 from . import datasets, hosts, paths, suite, swap
-from .engine import request_kwargs
+from .engine import reasoning_of, request_kwargs
 
 
 class Filler:
@@ -82,7 +82,7 @@ class SpeedRun:
                     usage = chunk.usage
                 for choice in chunk.choices:
                     delta = choice.delta
-                    text = (delta.content or "") + (getattr(delta, "reasoning_content", None) or "")
+                    text = (delta.content or "") + reasoning_of(delta)
                     if text:
                         now = time.perf_counter()
                         first = first if first is not None else now
