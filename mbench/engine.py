@@ -28,7 +28,7 @@ def resolve_effort(profile, requested):
     it declares, and "none" needs a template that can switch thinking off."""
     levels = profile.efforts
     if requested == EFFORT_OFF:
-        if EFFORT_OFF in levels or profile.thinking in ("qwen", "none"):
+        if EFFORT_OFF in levels or profile.thinking in ("qwen", "nemotron", "none"):
             return EFFORT_OFF
         raise ValueError(f"{profile.id} can't switch thinking off; its levels are {', '.join(levels) or 'undeclared'}, "
                          "and --effort min is its lowest")
@@ -50,6 +50,17 @@ def seed_for(item_id):
     return int(hashlib.sha256(item_id.encode()).hexdigest()[:8], 16) % 2_147_483_647
 
 
+def nemotron_template_kwargs(effort):
+    """Nemotron 3.5's chat template has two switches: `enable_thinking`, and `medium_effort` for the shorter "efficient"
+    reasoning. Its default, thinking on without the second switch, is the full effort, so every level above medium
+    asks for the same thing."""
+    if effort == EFFORT_OFF:
+        return {"enable_thinking": False}
+    if effort == "medium":
+        return {"enable_thinking": True, "medium_effort": True}
+    return {"enable_thinking": True}
+
+
 def request_kwargs(profile, effort, *, greedy=False, seed=None):
     """How each chat template takes a thinking level; sampling stays on the server's model defaults unless greedy."""
     kwargs, extra = {}, {}
@@ -60,6 +71,8 @@ def request_kwargs(profile, effort, *, greedy=False, seed=None):
                                          else {"enable_thinking": True, "reasoning_effort": effort})
     elif profile.thinking == "muse":
         extra["chat_template_kwargs"] = {"reasoning_strength": effort}
+    elif profile.thinking == "nemotron":
+        extra["chat_template_kwargs"] = nemotron_template_kwargs(effort)
     if greedy:
         kwargs["temperature"] = 0
     if seed is not None and supports_seed(profile):

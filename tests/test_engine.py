@@ -44,6 +44,16 @@ def test_muse_takes_its_level_as_reasoning_strength():
         resolve_effort(muse, "none")
 
 
+def test_nemotron_has_a_medium_switch_and_a_full_default():
+    nemotron = profile("nemotron", efforts=("medium", "high"))
+    assert request_kwargs(nemotron, "medium") == {
+        "extra_body": {"chat_template_kwargs": {"enable_thinking": True, "medium_effort": True}}}
+    assert request_kwargs(nemotron, "high") == {"extra_body": {"chat_template_kwargs": {"enable_thinking": True}}}
+    assert request_kwargs(nemotron, "none") == {"extra_body": {"chat_template_kwargs": {"enable_thinking": False}}}
+    assert resolve_effort(nemotron, "max") == "high"
+    assert resolve_effort(nemotron, "none") == "none"
+
+
 def refusal(message, body=None):
     response = httpx.Response(400, request=httpx.Request("POST", "http://swap/v1/chat/completions"))
     return openai.BadRequestError(message, response=response, body=body)

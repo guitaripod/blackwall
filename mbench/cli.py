@@ -900,7 +900,7 @@ def cmd_profile(args):
         print(f"{key:<13} {value if value not in (None, {}, '') else '–'}" + (f"   ({source})" if source else ""))
     print(f"{'cmd':<13} {profile.cmd}")
     if profile.thinking == "none":
-        print(f"\nNo thinking style is set, so --effort is not passed to this model. Add thinking = \"openai\" or \"qwen\""
+        print(f"\nNo thinking style is set, so --effort is not passed to this model. Add thinking = \"openai\", \"qwen\" or \"nemotron\""
               f" (and efforts = [...]) under [{profile.id}] in {paths.PROFILES}.")
     missing = lmx.missing_fields(profile)
     if missing:
