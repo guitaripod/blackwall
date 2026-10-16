@@ -1,7 +1,7 @@
 import json
 import time
 
-from mbench import board, doctor, hosts, metrics, phone, profiles, stack, store, suite, units
+from blackwall import board, doctor, hosts, metrics, phone, profiles, stack, store, suite, units
 
 HEALTH = {
     "app": {"version": "0.1.0", "llama_commit": "5266f24", "llama_build": 50},
@@ -121,7 +121,7 @@ def phone_run(db, run_id, model, flags):
 
 
 def test_a_phone_run_shows_the_quality_of_the_desktop_run_it_names(tmp_path, monkeypatch):
-    monkeypatch.setattr("mbench.paths.DB", tmp_path / "bench.db")
+    monkeypatch.setattr("blackwall.paths.DB", tmp_path / "bench.db")
     db = store.connect()
     store.insert_run(db, {"id": "desktop", "model": "qwen3-4b", "name": "Qwen3 4B", "suite": suite.label("full"),
                           "effort": "max", "status": "complete", "finished": 1, "hardware": {"gpu": "RTX PRO 6000"},
@@ -139,7 +139,7 @@ def test_a_phone_run_shows_the_quality_of_the_desktop_run_it_names(tmp_path, mon
 
 
 def test_a_phone_run_without_a_named_quality_run_shows_none(tmp_path, monkeypatch):
-    monkeypatch.setattr("mbench.paths.DB", tmp_path / "bench.db")
+    monkeypatch.setattr("blackwall.paths.DB", tmp_path / "bench.db")
     db = store.connect()
     phone_run(db, "air", "qwen3-4b-air", {})
     entry = board.collect(db)["rankings"]["max"][0]
@@ -209,7 +209,7 @@ def test_a_run_with_no_thermal_numbers_gets_no_verdict():
 
 
 def test_the_board_carries_the_verdict(tmp_path, monkeypatch):
-    monkeypatch.setattr("mbench.paths.DB", tmp_path / "bench.db")
+    monkeypatch.setattr("blackwall.paths.DB", tmp_path / "bench.db")
     db = store.connect()
     phone_run(db, "air", "qwen3-4b-air", {})
     store.set_metrics(db, "air", {"speed.decode_steady": {"value": 5.0, "unit": "tok/s", "n": 7},
@@ -228,7 +228,7 @@ def test_a_phone_suite_cannot_score_quality_at_all():
 
 
 def test_a_phone_row_only_takes_quality_from_a_full_question_set(tmp_path, monkeypatch):
-    monkeypatch.setattr("mbench.paths.DB", tmp_path / "bench.db")
+    monkeypatch.setattr("blackwall.paths.DB", tmp_path / "bench.db")
     db = store.connect()
     store.insert_run(db, {"id": "small", "model": "qwen3-0.6b", "name": "Qwen3 0.6B", "suite": suite.label("smoke"),
                           "effort": "max", "status": "complete", "finished": 1, "hardware": {"gpu": "RTX PRO 6000"},
@@ -302,7 +302,7 @@ def test_the_phone_gives_up_cooling_and_records_that_it_did(monkeypatch):
 
 
 def test_quality_is_not_inherited_across_two_different_files(tmp_path, monkeypatch):
-    monkeypatch.setattr("mbench.paths.DB", tmp_path / "bench.db")
+    monkeypatch.setattr("blackwall.paths.DB", tmp_path / "bench.db")
     db = store.connect()
     store.insert_run(db, {"id": "desktop", "model": "m", "name": "m", "suite": suite.label("full"), "effort": "max",
                           "status": "complete", "finished": 1, "hardware": {"gpu": "RTX PRO 6000"}, "profile": {},
@@ -317,7 +317,7 @@ def test_quality_is_not_inherited_across_two_different_files(tmp_path, monkeypat
 
 
 def test_matching_weights_are_marked_verified(tmp_path, monkeypatch):
-    monkeypatch.setattr("mbench.paths.DB", tmp_path / "bench.db")
+    monkeypatch.setattr("blackwall.paths.DB", tmp_path / "bench.db")
     db = store.connect()
     store.insert_run(db, {"id": "desktop", "model": "m", "name": "m", "suite": suite.label("full"), "effort": "max",
                           "status": "complete", "finished": 1, "hardware": {"gpu": "RTX PRO 6000"}, "profile": {},
@@ -333,7 +333,7 @@ def test_matching_weights_are_marked_verified(tmp_path, monkeypatch):
 
 
 def test_a_digest_is_the_file_not_its_name(tmp_path, monkeypatch):
-    monkeypatch.setattr("mbench.paths.CACHE", tmp_path / "cache")
+    monkeypatch.setattr("blackwall.paths.CACHE", tmp_path / "cache")
     weights = tmp_path / "model.gguf"
     weights.write_bytes(b"one")
     first = stack.digest_of(weights)
@@ -461,7 +461,7 @@ def test_a_phone_model_can_name_its_desktop_twin(monkeypatch):
 
 
 def test_quality_follows_the_twin_without_naming_a_run(tmp_path, monkeypatch):
-    monkeypatch.setattr("mbench.paths.DB", tmp_path / "bench.db")
+    monkeypatch.setattr("blackwall.paths.DB", tmp_path / "bench.db")
     db = store.connect()
     for index, run_id in enumerate(("older", "newer")):
         store.insert_run(db, {"id": run_id, "model": "m-gguf", "name": "m", "suite": suite.label("full"),
@@ -519,7 +519,7 @@ class Refusal(Exception):
 
 def test_a_template_that_refuses_a_conversation_scores_zero(monkeypatch):
     import openai
-    from mbench import engine
+    from blackwall import engine
 
     class Refused(openai.BadRequestError):
         def __init__(self):
@@ -536,7 +536,7 @@ def test_a_template_that_refuses_a_conversation_scores_zero(monkeypatch):
 
 
 def test_a_refused_template_warns_rather_than_abandoning_the_run():
-    from mbench import doctor
+    from blackwall import doctor
     checks = [{"check": "long prompt", "status": "fail", "detail": "failed: Unable to generate parser for this template"},
               {"check": "answer", "status": "ok", "detail": "answers"}]
     softened = doctor.soften_template_refusals(checks)
@@ -557,7 +557,7 @@ def test_a_swapping_group_is_not_resident():
 
 
 def test_a_run_waits_for_room_rather_than_dying_at_question_four_hundred(monkeypatch):
-    from mbench import worker
+    from blackwall import worker
 
     class Events:
         def __init__(self):
@@ -582,7 +582,7 @@ def test_a_run_waits_for_room_rather_than_dying_at_question_four_hundred(monkeyp
 
 
 def test_a_run_gives_up_waiting_if_the_box_never_frees_up(monkeypatch):
-    from mbench import worker
+    from blackwall import worker
 
     class Events:
         def emit(self, phase, **fields):
@@ -597,9 +597,9 @@ def test_a_run_gives_up_waiting_if_the_box_never_frees_up(monkeypatch):
 
 
 def test_the_run_with_the_least_written_down_gives_way(tmp_path, monkeypatch):
-    from mbench import worker
-    monkeypatch.setattr("mbench.paths.DB", tmp_path / "bench.db")
-    monkeypatch.setattr("mbench.paths.RUNS", tmp_path / "runs")
+    from blackwall import worker
+    monkeypatch.setattr("blackwall.paths.DB", tmp_path / "bench.db")
+    monkeypatch.setattr("blackwall.paths.RUNS", tmp_path / "runs")
     db = store.connect()
     for run_id, written in (("20260914-183712-a-instruct", 9000), ("20260914-183712-z-thinking", 10)):
         store.insert_run(db, {"id": run_id, "model": run_id, "name": run_id, "suite": suite.label("full"),
@@ -612,8 +612,8 @@ def test_the_run_with_the_least_written_down_gives_way(tmp_path, monkeypatch):
 
 
 def test_a_lone_run_always_gives_way(tmp_path, monkeypatch):
-    from mbench import worker
-    monkeypatch.setattr("mbench.paths.DB", tmp_path / "bench.db")
+    from blackwall import worker
+    monkeypatch.setattr("blackwall.paths.DB", tmp_path / "bench.db")
     store.connect()
     assert worker.MemoryGuard(None, None, "20260914-100000-a").gives_way()
     assert worker.MemoryGuard(None, None, None).gives_way()
@@ -621,8 +621,8 @@ def test_a_lone_run_always_gives_way(tmp_path, monkeypatch):
 
 def test_only_one_run_reads_a_question_set_at_a_time(tmp_path, monkeypatch):
     import multiprocessing
-    from mbench import datasets
-    monkeypatch.setattr("mbench.paths.CACHE", tmp_path)
+    from blackwall import datasets
+    monkeypatch.setattr("blackwall.paths.CACHE", tmp_path)
     order = multiprocessing.Manager().list()
 
     def hold(index):
@@ -640,7 +640,7 @@ def test_only_one_run_reads_a_question_set_at_a_time(tmp_path, monkeypatch):
 
 
 def test_a_metal_compute_error_is_named_as_the_model_not_fitting():
-    from mbench import doctor
+    from blackwall import doctor
     checks = [{"check": "long prompt", "status": "fail", "detail": "failed: InternalServerError('Compute error.')"}]
     named = doctor.name_memory_failures(checks, phone=True)
     assert "does not fit at this context" in named[0]["detail"]
@@ -673,14 +673,14 @@ def test_an_idle_app_counts_as_answering():
 def test_the_tool_is_found_without_a_shell_path(monkeypatch, tmp_path):
     binary = tmp_path / "pymobiledevice3"
     binary.write_text("#!/bin/sh\n")
-    monkeypatch.delenv("MBENCH_PMD", raising=False)
+    monkeypatch.delenv("BLACKWALL_PMD", raising=False)
     monkeypatch.setattr(phone.shutil, "which", lambda name: None)
     monkeypatch.setattr(phone, "TOOL_PATHS", (str(binary),))
     assert phone.tool() == str(binary)
 
 
 def test_a_genuinely_missing_tool_still_says_so(monkeypatch):
-    monkeypatch.delenv("MBENCH_PMD", raising=False)
+    monkeypatch.delenv("BLACKWALL_PMD", raising=False)
     monkeypatch.setattr(phone.shutil, "which", lambda name: None)
     monkeypatch.setattr(phone, "TOOL_PATHS", ("/nowhere/pymobiledevice3",))
     try:
@@ -693,7 +693,7 @@ def test_a_genuinely_missing_tool_still_says_so(monkeypatch):
 
 def test_a_template_refusal_never_counts_as_a_dead_server():
     import openai
-    from mbench import engine
+    from blackwall import engine
 
     class Refused(openai.BadRequestError):
         def __init__(self):
@@ -717,14 +717,14 @@ def test_a_template_refusal_never_counts_as_a_dead_server():
 
 
 def test_every_refused_item_scores_zero_and_none_of_them_fail_the_task():
-    from mbench import engine
+    from blackwall import engine
     item = {"id": "tools-1", "sample": 0, "gold": "g", "meta": {}, "max_tokens": 4096}
     record = engine.refused("tools", item, 0.0)
     assert record["score"] == 0.0 and record["finish"] == "template" and record["prediction"] is None
 
 
 def test_a_speed_run_keeps_what_it_has_measured(tmp_path):
-    from mbench import speed
+    from blackwall import speed
     kept = []
     run = speed.SpeedRun.__new__(speed.SpeedRun)
     run.partial = kept.append
@@ -736,7 +736,7 @@ def test_a_speed_run_keeps_what_it_has_measured(tmp_path):
 
 
 def test_a_run_spawned_a_moment_ago_is_not_declared_dead(tmp_path, monkeypatch):
-    monkeypatch.setattr("mbench.paths.DB", tmp_path / "bench.db")
+    monkeypatch.setattr("blackwall.paths.DB", tmp_path / "bench.db")
     monkeypatch.setattr(units, "unit_active", lambda run_id: False)
     db = store.connect()
     store.insert_run(db, {"id": "fresh", "model": "m", "name": "m", "suite": suite.label("full"), "effort": "max",
@@ -747,7 +747,7 @@ def test_a_run_spawned_a_moment_ago_is_not_declared_dead(tmp_path, monkeypatch):
 
 
 def test_a_run_whose_unit_has_been_gone_a_while_is_failed(tmp_path, monkeypatch):
-    monkeypatch.setattr("mbench.paths.DB", tmp_path / "bench.db")
+    monkeypatch.setattr("blackwall.paths.DB", tmp_path / "bench.db")
     monkeypatch.setattr(units, "unit_active", lambda run_id: False)
     db = store.connect()
     store.insert_run(db, {"id": "stale", "model": "m", "name": "m", "suite": suite.label("full"), "effort": "max",
@@ -758,7 +758,7 @@ def test_a_run_whose_unit_has_been_gone_a_while_is_failed(tmp_path, monkeypatch)
 
 
 def test_a_phone_that_ran_out_of_room_fails_instead_of_waiting_for_another_turn():
-    from mbench import worker
+    from blackwall import worker
 
     class Halt:
         reason = "memory"
@@ -774,7 +774,7 @@ def test_a_phone_that_ran_out_of_room_fails_instead_of_waiting_for_another_turn(
 
 
 def test_a_desktop_short_of_ram_is_only_asked_to_wait():
-    from mbench import worker
+    from blackwall import worker
 
     class Halt:
         reason = "memory"
@@ -786,7 +786,7 @@ def test_a_desktop_short_of_ram_is_only_asked_to_wait():
 
 
 def test_a_finished_phone_run_gives_the_model_back():
-    from mbench import worker
+    from blackwall import worker
 
     class Events:
         def log(self, message):
@@ -807,7 +807,7 @@ def test_a_finished_phone_run_gives_the_model_back():
 
 
 def test_a_finished_gpu_run_leaves_llama_swap_alone():
-    from mbench import worker
+    from blackwall import worker
 
     class Events:
         def log(self, message):
@@ -871,7 +871,7 @@ def test_the_app_is_stopped_by_bundle_id(monkeypatch):
 
 
 def test_the_phone_is_told_where_the_run_has_got_to(tmp_path):
-    from mbench import worker
+    from blackwall import worker
 
     class Host:
         def __init__(self):
@@ -890,7 +890,7 @@ def test_the_phone_is_told_where_the_run_has_got_to(tmp_path):
 
 
 def test_a_run_nobody_watches_reports_to_nobody(tmp_path):
-    from mbench import worker
+    from blackwall import worker
 
     events = worker.Events(tmp_path)
     events.progress("speed", 1, 43)

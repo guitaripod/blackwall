@@ -1,6 +1,6 @@
 import json
 
-from mbench import metrics, suite
+from blackwall import metrics, suite
 
 
 def record(item_id, score, tokens=100, finish="stop", meta=None):

@@ -2,27 +2,27 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 effort="${1:-max}"
-mbench export --out site >/dev/null
+blackwall export --out site >/dev/null
 scripts/screenshots.sh site/index.html >/dev/null
 cp docs/leaderboard.png docs/leaderboard-dark.png docs/phone.png site/
 [[ -f docs/card.png ]] && cp docs/card.png site/
-mbench ls --effort "$effort" --markdown > /tmp/mbench-readme-table.md
-: > /tmp/mbench-phone-table.md
+blackwall ls --effort "$effort" --markdown > /tmp/blackwall-readme-table.md
+: > /tmp/blackwall-phone-table.md
 for phone_effort in "$effort" $(python -c "
 import json, pathlib
 board = json.loads(pathlib.Path('site/board.json').read_text())
 suite = board.get('current') or next(iter(board['suites']))
 print(' '.join(board['suites'][suite]['efforts']))
 "); do
-  mbench ls --effort "$phone_effort" --device phone --markdown > /tmp/mbench-phone-table.md 2>/dev/null || true
-  [[ -s /tmp/mbench-phone-table.md ]] && break
+  blackwall ls --effort "$phone_effort" --device phone --markdown > /tmp/blackwall-phone-table.md 2>/dev/null || true
+  [[ -s /tmp/blackwall-phone-table.md ]] && break
 done
 python - "$effort" <<'PYTHON'
 import pathlib, sys
-table = pathlib.Path("/tmp/mbench-readme-table.md").read_text().strip()
+table = pathlib.Path("/tmp/blackwall-readme-table.md").read_text().strip()
 readme = pathlib.Path("README.md")
 text = readme.read_text()
-phone = pathlib.Path("/tmp/mbench-phone-table.md")
+phone = pathlib.Path("/tmp/blackwall-phone-table.md")
 phone_table = phone.read_text().strip() if phone.exists() and phone.read_text().strip() else ""
 start, end = "<!--LEADERBOARD-->", "<!--/LEADERBOARD-->"
 block = f"{start}\n{table}\n{end}"

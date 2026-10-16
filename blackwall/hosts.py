@@ -157,7 +157,7 @@ class NullSampler:
 
 class RemoteHost:
     """An OpenAI-compatible server on another machine — the Mac running MLX. Nothing here is launched or unloaded:
-    the server holds the model, and mbench only measures what it answers."""
+    the server holds the model, and blackwall only measures what it answers."""
 
     kind = "remote"
 

@@ -266,15 +266,15 @@ TOOL_PATHS = ("~/.local/bin/pymobiledevice3", "~/.local/share/pmd-venv/bin/pymob
 
 
 def tool():
-    """pymobiledevice3 carries files and ports over the cable; it is not a dependency of mbench itself. A worker runs
+    """pymobiledevice3 carries files and ports over the cable; it is not a dependency of blackwall itself. A worker runs
     as a systemd unit, whose PATH is the system's and not the shell's, so the usual places are searched by hand
     rather than trusted to `which`."""
-    found = os.environ.get("MBENCH_PMD") or shutil.which("pymobiledevice3")
+    found = os.environ.get("BLACKWALL_PMD") or shutil.which("pymobiledevice3")
     if not found:
         found = next((str(path) for candidate in TOOL_PATHS
                       if (path := Path(candidate).expanduser()).exists()), None)
     if not found:
-        raise RuntimeError("pymobiledevice3 is not installed; `pipx install pymobiledevice3`, or set MBENCH_PMD")
+        raise RuntimeError("pymobiledevice3 is not installed; `pipx install pymobiledevice3`, or set BLACKWALL_PMD")
     return found
 
 
@@ -306,7 +306,7 @@ def apps():
 
 
 def bundle_id():
-    return os.environ.get("MBENCH_BUNDLE_ID") or apps()[0][0]
+    return os.environ.get("BLACKWALL_BUNDLE_ID") or apps()[0][0]
 
 
 def installed():

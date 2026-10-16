@@ -1,23 +1,23 @@
 from types import SimpleNamespace
 
-from mbench import datasets, notify, sources
+from blackwall import datasets, notify, sources
 
 
 def test_the_notify_command_gets_the_text(monkeypatch):
     calls = []
     monkeypatch.setattr(notify.shutil, "which", lambda name: None)
     monkeypatch.setattr(notify.subprocess, "run", lambda command, **kwargs: calls.append((command, kwargs.get("env") or {})))
-    monkeypatch.setenv("MBENCH_NOTIFY", "push-it")
-    notify.send("mbench finished", "gpt-oss: quality index 71.2", run="r1")
+    monkeypatch.setenv("BLACKWALL_NOTIFY", "push-it")
+    notify.send("blackwall finished", "gpt-oss: quality index 71.2", run="r1")
     command, environment = calls[0]
     assert command == "push-it"
-    assert environment["MBENCH_MESSAGE"] == "gpt-oss: quality index 71.2" and environment["MBENCH_RUN"] == "r1"
+    assert environment["BLACKWALL_MESSAGE"] == "gpt-oss: quality index 71.2" and environment["BLACKWALL_RUN"] == "r1"
 
 
 def test_the_config_file_supplies_the_command(monkeypatch, tmp_path):
-    monkeypatch.delenv("MBENCH_NOTIFY", raising=False)
+    monkeypatch.delenv("BLACKWALL_NOTIFY", raising=False)
     monkeypatch.setattr(notify.paths, "SETTINGS", tmp_path / "config.toml")
-    (tmp_path / "config.toml").write_text('notify = "curl -d \\"$MBENCH_MESSAGE\\" https://ntfy.example/bench"\n')
+    (tmp_path / "config.toml").write_text('notify = "curl -d \\"$BLACKWALL_MESSAGE\\" https://ntfy.example/bench"\n')
     assert notify.hook().startswith("curl")
 
 

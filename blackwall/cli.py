@@ -23,13 +23,13 @@ REUSE_STATUSES = ("complete", "failed", "cancelled")
 
 
 def fail(message) -> NoReturn:
-    print(f"mbench: {message}", file=sys.stderr)
+    print(f"blackwall: {message}", file=sys.stderr)
     sys.exit(1)
 
 
 def resolve_profile(model):
     if not paths.LLAMA_SWAP_CONFIG.exists():
-        fail(f"no llama-swap config at {paths.LLAMA_SWAP_CONFIG}; point MBENCH_SWAP_CONFIG at yours")
+        fail(f"no llama-swap config at {paths.LLAMA_SWAP_CONFIG}; point BLACKWALL_SWAP_CONFIG at yours")
     try:
         return profiles.resolve(model)
     except KeyError as error:
@@ -136,7 +136,7 @@ def follow(run_id):
                 reconcile(db)
             time.sleep(2)
     except KeyboardInterrupt:
-        print(f"\nDetached. {run_id} keeps running; see `mbench status` or `mbench logs -f`.")
+        print(f"\nDetached. {run_id} keeps running; see `blackwall status` or `blackwall logs -f`.")
 
 
 def level_of(run):
@@ -319,7 +319,7 @@ def cmd_run(args):
     if len(chosen) > len(starting) or not immediate:
         schedule.install_timer()
     if not immediate:
-        print("`mbench status` lists the schedule; `mbench cancel <run>` takes a run off it.")
+        print("`blackwall status` lists the schedule; `blackwall cancel <run>` takes a run off it.")
         return
     config = profiles.swap_config() if device == "gpu" else {}
     resident = {profile.id for profile in chosen}
@@ -365,7 +365,7 @@ def phone_action(args):
                 print(f"Answering at {device.control_url}.")
                 return
             time.sleep(1)
-        fail("the app launched but never answered; `mbench phone logs` may say why")
+        fail("the app launched but never answered; `blackwall phone logs` may say why")
     if args.action == "kill":
         print("stopped" if phone.kill() else "was not running")
         return
@@ -397,7 +397,7 @@ def phone_action(args):
         return
     health = device.health()
     if not health:
-        fail(f"mbenchd is not answering at {device.control_url}; `mbench phone forward` and open the app")
+        fail(f"mbenchd is not answering at {device.control_url}; `blackwall phone forward` and open the app")
     telemetry, server = health["telemetry"], health["server"]
     described = device.describe()
     print(f"{described['device']} · {described['soc'] or '?'} · {described['os']} · mbenchd {described['app']} · "
@@ -438,7 +438,7 @@ def latest_run(db, run_id=None):
     if run_id:
         return store.get_run(db, run_id) or fail(f"no run {run_id}")
     runs = store.list_runs(db)
-    return runs[0] if runs else fail("no runs yet; start one with `mbench run <llama-swap model>`")
+    return runs[0] if runs else fail("no runs yet; start one with `blackwall run <llama-swap model>`")
 
 
 def schedule_line(run):
@@ -517,7 +517,7 @@ def progress_note(run, events, now, running):
 
 
 def run_lines(run):
-    """A run's lines for `mbench status` and `mbench wait`: where it is, and when it can tell, how long its task has
+    """A run's lines for `blackwall status` and `blackwall wait`: where it is, and when it can tell, how long its task has
     left and which tasks follow. A parked run shows when it continues instead of how long it has run."""
     now = time.time()
     events = read_events(run["id"])
@@ -607,10 +607,10 @@ def cmd_cancel(args):
     run = latest_run(db, args.run)
     subprocess.run(["systemctl", "--user", "stop", unit_name(run["id"])], capture_output=True)
     store.update_run(db, run["id"], status="cancelled", finished=time.time())
-    print(f"{run['id']}: cancelled. `mbench resume {run['id']}` picks it up where it stopped.")
+    print(f"{run['id']}: cancelled. `blackwall resume {run['id']}` picks it up where it stopped.")
     waiting = [other for other in store.list_runs(db) if other["status"] == "scheduled"]
     if waiting:
-        print(f"{len(waiting)} more scheduled; `mbench status` lists them and `mbench cancel <run>` removes one.")
+        print(f"{len(waiting)} more scheduled; `blackwall status` lists them and `blackwall cancel <run>` removes one.")
     else:
         schedule.remove_timer()
 
@@ -646,7 +646,7 @@ def cmd_rm(args):
         fail(f"no run or model called {', '.join(args.targets)}")
     live = [run for run in wanted if run["status"] in ("running", "scheduled")]
     if live and not args.force:
-        fail(f"{live[0]['id']} is {live[0]['status']}; `mbench cancel {live[0]['id']}` first, or pass --force")
+        fail(f"{live[0]['id']} is {live[0]['status']}; `blackwall cancel {live[0]['id']}` first, or pass --force")
     orphaned = depends_on(db, wanted)
     if orphaned and not args.force:
         fail(f"{orphaned[0]['id']} took its quality from one of these; pass --force to remove them anyway")
@@ -676,8 +676,8 @@ def cmd_resume(args):
     if run["status"] == "complete":
         fail(f"{run['id']} already finished")
     if suite.version_of(run["suite"]) != suite.VERSION:
-        fail(f"{run['id']} was measured under suite v{suite.version_of(run['suite'])} and this mbench runs v{suite.VERSION}; "
-             f"`mbench run {run['model']} --reuse {run['id']}` starts a v{suite.VERSION} run that keeps what still applies")
+        fail(f"{run['id']} was measured under suite v{suite.version_of(run['suite'])} and this blackwall runs v{suite.VERSION}; "
+             f"`blackwall run {run['model']} --reuse {run['id']}` starts a v{suite.VERSION} run that keeps what still applies")
     at, window = window_of(args)
     flags = {key: value for key, value in (run.get("flags") or {}).items() if key not in ("parked", "stall")}
     flags["yield"] = not args.keep_gpu
@@ -761,14 +761,14 @@ def cmd_ls(args):
         others = ", ".join(effort for effort in view["efforts"] if effort != args.effort)
         older = [name for name, other in data["suites"].items() if name != version and other["efforts"]]
         print(f"No finished {args.effort}-effort runs on suite v{version} yet."
-              + (f" There are {others}-effort runs: `mbench ls --effort <level>`." if others else "")
-              + (f" Older suites have runs: `mbench ls --suite {older[0]}`." if older else "")
-              + ("" if others or older else " Start one with `mbench run <llama-swap model>`."))
+              + (f" There are {others}-effort runs: `blackwall ls --effort <level>`." if others else "")
+              + (f" Older suites have runs: `blackwall ls --suite {older[0]}`." if older else "")
+              + ("" if others or older else " Start one with `blackwall run <llama-swap model>`."))
         return
     models = [model for model in view["rankings"][args.effort]
               if (model.get("deviceClass") or "gpu") == args.device]
     if not models:
-        fail(f"no {args.device} runs at {args.effort} effort; `mbench ls --device "
+        fail(f"no {args.device} runs at {args.effort} effort; `blackwall ls --device "
              f"{'gpu' if args.device == 'phone' else 'phone'}` has some")
     header, rows = ranking_table(view, args.effort, args.device)
     (print_markdown if args.markdown else print_columns)(header, rows)
@@ -921,24 +921,24 @@ def cmd_worker(args):
 
 ROOT_EPILOG = """\
 examples:
-  mbench run qwen3-32b                          full suite at medium effort (3–6 h, in the background)
-  mbench run qwen3-32b --effort max --submit
+  blackwall run qwen3-32b                          full suite at medium effort (3–6 h, in the background)
+  blackwall run qwen3-32b --effort max --submit
                                                 the model at its maximum effort, recorded and submitted
-  mbench run qwen3-32b --quick                  45–90 min, ranked as provisional
-  mbench run qwen3-32b gpt-oss-120b --at 03:00 --until 08:00
+  blackwall run qwen3-32b --quick                  45–90 min, ranked as provisional
+  blackwall run qwen3-32b gpt-oss-120b --at 03:00 --until 08:00
                                                 both models, one after the other, only at night
-  mbench status                                 what is running, how far along it is and how long it has left
-  mbench wait                                   block until the latest run finishes, however often it gives way
-  mbench ls --effort max                        ranked table for one effort level
-  mbench compare qwen3-32b gpt-oss-120b         which differences are real, task by task
-  mbench doctor qwen3-32b                       check a model's server before spending a night on it
-  mbench sources                                newer question sets, or pinned files that moved upstream
-  mbench board --open                           the leaderboard page
-  mbench export --out site                      the page plus board.json, ready to publish
+  blackwall status                                 what is running, how far along it is and how long it has left
+  blackwall wait                                   block until the latest run finishes, however often it gives way
+  blackwall ls --effort max                        ranked table for one effort level
+  blackwall compare qwen3-32b gpt-oss-120b         which differences are real, task by task
+  blackwall doctor qwen3-32b                       check a model's server before spending a night on it
+  blackwall sources                                newer question sets, or pinned files that moved upstream
+  blackwall board --open                           the leaderboard page
+  blackwall export --out site                      the page plus board.json, ready to publish
 
-A model is any llama-swap id (see `mbench profile <id>`). Only one run at a time; a run
+A model is any llama-swap id (see `blackwall profile <id>`). Only one run at a time; a run
 swaps its model into the GPU and unloads whatever llama-swap had loaded.
-Run `mbench run -h` for everything a run does and every option.
+Run `blackwall run -h` for everything a run does and every option.
 """
 
 RUN_DESCRIPTION = """\
@@ -949,7 +949,7 @@ A run: waits for the GPU to be idle, loads the model through llama-swap, measure
 to 250k-token prompts, board power), then quality at the chosen effort (SuperGPQA, AIME
 and HMMT 2026, agentic tool use, MRCR and Graphwalks long context, LiveCodeBench graded
 in a sandbox), and rebuilds the leaderboard. Answers are saved as they arrive, so
-`mbench resume` continues a stopped run. It stops itself and unloads the model if free
+`blackwall resume` continues a stopped run. It stops itself and unloads the model if free
 RAM drops under 4 GB.
 """
 
@@ -964,15 +964,15 @@ effort (--effort LEVEL, default medium):
   How hard the model reasons. max and min pick the top or bottom of the levels the model
   declares (efforts = [...] in models.toml, or Oh My Pi's thinking.efforts), so it is
   "xhigh" on a Qwen3.x template that declares it and "high" on gpt-oss. Named levels work;
-  `mbench profile <id>` lists them. Each effort gets its own ranking on the board and in
-  `mbench ls --effort`, so a max run sits next to the everyday medium one. Higher effort
+  `blackwall profile <id>` lists them. Each effort gets its own ranking on the board and in
+  `blackwall ls --effort`, so a max run sits next to the everyday medium one. Higher effort
   means more tokens per answer; a full max run of a verbose dense model can take 8 h+.
 
 scheduling (--at TIME [--until TIME]):
   --at 03:00 (or --at "2026-09-12 03:00") starts the runs then instead of now; several
   models run one after another. --until 08:00 makes it a daily window: whatever is still
   running at 08:00 stops, llama-swap unloads the model, and the run continues from its
-  last saved answer at 03:00 the next day. A user timer (mbench-tick.timer) checks every
+  last saved answer at 03:00 the next day. A user timer (blackwall-tick.timer) checks every
   five minutes and switches itself off when nothing is scheduled; it keeps working after
   a reboot if lingering is on (loginctl enable-linger). Without --at, several models
   queue behind each other, and a run started while another is going waits its turn.
@@ -982,10 +982,10 @@ scheduling (--at TIME [--until TIME]):
   that couldn't finish in time.
 
 every run:
-  starts with the checks `mbench doctor` runs (context per request, reasoning and
+  starts with the checks `blackwall doctor` runs (context per request, reasoning and
   tool-call parsing, a 16k-token prompt), sends as many requests at once as the server
   takes and as fit its shared context, and notifies the desktop, plus the `notify`
-  command in ~/.config/mbench/config.toml or MBENCH_NOTIFY, when it finishes or fails.
+  command in ~/.config/blackwall/config.toml or BLACKWALL_NOTIFY, when it finishes or fails.
 
 reuse (--reuse [RUN]):
   Copies the answers of an earlier run of the same model, config, effort and suite size
@@ -993,8 +993,8 @@ reuse (--reuse [RUN]):
   the rest. Without a run id it takes the newest run that qualifies.
 
 localmaxxing (--submit [all|speed|evals], needs hf_id and quantization in
-~/.config/mbench/models.toml):
-  speed  lmx measures the two canonical prompts, then mbench submits them through the
+~/.config/blackwall/models.toml):
+  speed  lmx measures the two canonical prompts, then blackwall submits them through the
          API with the prompt hash, output sample and timings, so they earn Verified
   evals  GSM8K and HellaSwag shards the site doesn't have yet for this model and
          quantization, answered at the run's effort
@@ -1006,24 +1006,24 @@ tasks (for --only/--skip): speed, supergpqa, math, tools, mrcr, graphwalks, lcb
   tool use.
 
 examples:
-  mbench run gpt-oss-120b                        full suite; Ctrl-C detaches, the run continues
-  mbench run gpt-oss-120b --effort max --submit  maximum effort, full suite, everything submitted
-  mbench run qwen3-32b --quick --effort max      a quick look at maximum effort
-  mbench run gpt-oss-120b --reuse                keep what still applies from the last run
-  mbench run qwen3-32b gpt-oss-120b --at 01:00 --until 07:30
+  blackwall run gpt-oss-120b                        full suite; Ctrl-C detaches, the run continues
+  blackwall run gpt-oss-120b --effort max --submit  maximum effort, full suite, everything submitted
+  blackwall run qwen3-32b --quick --effort max      a quick look at maximum effort
+  blackwall run gpt-oss-120b --reuse                keep what still applies from the last run
+  blackwall run qwen3-32b gpt-oss-120b --at 01:00 --until 07:30
                                                  both at night, paused by day until done
-  mbench run qwen3-32b --only speed --submit speed
+  blackwall run qwen3-32b --only speed --submit speed
                                                  speed only, submitted as verified runs
-  mbench run qwen3-32b --skip lcb --detach       everything except LiveCodeBench, return at once
-  mbench run qwen3-32b --submit evals            full suite plus GSM8K/HellaSwag shards
+  blackwall run qwen3-32b --skip lcb --detach       everything except LiveCodeBench, return at once
+  blackwall run qwen3-32b --submit evals            full suite plus GSM8K/HellaSwag shards
 """
 
 
 def parser():
     formatter = argparse.RawDescriptionHelpFormatter
-    root = argparse.ArgumentParser(prog="mbench", description="Benchmark llama-swap models and rank them on one leaderboard.",
+    root = argparse.ArgumentParser(prog="blackwall", description="Benchmark llama-swap models and rank them on one leaderboard.",
                                    epilog=ROOT_EPILOG, formatter_class=formatter)
-    root.add_argument("--version", action="version", version=f"mbench {__version__}")
+    root.add_argument("--version", action="version", version=f"blackwall {__version__}")
     commands = root.add_subparsers(dest="command", required=True, title="commands",
                                    metavar="{run,status,wait,logs,cancel,resume,ls,compare,doctor,sources,export,board,profile}")
 
@@ -1065,7 +1065,7 @@ def parser():
     logs.add_argument("run", nargs="?", help="run id; defaults to the latest")
     logs.add_argument("-f", "--follow", action="store_true", help="keep printing until the run ends")
     logs.set_defaults(handler=cmd_logs)
-    cancel = commands.add_parser("cancel", help="stop a run; `mbench resume` picks it up later")
+    cancel = commands.add_parser("cancel", help="stop a run; `blackwall resume` picks it up later")
     cancel.add_argument("run", nargs="?", help="run id; defaults to the latest")
     cancel.set_defaults(handler=cmd_cancel)
     resume = commands.add_parser("resume", help="continue a failed or cancelled run where it stopped")
@@ -1096,12 +1096,12 @@ def parser():
     doctor_parser.set_defaults(handler=cmd_doctor)
     commands.add_parser("sources", help="newer question sets, or pinned files changed upstream").set_defaults(handler=cmd_sources)
     export_parser = commands.add_parser("export", help="write the leaderboard page and its data to a folder you can publish")
-    export_parser.add_argument("--out", metavar="DIR", help="where to write index.html and board.json (default ~/.local/share/mbench/site)")
+    export_parser.add_argument("--out", metavar="DIR", help="where to write index.html and board.json (default ~/.local/share/blackwall/site)")
     export_parser.set_defaults(handler=cmd_export)
     board_parser = commands.add_parser("board", help="rebuild the leaderboard page and print its path")
     board_parser.add_argument("--open", action="store_true", help="also open it in the browser")
     board_parser.set_defaults(handler=cmd_board)
-    profile = commands.add_parser("profile", help="what mbench knows about a model and where each fact came from")
+    profile = commands.add_parser("profile", help="what blackwall knows about a model and where each fact came from")
     profile.add_argument("model", help="llama-swap model id or alias")
     profile.set_defaults(handler=cmd_profile)
     phone_parser = commands.add_parser("phone", help="the phone mbenchd runs on: forward its ports, push models, read its logs")

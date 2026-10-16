@@ -1,6 +1,6 @@
 import textwrap
 
-from mbench import paths, profiles
+from blackwall import paths, profiles
 
 
 def setup_files(tmp_path, monkeypatch, script_body="exec .venv/bin/sglang serve --model-path /models/big"):

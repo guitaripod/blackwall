@@ -1,6 +1,6 @@
 import pytest
 
-from mbench import datasets, suite
+from blackwall import datasets, suite
 
 REQUIRED = ("supergpqa", "aime2026", "hmmt2026", "lcb", "mrcr0", "mrcr1", "graphwalks", "tokenizer")
 needs_data = pytest.mark.skipif(not all(datasets.cached_path(name).exists() for name in REQUIRED),

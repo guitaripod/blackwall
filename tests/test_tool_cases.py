@@ -1,7 +1,7 @@
 import pytest
 
-from mbench import tool_cases
-from mbench.tool_cases import ALICE, BOB, DANA, ERROR_LINES
+from blackwall import tool_cases
+from blackwall.tool_cases import ALICE, BOB, DANA, ERROR_LINES
 
 AGENDA = tool_cases.WORLD["files"]["docs/agenda.md"]
 ORACLE = {

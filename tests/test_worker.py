@@ -1,4 +1,4 @@
-from mbench import paths, store, worker
+from blackwall import paths, store, worker
 
 
 def test_sessions_that_fail_without_gaining_an_answer_are_counted_in_a_row(monkeypatch, tmp_path):

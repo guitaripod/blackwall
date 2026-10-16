@@ -160,7 +160,7 @@ def changed(previous, hardware, found):
 
 
 def checkout_commit(root):
-    """The commit of the source checkout mbench runs from (an editable install), marked -dirty when its package files changed."""
+    """The commit of the source checkout blackwall runs from (an editable install), marked -dirty when its package files changed."""
     def git(*args):
         return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True).stdout.strip()
 
@@ -168,7 +168,7 @@ def checkout_commit(root):
         top = git("rev-parse", "--show-toplevel")
         if not top or Path(top).resolve() != root.resolve():
             return None
-        return git("rev-parse", "--short", "HEAD") + ("-dirty" if git("status", "--porcelain", "--", "mbench") else "")
+        return git("rev-parse", "--short", "HEAD") + ("-dirty" if git("status", "--porcelain", "--", "blackwall") else "")
     except FileNotFoundError:
         return None
 
@@ -176,14 +176,14 @@ def checkout_commit(root):
 def installed_commit():
     """The commit `uv tool install git+…` built from, which uv and pip record in the package's direct_url.json (PEP 610)."""
     try:
-        record = json.loads(metadata.distribution("mbench").read_text("direct_url.json") or "{}")
+        record = json.loads(metadata.distribution("blackwall").read_text("direct_url.json") or "{}")
     except metadata.PackageNotFoundError:
         return None
     return ((record.get("vcs_info") or {}).get("commit_id") or "")[:7] or None
 
 
 def harness():
-    """The mbench that is measuring: a run records it when it starts, not when it was queued, because the code can move
+    """The blackwall that is measuring: a run records it when it starts, not when it was queued, because the code can move
     between the two."""
     return f"{VERSION}+{checkout_commit(paths.PACKAGE.parent) or installed_commit() or 'nogit'}"
 

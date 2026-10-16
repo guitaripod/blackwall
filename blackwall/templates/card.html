@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>mbench comparison card</title>
+<title>blackwall comparison card</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..800&family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;1,400&display=swap">
@@ -243,7 +243,7 @@ function chosen() {
 }
 
 function chrome(models) {
-  text("mbench", 56, 62, { size: 24, weight: 700, family: "display" });
+  text("blackwall", 56, 62, { size: 24, weight: 700, family: "display" });
   const first = models[0] || {};
   const where = classOf(first) === "phone" ? ((first.stack || {}).device || "a phone")
     : (first.stack && first.stack.gpu ? first.stack.gpu.replace("NVIDIA ", "") : "one GPU");
@@ -253,7 +253,7 @@ function chrome(models) {
   const newest = Math.max(...models.map(model => (model.run || {}).finished || 0));
   const when = newest > 0 ? new Date(newest * 1000)
     .toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "";
-  text("guitaripod.github.io/mbench", 56, H - 28, { size: 13, family: "mono", color: "muted" });
+  text("guitaripod.github.io/blackwall", 56, H - 28, { size: 13, family: "mono", color: "muted" });
   return when;
 }
 
@@ -398,7 +398,7 @@ function draw() {
   if (list.length === 1) return drawOne(list[0]);
   if (list.length > 2) return drawMany(list);
   const left = list[0], right = list[1];
-  text("mbench", 56, 62, { size: 24, weight: 700, family: "display" });
+  text("blackwall", 56, 62, { size: 24, weight: 700, family: "display" });
   const stack = left.stack && left.stack.gpu ? left.stack.gpu.replace("NVIDIA ", "") : "one GPU";
   text(`suite ${DATA.suite || "full"} · ${state.effort} effort · ${stack}`, W - 56, 62,
     { size: 14, family: "mono", color: "muted", align: "right" });
@@ -409,7 +409,7 @@ function draw() {
   const end = rows(left, right);
   box(56, end + 14, W - 112, 1, "grid");
   strip(left, right, end + 26);
-  text("guitaripod.github.io/mbench   ·   grey bars: the two 95% intervals overlap", 56, H - 28,
+  text("guitaripod.github.io/blackwall   ·   grey bars: the two 95% intervals overlap", 56, H - 28,
     { size: 13, family: "mono", color: "muted" });
   const when = left.run.finished ? new Date(Math.max(left.run.finished, right.run.finished) * 1000)
     .toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "";
@@ -536,7 +536,7 @@ function writeHash() {
 const HINTS = {
   one: "One model, question by question, and what it cost the device that ran it.",
   two: "A difference smaller than the two 95% intervals allow is drawn in grey and marked \"tied\" — this run can't "
-    + "tell those two apart. <code>mbench compare</code> answers the same question question by question, which is a "
+    + "tell those two apart. <code>blackwall compare</code> answers the same question question by question, which is a "
     + "sharper test.",
   many: "The ranking at these settings, with what each model settles at beside it.",
 };
@@ -575,7 +575,7 @@ document.getElementById("download").addEventListener("click", () => {
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     const list = chosen();
-    link.download = "mbench-" + (list.length === 1 ? list[0].id
+    link.download = "blackwall-" + (list.length === 1 ? list[0].id
       : list.length === 2 ? `${list[0].id}-vs-${list[1].id}` : `${state.effort}-top${list.length}`) + ".png";
     link.click();
     setTimeout(() => URL.revokeObjectURL(link.href), 5000);

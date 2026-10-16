@@ -1,6 +1,6 @@
 import json
 
-from mbench import board, paths, store, suite
+from blackwall import board, paths, store, suite
 
 
 def run(model, suite_label, effort, stamp):

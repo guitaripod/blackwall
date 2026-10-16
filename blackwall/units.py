@@ -38,7 +38,7 @@ def busy(runs, klass=GPU_CLASS, speed=True):
 
 
 def unit_name(run_id):
-    return "mbench-" + re.sub(r"[^A-Za-z0-9_.-]", "_", run_id)
+    return "blackwall-" + re.sub(r"[^A-Za-z0-9_.-]", "_", run_id)
 
 
 def unit_active(run_id):
@@ -67,7 +67,7 @@ def spawn(run_id, foreground):
     subprocess.run(["systemctl", "--user", "reset-failed", unit_name(run_id)], capture_output=True)
     subprocess.run(
         ["systemd-run", "--user", "--collect", f"--unit={unit_name(run_id)}", "-p", "MemoryMax=8G",
-         f"--working-directory={paths.DATA}", sys.executable, "-m", "mbench.cli", "worker", run_id],
+         f"--working-directory={paths.DATA}", sys.executable, "-m", "blackwall.cli", "worker", run_id],
         check=True, capture_output=True,
     )
 

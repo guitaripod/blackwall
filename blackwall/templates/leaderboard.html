@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>mbench leaderboard</title>
-<meta property="og:title" content="mbench leaderboard">
+<title>blackwall leaderboard</title>
+<meta property="og:title" content="blackwall leaderboard">
 <meta property="og:description" content="Local models ranked on one GPU: quality index, speed and energy, measured the same way each time.">
 <meta property="og:image" content="card.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -206,12 +206,12 @@ footer { color: var(--muted); font-size: 0.8rem; }
   <div id="content"></div>
   <section class="howto" aria-labelledby="howto-title">
     <h2 id="howto-title">Benchmark another model</h2>
-    <pre>mbench run &lt;llama-swap id&gt;          full suite, 2–5 hours, runs in the background
-mbench run &lt;id&gt; --quick             45–90 minutes, ranked as provisional
-mbench run &lt;id&gt; --reuse             keep what still applies from the last run
-mbench run &lt;id&gt; --submit            also submit to localmaxxing
-mbench compare &lt;id&gt; &lt;id&gt;           which differences are real, task by task
-mbench status · mbench logs -f · mbench ls · mbench board --open</pre>
+    <pre>blackwall run &lt;llama-swap id&gt;          full suite, 2–5 hours, runs in the background
+blackwall run &lt;id&gt; --quick             45–90 minutes, ranked as provisional
+blackwall run &lt;id&gt; --reuse             keep what still applies from the last run
+blackwall run &lt;id&gt; --submit            also submit to localmaxxing
+blackwall compare &lt;id&gt; &lt;id&gt;           which differences are real, task by task
+blackwall status · blackwall logs -f · blackwall ls · blackwall board --open</pre>
   </section>
   <footer id="footer"></footer>
 </main>
@@ -1069,7 +1069,7 @@ function renderSuiteTabs(host) {
   }))));
   if (state.suite !== CURRENT) {
     host.appendChild(h("p", { className: "lede", text: `Suite v${state.suite} measured different tasks, so its scores are not ranked against suite v${CURRENT}. `
-      + `\`mbench run <id> --reuse\` measures a model on v${CURRENT} and keeps what still applies.` }));
+      + `\`blackwall run <id> --reuse\` measures a model on v${CURRENT} and keeps what still applies.` }));
   }
 }
 
@@ -1083,7 +1083,7 @@ function render() {
     host.appendChild(h("div", { className: "panel empty" }, [
       h("h2", { text: "No finished runs yet" }),
       h("p", { text: "Pick a model from llama-swap and run the suite; this page rebuilds itself when the run ends." }),
-      h("pre", { text: "mbench run <llama-swap id>" }),
+      h("pre", { text: "blackwall run <llama-swap id>" }),
     ]));
     return;
   }
@@ -1093,7 +1093,7 @@ function render() {
     host.appendChild(h("div", { className: "panel empty" }, [
       h("h2", { text: `No model has run suite v${state.suite} yet` }),
       h("p", { text: "Earlier results are under the other suite tab. A new run can carry over the answers whose questions did not change." }),
-      h("pre", { text: "mbench run <llama-swap id> --reuse" }),
+      h("pre", { text: "blackwall run <llama-swap id> --reuse" }),
     ]));
     return;
   }
@@ -1156,7 +1156,7 @@ function renderMeta() {
     "built " + new Date(DATA.generated * 1000).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })]
     .filter(Boolean).join(" · ");
 }
-document.getElementById("footer").textContent = `Data: ${DATA.database}. Rebuilt after every run, or with mbench board.`;
+document.getElementById("footer").textContent = `Data: ${DATA.database}. Rebuilt after every run, or with blackwall board.`;
 render();
 </script>
 </body>

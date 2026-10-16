@@ -1,12 +1,12 @@
 # mbenchd
 
-The iOS side of an mbench phone run: llama.cpp's own `llama-server`, built for arm64 iOS and run inside an app, plus a small control server that reports what a phone has instead of a driver — thermal state, the memory the process holds, and the battery.
+The iOS side of an blackwall phone run: llama.cpp's own `llama-server`, built for arm64 iOS and run inside an app, plus a small control server that reports what a phone has instead of a driver — thermal state, the memory the process holds, and the battery.
 
 The app serves two ports on the device:
 
 | Port | What answers | What it is for |
 |---|---|---|
-| 8080 | `llama-server` itself, unproxied | `/v1/chat/completions`, `/props`, `/slots`, `/metrics` — mbench measures straight against it, so no timing passes through code of ours |
+| 8080 | `llama-server` itself, unproxied | `/v1/chat/completions`, `/props`, `/slots`, `/metrics` — blackwall measures straight against it, so no timing passes through code of ours |
 | 8081 | mbenchd | `/mb/health`, `/mb/models`, `/mb/load`, `/mb/unload`, and llama-swap's `/running` and `/unload` |
 
 ## Building from Linux
@@ -16,10 +16,10 @@ No Mac and no Xcode. Metal is the usual obstacle — `xcrun metal` only exists o
 ```
 ./scripts/build-llama.sh     # cross-compiles llama.cpp into Vendor/lib (about four minutes)
 xtool dev                    # builds, signs and installs the app
-mbench phone launch          # starts it on the device
+blackwall phone launch          # starts it on the device
 ```
 
-`xtool launch` cannot start the app on iOS 17 and later: it goes through a debugserver it has no tunnel to, so it resolves the bundle and stops there, leaving an app that was never run. `mbench phone launch` uses DVT process control instead, which pymobiledevice3 reaches over a userspace tunnel without root.
+`xtool launch` cannot start the app on iOS 17 and later: it goes through a debugserver it has no tunnel to, so it resolves the bundle and stops there, leaving an app that was never run. `blackwall phone launch` uses DVT process control instead, which pymobiledevice3 reaches over a userspace tunnel without root.
 
 `build-llama.sh` reads `LLAMA_DIR` (default `~/llama.cpp`) and builds the `llama-server-impl` target: the server, its context, mtmd, common and ggml, all static. `Package.swift` links every archive it finds in `Vendor/lib`, so the app is exactly the llama.cpp the checkout was on — recorded in `Vendor/llama-commit.txt` and reported by `/mb/health`, which is what a run's stack fingerprint uses.
 
@@ -31,4 +31,4 @@ The app holds about 3.4 GB before iOS kills it. `com.apple.developer.kernel.incr
 
 The app must be in the foreground with the screen on — iOS suspends a backgrounded app and its listening sockets go with it. Guided Access holds it there. Keep the phone plugged in and charged to full before starting, and record it: charging heat moves the steady-state number as much as the model does.
 
-Models live in `Documents/models/*.gguf`; `mbench phone push <file>` puts them there over USB. Logs are `Library/Logs/mbenchd.log` (the app) and `Documents/logs/llama-server.log` (the server); `mbench phone logs` pulls both.
+Models live in `Documents/models/*.gguf`; `blackwall phone push <file>` puts them there over USB. Logs are `Library/Logs/mbenchd.log` (the app) and `Documents/logs/llama-server.log` (the server); `blackwall phone logs` pulls both.

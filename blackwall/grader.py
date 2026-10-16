@@ -3,7 +3,7 @@ import subprocess
 
 from . import datasets, metrics, paths
 
-IMAGE = "mbench-lcb-grader"
+IMAGE = "blackwall-lcb-grader"
 LCB_REPO = "https://github.com/LiveCodeBench/LiveCodeBench.git"
 LCB_COMMIT = "28fef95ea8c9f7a547c8329f2cd3d32b92c1fa24"
 GRADER_DIR = paths.PACKAGE / "grader"

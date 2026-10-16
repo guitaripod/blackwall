@@ -3,17 +3,17 @@ from types import SimpleNamespace
 
 import pytest
 
-from mbench import cli, paths, store, suite
-from mbench.profiles import Profile
+from blackwall import cli, paths, store, suite
+from blackwall.profiles import Profile
 
 
 def test_a_missing_llama_swap_config_is_a_clear_error(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(paths, "LLAMA_SWAP_CONFIG", tmp_path / "config.yaml")
-    monkeypatch.setattr("sys.argv", ["mbench", "profile", "some-model"])
+    monkeypatch.setattr("sys.argv", ["blackwall", "profile", "some-model"])
     with pytest.raises(SystemExit) as exit_info:
         cli.main()
     assert exit_info.value.code == 1
-    assert "MBENCH_SWAP_CONFIG" in capsys.readouterr().err
+    assert "BLACKWALL_SWAP_CONFIG" in capsys.readouterr().err
 
 
 OLDER = {"0": {"task_versions": {"speed": 1, "lcb": 1, "tools": 0}}}

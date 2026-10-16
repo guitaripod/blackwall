@@ -1,7 +1,7 @@
 import json
 import subprocess
 
-from mbench import board, gpu, stack
+from blackwall import board, gpu, stack
 
 
 def venv(tmp_path, package, version, editable=None):
@@ -98,7 +98,7 @@ def test_the_board_groups_models_by_the_setup_that_measured_them():
 def test_a_git_install_records_the_commit_it_was_built_from(monkeypatch):
     class Distribution:
         def read_text(self, name):
-            return json.dumps({"url": "https://github.com/guitaripod/mbench",
+            return json.dumps({"url": "https://github.com/guitaripod/blackwall",
                                "vcs_info": {"vcs": "git", "commit_id": "5fbf2e1c0ffee0ddba11"}})
 
     monkeypatch.setattr(stack.metadata, "distribution", lambda name: Distribution())

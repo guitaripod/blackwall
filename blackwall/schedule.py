@@ -7,7 +7,7 @@ from pathlib import Path
 
 from . import gpu, notify, paths, store, swap, units
 
-TIMER = "mbench-tick"
+TIMER = "blackwall-tick"
 UNIT_DIR = Path(os.environ.get("XDG_CONFIG_HOME", paths.HOME / ".config")) / "systemd" / "user"
 PASSED_ENV = ("XDG_CACHE_HOME", "XDG_CONFIG_HOME")
 
@@ -72,13 +72,13 @@ def describe(timestamp):
 
 
 def unit_files():
-    environment = {key: value for key, value in os.environ.items() if key.startswith("MBENCH_") or key in PASSED_ENV}
+    environment = {key: value for key, value in os.environ.items() if key.startswith("BLACKWALL_") or key in PASSED_ENV}
     service = (
-        "[Unit]\nDescription=Start due mbench runs and pause runs outside their window\n\n[Service]\nType=oneshot\n"
+        "[Unit]\nDescription=Start due blackwall runs and pause runs outside their window\n\n[Service]\nType=oneshot\n"
         + "".join(f'Environment="{key}={value}"\n' for key, value in sorted(environment.items()))
-        + f"WorkingDirectory={paths.DATA}\nExecStart={sys.executable} -m mbench.cli tick\n"
+        + f"WorkingDirectory={paths.DATA}\nExecStart={sys.executable} -m blackwall.cli tick\n"
     )
-    timer = ("[Unit]\nDescription=Check the mbench schedule every five minutes\n\n[Timer]\nOnCalendar=*:0/5\n"
+    timer = ("[Unit]\nDescription=Check the blackwall schedule every five minutes\n\n[Timer]\nOnCalendar=*:0/5\n"
              "AccuracySec=1s\n\n[Install]\nWantedBy=timers.target\n")
     return {f"{TIMER}.service": service, f"{TIMER}.timer": timer}
 
@@ -131,7 +131,7 @@ def pause(db, run, moment):
     swap.unload()
     resumes = next_start(moment, window["start"]).timestamp()
     if park(db, run["id"], resumes, f"the window closed at {window['end']}", "paused") == 1:
-        notify.send("mbench paused", f"{run['model']}: the window closed at {window['end']}; continues {describe(resumes)}",
+        notify.send("blackwall paused", f"{run['model']}: the window closed at {window['end']}; continues {describe(resumes)}",
                     run=run["id"], status="paused")
 
 

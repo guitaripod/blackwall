@@ -5,9 +5,9 @@ import time
 
 import pytest
 
-from mbench import engine
-from mbench.engine import Gate, QualityRunner
-from mbench.profiles import Profile
+from blackwall import engine
+from blackwall.engine import Gate, QualityRunner
+from blackwall.profiles import Profile
 
 
 def profile(thinking="qwen", efforts=("low", "medium", "xhigh")):

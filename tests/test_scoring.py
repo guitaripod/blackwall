@@ -1,4 +1,4 @@
-from mbench import scoring
+from blackwall import scoring
 
 
 def test_choice_final_answer_formats():

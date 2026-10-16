@@ -14,7 +14,7 @@ def settings():
 
 
 def hook():
-    return os.environ.get("MBENCH_NOTIFY") or settings().get("notify")
+    return os.environ.get("BLACKWALL_NOTIFY") or settings().get("notify")
 
 
 def quietly(command, **kwargs):
@@ -25,12 +25,12 @@ def quietly(command, **kwargs):
 
 
 def send(title, message, **fields):
-    """A desktop notification, plus the `notify` command from config.toml or MBENCH_NOTIFY (one that pushes to a phone,
-    say), which reads the text from MBENCH_TITLE and MBENCH_MESSAGE. A failing notifier never fails a run."""
+    """A desktop notification, plus the `notify` command from config.toml or BLACKWALL_NOTIFY (one that pushes to a phone,
+    say), which reads the text from BLACKWALL_TITLE and BLACKWALL_MESSAGE. A failing notifier never fails a run."""
     if shutil.which("notify-send"):
-        quietly(["notify-send", "-a", "mbench", title, message])
+        quietly(["notify-send", "-a", "blackwall", title, message])
     command = hook()
     if command:
-        environment = {**os.environ, "MBENCH_TITLE": title, "MBENCH_MESSAGE": message,
-                       **{f"MBENCH_{key.upper()}": str(value) for key, value in fields.items()}}
+        environment = {**os.environ, "BLACKWALL_TITLE": title, "BLACKWALL_MESSAGE": message,
+                       **{f"BLACKWALL_{key.upper()}": str(value) for key, value in fields.items()}}
         quietly(command, shell=True, env=environment)

@@ -4,7 +4,7 @@ cd "$(dirname "$0")/.."
 page="${1:-}"
 if [[ -z "$page" ]]; then
   page="site/index.html"
-  [[ -f "$page" ]] || page="${MBENCH_HOME:-$HOME/.local/share/mbench}/leaderboard.html"
+  [[ -f "$page" ]] || page="${BLACKWALL_HOME:-$HOME/.local/share/blackwall}/leaderboard.html"
 fi
 [[ -f "$page" ]] || { echo "screenshots.sh: no leaderboard at $page" >&2; exit 1; }
 browser=$(command -v chromium || command -v google-chrome-stable || command -v google-chrome \

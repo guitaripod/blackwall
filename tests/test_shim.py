@@ -3,7 +3,7 @@ import threading
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from mbench import shim
+from blackwall import shim
 
 
 class Upstream(BaseHTTPRequestHandler):

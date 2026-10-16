@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 
-from mbench import gpu, swap
+from blackwall import gpu, swap
 
 PMON = """# gpu         pid   type     sm    mem    enc    dec    jpg    ofa     fb   ccpm    command
 # Idx           #    C/G      %      %      %      %      %      %     MB     MB    name

@@ -77,7 +77,7 @@ def evidence(run):
         "promptSample": prompt[:2000],
         "outputSha256": sha256(output),
         "outputSample": output if len(output) <= 4000 else output[:2996] + "\n…\n" + output[-1000:],
-        "engineTimingsRaw": {"source": f"mbench {__version__}: OpenAI-compatible usage and client stream timings per timed iteration",
+        "engineTimingsRaw": {"source": f"blackwall {__version__}: OpenAI-compatible usage and client stream timings per timed iteration",
                              "samples": run.get("samples", [])},
     }
 
@@ -94,7 +94,7 @@ def api(path, body):
     """Posts to the localmaxxing API with the key lmx saved, bypassing the lmx client, which drops the verification evidence."""
     key = json.loads(LMX_CONFIG.read_text())["apiKey"]
     request = urllib.request.Request(API + path, data=json.dumps(body).encode(), headers={
-        "Content-Type": "application/json", "Authorization": f"Bearer {key}", "User-Agent": f"mbench/{__version__}"})
+        "Content-Type": "application/json", "Authorization": f"Bearer {key}", "User-Agent": f"blackwall/{__version__}"})
     try:
         with urllib.request.urlopen(request, timeout=60) as response:
             status, raw = response.status, response.read()
@@ -115,7 +115,7 @@ def created(response):
 
 
 def speed_runs(profile, run_dir, run_id, log):
-    """lmx measures the two canonical prompts; mbench submits them itself, with evidence, so they can earn the Verified badge."""
+    """lmx measures the two canonical prompts; blackwall submits them itself, with evidence, so they can earn the Verified badge."""
     engine = LMX_ENGINES.get(profile.engine)
     if not engine:
         log(f"localmaxxing: no speed-test engine for {profile.engine}, skipped")
@@ -157,7 +157,7 @@ def speed_runs(profile, run_dir, run_id, log):
                 run["peakVramGb"] = round(window["vram_mib"] / 1024, 1)
             if window.get("power_w"):
                 run["gpuPowerWatts"] = [window["power_w"]]
-            run["notes"] = (f"mbench {__version__}, run {run_id}: canonical prompt, single request, greedy, "
+            run["notes"] = (f"blackwall {__version__}, run {run_id}: canonical prompt, single request, greedy, "
                             "the server's default reasoning effort.")
             body = payload(run, profile)
             out.write_text(json.dumps({**run, "apiPayload": body}, indent=2))

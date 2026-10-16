@@ -7,9 +7,9 @@ import httpx
 import openai
 import pytest
 
-from mbench import engine, tool_cases
-from mbench.engine import QualityRunner, reasoning_of, request_kwargs, resolve_effort
-from mbench.profiles import Profile
+from blackwall import engine, tool_cases
+from blackwall.engine import QualityRunner, reasoning_of, request_kwargs, resolve_effort
+from blackwall.profiles import Profile
 
 
 def profile(thinking="qwen", engine_name="sglang", efforts=("low", "medium", "xhigh")):

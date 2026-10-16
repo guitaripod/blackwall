@@ -2,8 +2,8 @@ import asyncio
 import json
 from types import SimpleNamespace
 
-from mbench import doctor
-from mbench.profiles import Profile
+from blackwall import doctor
+from blackwall.profiles import Profile
 
 PROFILE = Profile(id="m", name="m", engine="sglang", thinking="qwen", context=None, efforts=["medium"])
 ROOMY = {"slots": 4, "context": 262144, "pool": 262144}

@@ -1,8 +1,8 @@
 import hashlib
 
-from mbench import lmx
-from mbench.engine import injection
-from mbench.profiles import Profile
+from blackwall import lmx
+from blackwall.engine import injection
+from blackwall.profiles import Profile
 
 
 def profile(**fields):

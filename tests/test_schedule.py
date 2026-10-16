@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from mbench import paths, schedule, store, units
+from blackwall import paths, schedule, store, units
 
 NIGHT = {"start": "03:00", "end": "09:00"}
 LATE = {"start": "23:00", "end": "07:00"}
@@ -92,8 +92,8 @@ def test_a_run_without_an_end_catches_up_whenever_it_is_due(world):
 
 def test_the_timer_unit_runs_this_interpreter():
     files = schedule.unit_files()
-    assert "-m mbench.cli tick" in files["mbench-tick.service"]
-    assert "OnCalendar=*:0/5" in files["mbench-tick.timer"]
+    assert "-m blackwall.cli tick" in files["blackwall-tick.service"]
+    assert "OnCalendar=*:0/5" in files["blackwall-tick.timer"]
 
 
 def test_the_deadline_is_the_end_of_the_open_window():

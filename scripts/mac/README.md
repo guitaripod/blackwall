@@ -1,6 +1,6 @@
 # Serving MLX models for a remote run
 
-`mbench` measures a model wherever an OpenAI-compatible server answers for it. A Mac serving MLX weights is the only
+`blackwall` measures a model wherever an OpenAI-compatible server answers for it. A Mac serving MLX weights is the only
 way to score the quality of a phone row that runs MLX, because the same weights cannot run on the card.
 
     scp serve.py pool.py mac:~/Dev/mlx-serve/
@@ -12,7 +12,7 @@ way to score the quality of a phone row that runs MLX, because the same weights 
 of those and hands each request to a free one, reporting `/props` so a run reads the right number of slots. macOS
 blocks inbound connections to a Python process, so the port comes over an SSH tunnel rather than over the network.
 
-Then, in `~/.config/mbench/models.toml`:
+Then, in `~/.config/blackwall/models.toml`:
 
     ["<id>-mac"]
     engine_kind = "mlx"
