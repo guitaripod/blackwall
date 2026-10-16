@@ -2,7 +2,9 @@
 
 All notable changes to Blackwall are listed here, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the versions follow [Semantic Versioning](https://semver.org/). The published `board.json` carries its own `schema` number, described in [docs/data.md](docs/data.md).
 
-## [Unreleased]
+## [2.0.1] - 2026-10-17
+
+A cleanup release. What is measured, the scores and the `board.json` schema are unchanged.
 
 ### Changed
 - **Leaner page and card.** The leaderboard page and the share card lose their phone-only code (class tabs, verdicts, thermal and battery columns), which the published board could no longer reach. What they render is unchanged, and share links no longer carry a stray `class=null`.
