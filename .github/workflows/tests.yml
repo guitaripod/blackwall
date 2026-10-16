@@ -12,3 +12,24 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
       - run: uv run --locked --group dev pytest -q
+
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv build
+      - name: A clean environment installs the wheel and exports an empty board
+        run: |
+          uv venv /tmp/clean
+          uv pip install --python /tmp/clean/bin/python dist/*.whl
+          export BLACKWALL_HOME="$(mktemp -d)" XDG_CONFIG_HOME="$(mktemp -d)"
+          /tmp/clean/bin/blackwall --version
+          /tmp/clean/bin/blackwall export --out /tmp/site --site-url https://example.test/
+          /tmp/clean/bin/python - <<'PYTHON'
+          import json, pathlib, xml.etree.ElementTree as ET
+          site = pathlib.Path("/tmp/site")
+          assert json.loads((site / "board.json").read_text())["schema"] == 1
+          assert "/*__DATA__*/null" not in (site / "index.html").read_text()
+          assert ET.parse(site / "feed.xml").getroot().tag.endswith("feed")
+          PYTHON

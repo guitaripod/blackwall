@@ -83,6 +83,7 @@ code, pre, .mono { font-family: var(--mono); }
 .hero-copy { display: grid; gap: 0.8rem; }
 .tagline { font-family: var(--display); font-stretch: 112%; font-weight: 700; font-size: clamp(1.15rem, 0.9rem + 1vw, 1.6rem); line-height: 1.2; max-width: 30ch; }
 .lede { color: var(--ink-2); }
+.readout:empty { display: none; }
 .readout { margin: 0; padding: 0.9rem 1.1rem; display: grid; gap: 0.1rem; font-size: 0.86rem; }
 .readout div { display: flex; justify-content: space-between; gap: 1.5rem; padding: 0.22rem 0; border-bottom: 1px solid var(--grid); }
 .readout div:last-child { border-bottom: 0; }
@@ -108,6 +109,16 @@ code, pre, .mono { font-family: var(--mono); }
 .wall-item b { font-weight: 600; }
 .wall-item span { color: var(--ink-2); font-size: 0.82rem; }
 .frontier-head span { color: var(--muted); font-size: 0.84rem; max-width: 72ch; }
+.chip.best { background: var(--series); border-color: var(--series); color: #000; font-weight: 600; }
+.chip.up { border-color: var(--series); color: var(--series-hi); }
+.chip.down { border-color: var(--bad); color: var(--bad); }
+.result-line { display: flex; flex-wrap: wrap; gap: 0.15rem 0.5rem; align-items: baseline; }
+.follow:not([hidden]) { display: grid; gap: 0.6rem; }
+.follow-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 0.9rem 1.6rem; }
+.follow-grid a { display: grid; gap: 0.15rem; padding: 0.6rem 0 0.7rem; border-top: 2px solid var(--axis); text-decoration: none; }
+.follow-grid a:hover { border-top-color: var(--series); }
+.follow-grid b { font-weight: 600; text-decoration: underline; text-underline-offset: 0.2em; }
+.follow-grid span { color: var(--ink-2); font-size: 0.85rem; }
 .chip.verdict { border-color: transparent; font-weight: 600; }
 .chip.verdict.holds { background: var(--ok-wash); color: var(--ok); }
 .chip.verdict.fades { background: var(--warn-wash); color: var(--warn); }
@@ -241,6 +252,10 @@ footer p { max-width: 90ch; }
     </div>
   </header>
   <div id="content"></div>
+  <section class="follow" id="follow" aria-labelledby="follow-title" hidden>
+    <h2 id="follow-title">Follow the board</h2>
+    <div class="follow-grid" id="follow-links"></div>
+  </section>
   <section class="howto" aria-labelledby="howto-title">
     <h2 id="howto-title">Benchmark another model</h2>
     <pre>blackwall run &lt;llama-swap id&gt;    full suite, 2–5 hours, runs in the background
@@ -262,7 +277,17 @@ const NS = "http://www.w3.org/2000/svg";
 const SUITES = DATA.suites || { [DATA.current || "1"]: { indexTasks: DATA.indexTasks, taskLabels: DATA.taskLabels, taskNotes: {}, groups: null, efforts: DATA.efforts, rankings: DATA.rankings } };
 const CURRENT = DATA.current || Object.keys(SUITES)[0];
 const WITH_RUNS = Object.keys(SUITES).filter(name => SUITES[name].efforts.length).sort((a, b) => Number(b) - Number(a));
-const WANTED_CLASS = (location.hash.match(/(?:^|[#&])(gpu|phone)\b/) || [])[1] || null;
+const WANTED_CLASS = (location.hash.match(/^#(gpu|phone)$/) || [])[1] || null;
+const WANTED = (() => {
+  const raw = location.hash.slice(1), cut = raw.lastIndexOf("~");
+  try {
+    return { whole: decodeURIComponent(raw), model: decodeURIComponent(cut > 0 ? raw.slice(0, cut) : raw),
+             effort: cut > 0 ? decodeURIComponent(raw.slice(cut + 1)) : null };
+  } catch (error) {
+    return { whole: "", model: "", effort: null };
+  }
+})();
+const REPO = "https://github.com/guitaripod/blackwall";
 const state = { sortKey: "index", sortDir: "desc", columns: "scores", selected: null, effort: null, deviceClass: WANTED_CLASS, suite: SUITES[CURRENT].efforts.length ? CURRENT : (WITH_RUNS[0] || CURRENT) };
 const CLASS_LABELS = { gpu: "GPU", phone: "Phone" };
 const THERMAL_NAMES = ["nominal", "fair", "serious", "critical"];
@@ -828,6 +853,145 @@ function wallList(frontier) {
   ]);
 }
 
+function historyFor() {
+  return (DATA.history || []).filter(item => item.version === state.suite && item.effort === state.effort && item.index != null)
+    .sort((one, two) => one.finished - two.finished);
+}
+
+function jump(item) {
+  state.suite = item.version;
+  state.effort = item.effort;
+  select(item.model);
+}
+
+function historyRows(item) {
+  const half = item.lo != null && item.hi != null ? (item.hi - item.lo) / 2 : null;
+  const line = (value, text) => h("div", { className: "row" }, [h("b", { text: value }), " " + text]);
+  return [h("div", {}, [h("b", { text: shortName(item) })]),
+    line(fmt.pct(item.index) + "%" + (half != null ? ` ±${half.toFixed(1)}` : ""), "quality index"),
+    item.decode ? line(fmt.int(item.decode), "tok/s, one request") : null,
+    h("div", { text: fmt.date(item.finished) + (item.record ? " · new best" : item.debut ? " · debut" : "") })].filter(Boolean);
+}
+
+function resultChips(item) {
+  const chips = [];
+  if (item.record) chips.push(h("span", { className: "chip best", text: "new best" }));
+  else if (item.debut) chips.push(h("span", { className: "chip", text: "debut" }));
+  if (item.delta) chips.push(h("span", { className: "chip " + (item.delta > 0 ? "up" : "down"),
+    text: (item.delta > 0 ? "+" : "−") + Math.abs(item.delta).toFixed(1), title: "Against this model's previous run at the same effort" }));
+  if (item.kind === "quick") chips.push(h("span", { className: "chip", text: "quick", title: "A smaller sample, ranked as provisional" }));
+  return chips;
+}
+
+function resultsList(limit) {
+  /* What a reader following the board wants first: the latest results, newest on top, and what each one changed. */
+  const recent = (DATA.history || []).filter(item => item.version === state.suite)
+    .sort((one, two) => two.finished - one.finished).slice(0, limit);
+  return h("aside", { className: "wall-list", "aria-label": "Recent results" }, [
+    h("h3", { text: "Recent results" }),
+    h("ol", {}, recent.map(item => h("li", {}, [h("button", { type: "button", className: "wall-item", onclick: () => jump(item) }, [
+      h("span", { className: "result-line" }, [h("b", { text: shortName(item) }), ...resultChips(item)]),
+      h("span", { className: "mono", text: [fmt.date(item.finished), item.effort === "none" ? "no thinking" : item.effort + " effort",
+        item.index != null ? fmt.pct(item.index) + " quality" : "no index",
+        item.decode ? fmt.int(item.decode) + " tok/s" : null].filter(Boolean).join(" · ") }),
+    ])]))),
+  ]);
+}
+
+function dateTicks(start, end, count, spanDays) {
+  return Array.from({ length: count + 1 }, (_, index) => {
+    const at = start + (end - start) * index / count;
+    const when = spanDays > 300 ? { month: "short", year: "numeric" } : spanDays < 2 ? { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" } : { day: "numeric", month: "short" };
+    const label = new Date(at * 1000).toLocaleString("en-GB", when);
+    return { at, label };
+  });
+}
+
+function renderOverTime(host) {
+  const points = historyFor();
+  if (points.length < 2) return;
+  const figure = h("figure", { className: "panel frontier" });
+  figure.style.margin = "0";
+  figure.appendChild(h("div", { className: "frontier-head" }, [
+    h("h2", { text: "The wall over time" }),
+    h("span", { text: "Each point is a finished run. The green line is the best quality index so far: it steps up whenever a model beats everything before it." }),
+  ]));
+  const width = Math.max(280, Math.min(760, (host.clientWidth || 760) - 40)), roomy = width >= 520;
+  const height = 300, left = roomy ? 62 : 56, right = roomy ? 24 : 16, top = 16, bottom = 40;
+  const end = Math.max(DATA.generated || 0, points[points.length - 1].finished);
+  const span = Math.max(end - points[0].finished, 86400);
+  const start = points[0].finished - span * 0.04;
+  const values = points.map(point => point.index);
+  const minY = Math.max(0, Math.floor((Math.min(...values) - 4) / 5) * 5);
+  const maxY = Math.min(100, Math.ceil((Math.max(...values) + 3) / 5) * 5);
+  const x = at => left + (width - left - right) * (at - start) / (end - start);
+  const y = value => top + (height - top - bottom) * (maxY - value) / (maxY - minY);
+  const svgNode = s("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "Best quality index against the date each run finished" });
+  const stepY = (maxY - minY) > 30 ? 10 : 5;
+  for (let t = minY; t <= maxY; t += stepY) {
+    s("line", { x1: left, x2: width - right, y1: y(t), y2: y(t), class: "grid" }, svgNode);
+    s("text", { x: left - 10, y: y(t) + 4, "text-anchor": "end", class: "tick" }, svgNode, t + "%");
+  }
+  for (const tick of dateTicks(start, end, roomy ? 5 : 3, span / 86400)) {
+    s("line", { x1: x(tick.at), x2: x(tick.at), y1: height - bottom, y2: height - bottom + 4, class: "axis" }, svgNode);
+    s("text", { x: x(tick.at), y: height - bottom + 17, "text-anchor": "middle", class: "tick" }, svgNode, tick.label);
+  }
+  s("line", { x1: left, x2: width - right, y1: height - bottom, y2: height - bottom, class: "axis" }, svgNode);
+  const titleX = roomy ? 14 : 9;
+  s("text", { x: titleX, y: (top + height - bottom) / 2, "text-anchor": "middle", class: "axis-title",
+    transform: `rotate(-90 ${titleX} ${(top + height - bottom) / 2})` }, svgNode, "Quality index");
+  const records = points.filter(point => point.record);
+  let path = "", level = null;
+  records.forEach((point, index) => {
+    const at = x(point.finished).toFixed(1), row = y(point.index).toFixed(1);
+    path += index ? `L${at},${level}L${at},${row}` : `M${at},${row}`;
+    level = row;
+  });
+  if (records.length) s("path", { d: path + `L${x(end).toFixed(1)},${level}`, class: "frontier-line" }, svgNode);
+  const placed = [];
+  const labelY = (px, py) => {
+    let candidate = py - 10;
+    for (let guard = 0; guard < 8; guard++) {
+      if (!placed.some(seen => Math.abs(seen.y - candidate) < 14 && Math.abs(seen.x - px) < 130)) break;
+      candidate -= 14;
+    }
+    placed.push({ x: px, y: candidate });
+    return candidate;
+  };
+  for (const point of [...points].sort((one, two) => Number(one.record) - Number(two.record))) {
+    const px = x(point.finished), py = y(point.index);
+    s("circle", { cx: px, cy: py, r: point.record ? 5.5 : 4, class: "pt" + (point.record ? " selected" : "") }, svgNode);
+    if (point.record && (roomy || point === records[records.length - 1])) {
+      const flip = px > width * 0.6;
+      s("text", { x: flip ? px - 9 : px + 9, y: labelY(px, py), "text-anchor": flip ? "end" : "start", class: "pt-label selected" }, svgNode, shortName(point));
+    }
+    const hit = s("circle", { cx: px, cy: py, r: 14, class: "hit", tabindex: "0", role: "button",
+      "aria-label": `${shortName(point)}: quality ${fmt.pct(point.index)}%, ${fmt.date(point.finished)}` }, svgNode);
+    hit.addEventListener("pointermove", event => showTooltip(event, historyRows(point)));
+    hit.addEventListener("focus", event => showTooltip(event, historyRows(point)));
+    hit.addEventListener("blur", hideTooltip);
+    hit.addEventListener("pointerleave", hideTooltip);
+    hit.addEventListener("click", () => jump(point));
+    hit.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); jump(point); } });
+  }
+  figure.appendChild(h("div", { className: "frontier-body" }, [svgNode, resultsList(6)]));
+  host.appendChild(figure);
+}
+
+function renderFollow() {
+  const published = DATA.published;
+  if (!published) return;
+  const links = [
+    published.feed ? ["Atom feed", published.feed, "New results in your feed reader, newest first."] : null,
+    ["board.json", published.json, `Every number on this page. Schema ${DATA.schema}: keys are only ever added.`],
+    ["Releases", REPO + "/releases", "Versions of Blackwall itself, and what changed in each."],
+  ].filter(Boolean);
+  document.getElementById("follow-links").replaceChildren(...links.map(([name, href, note]) =>
+    h("a", { href }, [h("b", { text: name }), h("span", { text: note })])));
+  document.getElementById("follow").hidden = false;
+  if (published.feed) document.head.appendChild(h("link", { rel: "alternate", type: "application/atom+xml", title: "Blackwall", href: published.feed }));
+}
+
 function strip(task, model) {
   const entry = model.tasks[task];
   const width = 320, height = 36, pad = 8;
@@ -1124,6 +1288,7 @@ function renderDetail(host) {
 
 function select(id) {
   state.selected = id;
+  state.interacted = true;
   render();
   const detail = document.getElementById("detail-title");
   if (detail) detail.scrollIntoView({ block: "nearest", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
@@ -1160,6 +1325,7 @@ function render() {
   host.style.gap = "1.5rem";
   renderLede();
   if (!WITH_RUNS.length) {
+    renderMeta();
     host.appendChild(h("div", { className: "panel empty" }, [
       h("h2", { text: "No finished runs yet" }),
       h("p", { text: "Pick a model from llama-swap and run the suite; this page rebuilds itself when the run ends." }),
@@ -1170,6 +1336,7 @@ function render() {
   renderSuiteTabs(host);
   const efforts = effortsByWeight(view());
   if (!efforts.length) {
+    renderMeta();
     host.appendChild(h("div", { className: "panel empty" }, [
       h("h2", { text: `No model has run suite v${state.suite} yet` }),
       h("p", { text: "Earlier results are under the other suite tab. A new run can carry over the answers whose questions did not change." }),
@@ -1178,6 +1345,14 @@ function render() {
     return;
   }
   if (!efforts.includes(state.effort)) state.effort = efforts[0];
+  if (!state.hashRead) {
+    state.hashRead = true;
+    const ranks = (effort, id) => (view().rankings[effort] || []).some(model => model.id === id);
+    const asked = WANTED.effort && efforts.includes(WANTED.effort) && ranks(WANTED.effort, WANTED.model)
+      ? [WANTED.effort, WANTED.model]
+      : efforts.map(effort => [effort, WANTED.whole]).find(([effort, id]) => ranks(effort, id));
+    if (asked) [state.effort, state.selected] = asked;
+  }
   const classes = deviceClasses();
   if (classes.length > 1) {
     if (!classes.includes(state.deviceClass)) state.deviceClass = classes[0];
@@ -1189,7 +1364,7 @@ function render() {
   if (efforts.length > 1) {
     host.appendChild(h("div", { className: "tabs", role: "group", "aria-label": "Reasoning effort" }, efforts.map(effort => h("button", {
       type: "button", text: EFFORT_LABELS[effort] || `Effort ${effort}`, "aria-pressed": effort === state.effort ? "true" : "false",
-      onclick: () => { state.effort = effort; render(); },
+      onclick: () => { state.effort = effort; state.interacted = true; render(); },
     }))));
   }
   const notes = h("div", { className: "notes" });
@@ -1220,11 +1395,20 @@ function render() {
   renderMeta();
   renderTable(host);
   renderFrontier(host);
+  renderOverTime(host);
   renderDetail(host);
+  if (state.interacted) syncHash();
 }
 
 function cardName(name) {
   return (name || "").replace(/^NVIDIA /, "").replace(/ Workstation Edition$/, "");
+}
+
+function syncHash() {
+  /* The address follows what a reader opened, so copying it shares that model at that effort. A page holding several
+     device classes keeps the class in the hash instead. */
+  if (!state.selected || deviceClasses().length > 1) return;
+  try { history.replaceState(null, "", "#" + encodeURIComponent(state.selected) + "~" + encodeURIComponent(state.effort)); } catch (error) { return; }
 }
 
 function renderMeta() {
@@ -1241,7 +1425,9 @@ function renderMeta() {
   document.getElementById("readout").replaceChildren(...rows.filter(row => row[1])
     .map(([key, value, cls]) => h("div", {}, [h("dt", { text: key }), h("dd", { text: value, className: cls || null, title: key === "Card" ? hw.gpu : null })])));
 }
-document.getElementById("footer").textContent = "Rebuilt from the results database after every run, or with blackwall board.";
+document.getElementById("footer").replaceChildren("Built with ", h("a", { href: REPO, text: "Blackwall" + (DATA.generator ? " " + DATA.generator.version : "") }),
+  ". Rebuilt from the results database after every run, or with blackwall board.");
+renderFollow();
 render();
 </script>
 </body>

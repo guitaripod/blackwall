@@ -1,12 +1,16 @@
 import json
 import statistics
 import time
+from pathlib import Path
 
+from . import __version__, feed
 from . import metrics as scores
-from . import doctor, paths, stack, store, suite, units
+from . import doctor, notify, paths, stack, store, suite, timeline, units
 
 KINDS = ("full", "quick", "phone")
 PUBLISHED_CLASSES = (units.GPU_CLASS,)
+SCHEMA = 1
+HISTORY_KINDS = suite.QUALITY_SUITES
 EFFORT_ORDER = ("medium", "max", "high", "xhigh", "low", "min", "minimal", "none")
 DEFAULT_EFFORT = "medium"
 TEMPLATE = paths.PACKAGE / "templates" / "leaderboard.html"
@@ -155,6 +159,22 @@ def model_entry(db, run, history, definition):
     }
 
 
+def history_entry(db, run):
+    """One finished run as the history keeps it: small enough to hold hundreds, and everything a trend or a feed needs."""
+    metrics = store.metrics_of(db, run["id"])
+    index = metrics.get("index.quality") or {}
+    where = stack.of(run)
+
+    def value(key):
+        return (metrics.get(key) or {}).get("value")
+
+    return {"run": run["id"], "model": run["model"], "name": run.get("name") or run["model"], "effort": effort_of(run),
+            "suite": run["suite"], "version": suite.version_of(run["suite"]), "kind": kind_of(run),
+            "finished": run.get("finished"), "index": index.get("value"), "lo": index.get("lo"), "hi": index.get("hi"),
+            "decode": value("speed.decode"), "peak": value("speed.peak"), "energyPerCorrect": value("energy.per_correct"),
+            "gpu": where["gpu"], "driver": where["driver"], "build": where["build"]}
+
+
 def hosts(models):
     """Every card and driver a ranking's speed numbers come from, the one with most models first."""
     counts = {}
@@ -200,20 +220,30 @@ def collect(db, classes=None):
     suites = {version: suite_view(db, [run for run in ranked if suite.version_of(run["suite"]) == version], version)
               for version in versions}
     latest = ranked[0] if ranked else None
+    finished = [run for run in ranked if kind_of(run) in HISTORY_KINDS and run.get("finished")]
     return {
+        "schema": SCHEMA,
+        "generator": {"name": "blackwall", "version": __version__},
         "generated": time.time(),
         "suite": suite.label("full"),
         "current": suite.VERSION,
         "hardware": (latest or {}).get("hardware") or {},
         "suites": suites,
         **{key: suites[suite.VERSION][key] for key in ("indexTasks", "taskLabels", "efforts", "rankings")},
-        "database": str(paths.DB),
+        "history": timeline.annotate([history_entry(db, run) for run in finished]),
     }
+
+
+def publishable(data, indent=None):
+    """The data as JSON anyone can be given: nothing in it names the home directory of the machine that measured."""
+    text = json.dumps(data, indent=indent)
+    home = str(Path.home())
+    return text.replace(home, "~") if len(home) > 1 else text
 
 
 def page(data, template=None):
     """The whole leaderboard as one self-contained file: the template with the run data baked in."""
-    return (template or TEMPLATE).read_text().replace("/*__DATA__*/null", json.dumps(data))
+    return (template or TEMPLATE).read_text().replace("/*__DATA__*/null", publishable(data))
 
 
 def build():
@@ -225,11 +255,27 @@ def build():
     return paths.BOARD
 
 
-def export(db, directory):
-    """A folder anyone can serve: the page, plus the same numbers as JSON so other tools can read them."""
+def addressed(html, site_url):
+    """The page told where it lives. Link previews only follow absolute addresses, so the share card and the canonical
+    link name the site; opened from a folder, the page keeps its relative ones."""
+    image = '<meta property="og:image" content="card.png">'
+    assert image in html
+    return html.replace(image, f'<meta property="og:image" content="{site_url}card.png">\n'
+                               f'<meta property="og:url" content="{site_url}">\n<link rel="canonical" href="{site_url}">')
+
+
+def export(db, directory, site_url=None):
+    """A folder anyone can serve: the page, plus the same numbers as JSON so other tools can read them. Given the
+    address the folder will be served from, it adds an Atom feed of new results, which has to name that address."""
+    site_url = site_url or notify.settings().get("site_url")
+    site_url = feed.address(site_url) if site_url else None
     data = collect(db, PUBLISHED_CLASSES)
+    data["published"] = {"json": "board.json", "feed": "feed.xml" if site_url else None}
     directory.mkdir(parents=True, exist_ok=True)
-    (directory / "index.html").write_text(page(data))
-    (directory / "card.html").write_text(page(data, CARD))
-    (directory / "board.json").write_text(json.dumps(data, indent=1) + "\n")
-    return [directory / "index.html", directory / "card.html", directory / "board.json"]
+    written = {"index.html": page(data), "card.html": page(data, CARD), "board.json": publishable(data, indent=1) + "\n"}
+    if site_url:
+        written["index.html"] = addressed(written["index.html"], site_url)
+        written["feed.xml"] = feed.atom(data["history"], site_url)
+    for name, text in written.items():
+        (directory / name).write_text(text)
+    return [directory / name for name in written]

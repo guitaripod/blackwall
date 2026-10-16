@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import NoReturn
 
-from . import __version__, board, doctor, hosts, lmx, metrics, paths, phone, profiles, schedule, sources, stack, store, suite, swap
+from . import __version__, board, doctor, hosts, legacy, lmx, metrics, paths, phone, profiles, schedule, sources, stack, store, suite, swap
 from .engine import resolve_effort
 from . import units
 from .units import ACTIVE, MAX_SHARED_RUNS, busy, reconcile, spawn, unit_active, unit_name
@@ -787,7 +787,11 @@ def cmd_ls(args):
 
 
 def cmd_export(args):
-    for path in board.export(store.connect(), Path(args.out or paths.DATA / "site")):
+    try:
+        written = board.export(store.connect(), Path(args.out or paths.DATA / "site"), args.site_url)
+    except ValueError as error:
+        fail(str(error))
+    for path in written:
         print(path)
 
 
@@ -1097,6 +1101,8 @@ def parser():
     commands.add_parser("sources", help="newer question sets, or pinned files changed upstream").set_defaults(handler=cmd_sources)
     export_parser = commands.add_parser("export", help="write the leaderboard page and its data to a folder you can publish")
     export_parser.add_argument("--out", metavar="DIR", help="where to write index.html and board.json (default ~/.local/share/blackwall/site)")
+    export_parser.add_argument("--site-url", metavar="URL", help="where the folder will be served from; adds feed.xml, an Atom feed of "
+                                                                 "new results (or set site_url in config.toml)")
     export_parser.set_defaults(handler=cmd_export)
     board_parser = commands.add_parser("board", help="rebuild the leaderboard page and print its path")
     board_parser.add_argument("--open", action="store_true", help="also open it in the browser")
@@ -1126,6 +1132,8 @@ def parser():
 
 def main():
     args = parser().parse_args()
+    if args.command not in legacy.SILENT and (notice := legacy.hint()):
+        print(notice, file=sys.stderr)
     args.handler(args)
 
 

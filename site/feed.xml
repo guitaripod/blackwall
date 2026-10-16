@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <id>https://guitaripod.github.io/blackwall/</id>
+  <title>Blackwall</title>
+  <subtitle>New results on one NVIDIA RTX PRO 6000 Blackwell, in the order they finished.</subtitle>
+  <updated>2026-10-10T02:48:15Z</updated>
+  <author><name>Blackwall</name></author>
+  <generator version="2.0.0">blackwall</generator>
+  <link rel="self" type="application/atom+xml" href="https://guitaripod.github.io/blackwall/feed.xml"/>
+  <link rel="alternate" type="text/html" href="https://guitaripod.github.io/blackwall/"/>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-10-10:run/20261009-021625-kolibri-1-gguf</id>
+    <title>Kolibri 1 78B-A3B: 67.7 quality (debut)</title>
+    <updated>2026-10-10T02:48:15Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#kolibri-1-gguf~max"/>
+    <summary>Max effort, suite full/v1. Quality index 67.7 (95% interval 64.5 to 70.9). 172 tok/s decoding one request, 470 tok/s at peak, 12.00 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 615.71.09, llama.cpp b742-46baf1f.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-25:run/20260923-124151-mimo-v2.6-distill-9b-gguf</id>
+    <title>MiMo-V2.6 Distill Qwen 9B: 50.0 quality (debut)</title>
+    <updated>2026-09-25T10:26:48Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#mimo-v2.6-distill-9b-gguf~max"/>
+    <summary>Max effort, suite full/v1. Quality index 50.0 (95% interval 46.2 to 53.8). 164 tok/s decoding one request, 419 tok/s at peak, 17.92 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 615.71.09, llama.cpp b50-5266f24.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-22:run/20260918-101339-gemma4-e2b-gguf</id>
+    <title>Gemma 4 E2B: 39.5 quality (debut)</title>
+    <updated>2026-09-22T00:51:22Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#gemma4-e2b-gguf~medium"/>
+    <summary>Medium effort, suite full/v1. Quality index 39.5 (95% interval 35.4 to 43.6). 149 tok/s decoding one request, 428 tok/s at peak, 1.39 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 615.71.09, llama.cpp b50-5266f24.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-17:run/20260916-232854-lfm2_5-2_6b-gguf</id>
+    <title>LFM2.5 2.6B: 34.8 quality (debut)</title>
+    <updated>2026-09-17T00:38:02Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#lfm2_5-2_6b-gguf~medium"/>
+    <summary>Medium effort, suite full/v1. Quality index 34.8 (95% interval 31.0 to 38.3). 437 tok/s decoding one request, 1013 tok/s at peak, 4.70 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 610.57.04, llama.cpp b50-5266f24.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-15:run/20260915-095921-qwen3-4b-instruct-gguf</id>
+    <title>Qwen3 4B Instruct: 39.6 quality</title>
+    <updated>2026-09-15T10:08:50Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#qwen3-4b-instruct-gguf~medium"/>
+    <summary>Medium effort, suite full/v1. Quality index 39.6 (95% interval 35.5 to 43.5). 3.00 Wh per correct answer. -0.2 against its previous run. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 610.57.04, llama.cpp b50-5266f24.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-15:run/20260915-073524-qwen3.5-2b-gguf</id>
+    <title>Qwen3.5 2B: 26.8 quality (new best)</title>
+    <updated>2026-09-15T06:37:02Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#qwen3.5-2b-gguf~none"/>
+    <summary>None effort, suite full/v1. Quality index 26.8 (95% interval 23.4 to 30.3). 1.84 Wh per correct answer. The best quality index on this card at this effort so far. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 610.57.04, llama.cpp b50-5266f24.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-15:run/20260915-012817-qwen3.5-2b-gguf</id>
+    <title>Qwen3.5 2B: 22.8 quality (debut)</title>
+    <updated>2026-09-15T04:31:48Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#qwen3.5-2b-gguf~medium"/>
+    <summary>Medium effort, suite full/v1. Quality index 22.8 (95% interval 19.9 to 25.5). 6.52 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 610.57.04, llama.cpp b50-5266f24.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-15:run/20260914-222331-qwen3-1_7b-gguf</id>
+    <title>Qwen3 1.7B: 27.0 quality (debut)</title>
+    <updated>2026-09-15T01:17:06Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#qwen3-1_7b-gguf~medium"/>
+    <summary>Medium effort, suite full/v1. Quality index 27.0 (95% interval 23.1 to 31.0). 0.93 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 610.57.04, llama.cpp b50-5266f24.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-15:run/20260914-222332-qwen3-0_6b-gguf</id>
+    <title>Qwen3 0.6B: 15.4 quality (debut)</title>
+    <updated>2026-09-15T01:06:05Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#qwen3-0_6b-gguf~medium"/>
+    <summary>Medium effort, suite full/v1. Quality index 15.4 (95% interval 12.3 to 18.6). 2.53 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 610.57.04, llama.cpp b50-5266f24.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-14:run/20260915-012817-qwen3-4b-instruct-gguf</id>
+    <title>Qwen3 4B Instruct: 39.8 quality (new best)</title>
+    <updated>2026-09-14T23:06:59Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#qwen3-4b-instruct-gguf~medium"/>
+    <summary>Medium effort, suite full/v1. Quality index 39.8 (95% interval 35.7 to 43.7). 1.90 Wh per correct answer. The best quality index on this card at this effort so far. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 610.57.04, llama.cpp b50-5266f24.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-14:run/20260914-222334-lfm2-1_2b-gguf</id>
+    <title>LFM2 1.2B: 7.7 quality</title>
+    <updated>2026-09-14T20:02:36Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#lfm2-1_2b-gguf~medium"/>
+    <summary>Medium effort, suite full/v1. Quality index 7.7 (95% interval 5.3 to 10.4). Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 610.57.04, llama.cpp b50-5266f24.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-14:run/20260914-222333-gemma3-1b-gguf</id>
+    <title>Gemma 3 1B: 6.3 quality</title>
+    <updated>2026-09-14T20:02:15Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#gemma3-1b-gguf~medium"/>
+    <summary>Medium effort, suite full/v1. Quality index 6.3 (95% interval 4.0 to 9.1). 18.86 Wh per correct answer. -0.2 against its previous run. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 610.57.04, llama.cpp b50-5266f24.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-14:run/20260914-214153-gemma3-1b-gguf</id>
+    <title>Gemma 3 1B: 6.6 quality (debut)</title>
+    <updated>2026-09-14T19:28:42Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#gemma3-1b-gguf~medium"/>
+    <summary>Medium effort, suite full/v1. Quality index 6.6 (95% interval 4.0 to 9.3). 16.42 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 610.57.04, llama.cpp b50-5266f24.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-14:run/20260914-201004-lfm2-1_2b-gguf</id>
+    <title>LFM2 1.2B: 7.7 quality (new best)</title>
+    <updated>2026-09-14T17:47:12Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#lfm2-1_2b-gguf~medium"/>
+    <summary>Medium effort, suite full/v1. Quality index 7.7 (95% interval 5.3 to 10.4). 4.22 Wh per correct answer. The best quality index on this card at this effort so far. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 610.57.04, llama.cpp b50-5266f24.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-13:run/20260912-203516-sglang-muse30b</id>
+    <title>Muse Glimmer 30B: 71.6 quality (debut)</title>
+    <updated>2026-09-13T12:31:47Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#sglang-muse30b~max"/>
+    <summary>Max effort, suite full/v1. Quality index 71.6 (95% interval 68.4 to 74.7). 143 tok/s decoding one request, 680 tok/s at peak, 2.73 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 610.57.04, SGLang c0ead5877.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-12:run/20260911-233400-pennyroyal</id>
+    <title>Qwen 3.8 27B: 81.0 quality (new best)</title>
+    <updated>2026-09-12T14:09:42Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#pennyroyal~max"/>
+    <summary>Max effort, suite full/v1. Quality index 81.0 (95% interval 78.2 to 83.6). 157 tok/s decoding one request, 400 tok/s at peak, 2.67 Wh per correct answer. The best quality index on this card at this effort so far. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 610.57.04.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-09-12:run/20260911-233400-sglang-gptoss120b</id>
+    <title>GPT-OSS 120B: 71.2 quality (new best)</title>
+    <updated>2026-09-12T12:02:43Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#sglang-gptoss120b~max"/>
+    <summary>Max effort, suite full/v1. Quality index 71.2 (95% interval 68.5 to 73.9). 206 tok/s decoding one request, 432 tok/s at peak, 5.99 Wh per correct answer. The best quality index on this card at this effort so far. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 610.57.04.</summary>
+  </entry>
+</feed>

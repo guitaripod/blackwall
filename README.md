@@ -42,6 +42,18 @@ _tok/s, Peak and Wh/correct come from 2 setups — NVIDIA RTX PRO 6000 Blackwell
 
 Quality is the index; then one column per task, single-request decode speed, peak throughput across all requests, first-token wait on a 32k prompt, and board watt-hours per correct answer. The [live page](https://guitaripod.github.io/blackwall/) adds 95% intervals, per-length breakdowns and every server setting behind each run. Those are one card's numbers; a different card, quantization or server setting will move them.
 
+## Following the board
+
+The site rebuilds after every run, and the same results come three ways so you can follow them however you like:
+
+- **Atom feed.** [`feed.xml`](https://guitaripod.github.io/blackwall/feed.xml) has one entry per finished run, marked *new best* or *debut*. Add it to any feed reader.
+- **Data.** [`board.json`](https://guitaripod.github.io/blackwall/board.json) holds every number on the page plus a `history` of all finished runs, under a `schema` number whose keys are only ever added. [docs/data.md](docs/data.md) describes it.
+- **The software.** [Releases](https://github.com/guitaripod/blackwall/releases) list what changed in Blackwall itself, and the [changelog](CHANGELOG.md) keeps the same notes. A change to how scores are computed bumps the suite version, so old and new results are never ranked together.
+
+On the page, *The wall over time* charts the best quality index so far against the date each run finished, and *Recent results* says what each new run changed. `index.html#gpt-oss-120b` opens the page on a model.
+
+To publish a board of your own, `blackwall export --out site --site-url https://you.example/bench/` writes the page, the data and the feed.
+
 ## What a run measures
 
 | Task | Full suite | Scored by |
@@ -80,6 +92,8 @@ You need Linux with systemd user units and an NVIDIA GPU, llama-swap in front of
 ```
 uv tool install git+https://github.com/guitaripod/blackwall
 ```
+
+Each [release](https://github.com/guitaripod/blackwall/releases) also carries a wheel. Coming from mbench, the [changelog](CHANGELOG.md#migrating-from-mbench) lists the three `mv` commands, and Blackwall prints them itself while the old directories are still there.
 
 **1. Describe the model.** blackwall reads its launch command from llama-swap's config; anything that command doesn't say goes in `~/.config/blackwall/models.toml`, keyed by llama-swap model id. `blackwall profile <id>` shows what was resolved and where each value came from.
 
@@ -180,5 +194,7 @@ uv run --group dev pytest
 uv tool install --editable .
 scripts/publish.sh max         # site/, docs/*.png and the table above
 ```
+
+To release: set `__version__` in `blackwall/__init__.py`, write the version's section in `CHANGELOG.md`, commit, then `git tag X.Y.Z && git push --tags`. The `release` workflow checks the tag against the version, runs the tests, builds the wheel and sdist, and publishes the release with that section as its notes.
 
 Licensed under GPL-3.0-or-later.

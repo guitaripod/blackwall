@@ -1,6 +1,6 @@
 [project]
 name = "blackwall"
-version = "2.0.0"
+dynamic = ["version"]
 description = "Rank open models on an NVIDIA RTX PRO 6000 Blackwell: speed and answer quality, one leaderboard."
 readme = "README.md"
 license = "GPL-3.0-or-later"
@@ -9,7 +9,9 @@ authors = [{ name = "guitaripod" }]
 keywords = ["llm", "benchmark", "leaderboard", "rtx-pro-6000", "blackwell", "nvidia", "llama-swap", "llama.cpp", "sglang", "local-llm"]
 classifiers = [
   "Environment :: Console",
+  "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
   "Operating System :: POSIX :: Linux",
   "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
@@ -26,7 +28,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/guitaripod/blackwall"
+Homepage = "https://guitaripod.github.io/blackwall/"
+Repository = "https://github.com/guitaripod/blackwall"
+Changelog = "https://github.com/guitaripod/blackwall/blob/master/CHANGELOG.md"
 Issues = "https://github.com/guitaripod/blackwall/issues"
 
 [project.scripts]
@@ -39,5 +43,11 @@ dev = ["pytest>=8"]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.version]
+path = "blackwall/__init__.py"
+
 [tool.hatch.build.targets.wheel]
 packages = ["blackwall"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/blackwall", "/tests", "/scripts", "/docs/data.md", "/README.md", "/CHANGELOG.md", "/LICENSE", "/pyproject.toml", "/uv.lock"]

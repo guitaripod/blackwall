@@ -1,0 +1,27 @@
+name: release
+
+on:
+  push:
+    tags: ["[0-9]+.[0-9]+.[0-9]+"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: The tag is the version
+        run: |
+          version=$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' blackwall/__init__.py)
+          test "$version" = "$GITHUB_REF_NAME" || { echo "tag $GITHUB_REF_NAME does not match blackwall/__init__.py ($version)"; exit 1; }
+      - run: uv run --locked --group dev pytest -q
+      - run: uv build
+      - name: Notes from the changelog
+        run: python3 scripts/release-notes.py "$GITHUB_REF_NAME" > notes.md
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --title "Blackwall $GITHUB_REF_NAME" --notes-file notes.md

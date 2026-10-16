@@ -1,6 +1,11 @@
 import json
+import xml.etree.ElementTree as ET
+from pathlib import Path
 
+import blackwall
 from blackwall import board, paths, store, suite
+
+ATOM = "{http://www.w3.org/2005/Atom}"
 
 
 def run(model, suite_label, effort, stamp):
@@ -86,3 +91,93 @@ def test_the_published_board_is_the_cards_alone(monkeypatch, tmp_path):
     assert [model["id"] for model in published] == ["card"]
     board.export(db, tmp_path / "site")
     assert "iPhone Air" not in (tmp_path / "site" / "board.json").read_text()
+
+
+def connected(monkeypatch, tmp_path):
+    monkeypatch.setattr(paths, "DATA", tmp_path)
+    monkeypatch.setattr(paths, "DB", tmp_path / "bench.db")
+    return store.connect()
+
+
+def finished_run(db, run_id, model, suite_label, finished, status="complete", hardware=None):
+    fields = {"id": run_id, "model": model, "suite": suite_label, "effort": "medium", "status": status,
+              "created": finished, "finished": finished}
+    if hardware is not None:
+        fields["hardware"] = hardware
+    store.insert_run(db, fields)
+
+
+def test_collect_publishes_the_schema_generator_and_history_entries(monkeypatch, tmp_path):
+    db = connected(monkeypatch, tmp_path)
+    finished_run(db, "r1", "alpha", suite.label("full"), 10.0)
+    store.set_metrics(db, "r1", {"index.quality": {"value": 50.0, "lo": 48.0, "hi": 52.0},
+                                 "speed.decode": {"value": 120.0}, "energy.per_correct": {"value": 0.42}})
+    data = board.collect(db)
+    assert data["schema"] == board.SCHEMA
+    assert data["generator"] == {"name": "blackwall", "version": blackwall.__version__}
+    assert "database" not in data
+    entry = data["history"][0]
+    assert {"run", "model", "effort", "version", "index", "lo", "hi", "decode", "record", "debut", "delta"} <= set(entry)
+    assert (entry["run"], entry["model"], entry["effort"], entry["version"]) == ("r1", "alpha", "medium", suite.VERSION)
+    assert (entry["index"], entry["lo"], entry["hi"], entry["decode"]) == (50.0, 48.0, 52.0, 120.0)
+    assert entry["record"] is True and entry["debut"] is True and entry["delta"] is None
+
+
+def test_history_lists_only_complete_full_and_quick_runs(monkeypatch, tmp_path):
+    db = connected(monkeypatch, tmp_path)
+    finished_run(db, "full", "alpha", suite.label("full"), 10.0)
+    finished_run(db, "quick", "alpha", suite.label("quick"), 11.0)
+    finished_run(db, "phone", "alpha", "phone/v1", 12.0)
+    finished_run(db, "unfinished", "alpha", suite.label("full"), 13.0, status="running")
+    history = board.collect(db)["history"]
+    assert [entry["run"] for entry in history] == ["full", "quick"]
+
+
+def test_the_published_history_leaves_out_phone_class_runs(monkeypatch, tmp_path):
+    db = connected(monkeypatch, tmp_path)
+    finished_run(db, "card", "card", suite.label("full"), 10.0)
+    finished_run(db, "air", "air", suite.label("full"), 11.0, hardware={"class": "phone", "device": "iPhone Air"})
+    assert [entry["run"] for entry in board.collect(db)["history"]] == ["card", "air"]
+    assert [entry["run"] for entry in board.collect(db, board.PUBLISHED_CLASSES)["history"]] == ["card"]
+
+
+def test_export_without_a_site_url_writes_the_page_and_json_only(monkeypatch, tmp_path):
+    monkeypatch.setattr(paths, "SETTINGS", tmp_path / "absent.toml")
+    db = connected(monkeypatch, tmp_path)
+    finished_run(db, "r1", "alpha", suite.label("full"), 10.0)
+    written = board.export(db, tmp_path / "site")
+    assert sorted(path.name for path in written) == ["board.json", "card.html", "index.html"]
+    assert sorted(path.name for path in (tmp_path / "site").iterdir()) == ["board.json", "card.html", "index.html"]
+    published = json.loads((tmp_path / "site" / "board.json").read_text())["published"]
+    assert published == {"json": "board.json", "feed": None}
+
+
+def test_export_with_a_site_url_adds_a_feed_that_parses(monkeypatch, tmp_path):
+    monkeypatch.setattr(paths, "SETTINGS", tmp_path / "absent.toml")
+    db = connected(monkeypatch, tmp_path)
+    finished_run(db, "r1", "alpha", suite.label("full"), 10.0)
+    written = board.export(db, tmp_path / "site", "https://example.test/bench")
+    assert [path.name for path in written] == ["index.html", "card.html", "board.json", "feed.xml"]
+    published = json.loads((tmp_path / "site" / "board.json").read_text())["published"]
+    assert published == {"json": "board.json", "feed": "feed.xml"}
+    root = ET.parse(tmp_path / "site" / "feed.xml").getroot()
+    assert root.tag == f"{ATOM}feed"
+    assert len(root.findall(f"{ATOM}entry")) == 1
+
+
+def test_export_takes_the_feed_address_from_config_toml(monkeypatch, tmp_path):
+    config = tmp_path / "config.toml"
+    config.write_text('site_url = "https://example.test/x/"\n')
+    monkeypatch.setattr(paths, "SETTINGS", config)
+    db = connected(monkeypatch, tmp_path)
+    finished_run(db, "r1", "alpha", suite.label("full"), 10.0)
+    board.export(db, tmp_path / "site")
+    root = ET.parse(tmp_path / "site" / "feed.xml").getroot()
+    assert root.find(f"{ATOM}id").text == "https://example.test/x/"
+
+
+def test_publishable_replaces_the_home_directory_with_a_tilde(monkeypatch):
+    monkeypatch.setattr(Path, "home", staticmethod(lambda: Path("/home/someone")))
+    text = board.publishable({"path": "/home/someone/models/a.gguf"})
+    assert "/home/someone" not in text
+    assert json.loads(text) == {"path": "~/models/a.gguf"}
