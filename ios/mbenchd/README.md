@@ -1,6 +1,6 @@
 # mbenchd
 
-The iOS side of an blackwall phone run: llama.cpp's own `llama-server`, built for arm64 iOS and run inside an app, plus a small control server that reports what a phone has instead of a driver — thermal state, the memory the process holds, and the battery.
+The iOS side of a Blackwall phone run (the earlier side project, see ../../docs/phone.md; the board does not publish phone runs): llama.cpp's own `llama-server`, built for arm64 iOS and run inside an app, plus a small control server that reports what a phone has instead of a driver — thermal state, the memory the process holds, and the battery.
 
 The app serves two ports on the device:
 

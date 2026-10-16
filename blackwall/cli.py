@@ -1021,7 +1021,7 @@ examples:
 
 def parser():
     formatter = argparse.RawDescriptionHelpFormatter
-    root = argparse.ArgumentParser(prog="blackwall", description="Benchmark llama-swap models and rank them on one leaderboard.",
+    root = argparse.ArgumentParser(prog="blackwall", description="Rank open models on an NVIDIA RTX PRO 6000 Blackwell: speed and answer quality, one leaderboard.",
                                    epilog=ROOT_EPILOG, formatter_class=formatter)
     root.add_argument("--version", action="version", version=f"blackwall {__version__}")
     commands = root.add_subparsers(dest="command", required=True, title="commands",

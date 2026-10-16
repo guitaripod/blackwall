@@ -3,9 +3,10 @@ import statistics
 import time
 
 from . import metrics as scores
-from . import doctor, paths, stack, store, suite
+from . import doctor, paths, stack, store, suite, units
 
 KINDS = ("full", "quick", "phone")
+PUBLISHED_CLASSES = (units.GPU_CLASS,)
 EFFORT_ORDER = ("medium", "max", "high", "xhigh", "low", "min", "minimal", "none")
 DEFAULT_EFFORT = "medium"
 TEMPLATE = paths.PACKAGE / "templates" / "leaderboard.html"
@@ -190,8 +191,10 @@ def suite_view(db, runs, version):
     }
 
 
-def collect(db):
-    runs = store.list_runs(db, status="complete")
+def collect(db, classes=None):
+    """Every ranking in the database, or only those from the named hardware classes. The published page is the card's
+    alone; phones and other machines stay in the database and in `blackwall ls --device`."""
+    runs = [run for run in store.list_runs(db, status="complete") if not classes or units.device_class(run) in classes]
     ranked = [run for run in runs if kind_of(run) in KINDS and suite.version_of(run["suite"]) in suite.DEFINITIONS]
     versions = sorted({suite.version_of(run["suite"]) for run in ranked} | {suite.VERSION}, key=int, reverse=True)
     suites = {version: suite_view(db, [run for run in ranked if suite.version_of(run["suite"]) == version], version)
@@ -224,7 +227,7 @@ def build():
 
 def export(db, directory):
     """A folder anyone can serve: the page, plus the same numbers as JSON so other tools can read them."""
-    data = collect(db)
+    data = collect(db, PUBLISHED_CLASSES)
     directory.mkdir(parents=True, exist_ok=True)
     (directory / "index.html").write_text(page(data))
     (directory / "card.html").write_text(page(data, CARD))

@@ -71,3 +71,18 @@ def test_export_writes_a_page_and_its_data(monkeypatch, tmp_path):
     card = (tmp_path / "site" / "card.html").read_text()
     assert "/*__DATA__*/null" not in card and '"rankings"' in card
     assert json.loads((tmp_path / "site" / "board.json").read_text())["current"] == suite.VERSION
+
+
+def test_the_published_board_is_the_cards_alone(monkeypatch, tmp_path):
+    monkeypatch.setattr(paths, "DATA", tmp_path)
+    monkeypatch.setattr(paths, "DB", tmp_path / "bench.db")
+    db = store.connect()
+    for model, hardware in (("card", {"gpu": "RTX PRO 6000"}), ("air", {"class": "phone", "device": "iPhone Air"})):
+        store.insert_run(db, {"id": model, "model": model, "suite": suite.label("full"), "effort": "max",
+                              "status": "complete", "created": 1.0, "finished": 1.0, "hardware": hardware})
+    everything = board.collect(db)["rankings"]["max"]
+    published = board.collect(db, board.PUBLISHED_CLASSES)["rankings"]["max"]
+    assert {model["id"] for model in everything} == {"card", "air"}
+    assert [model["id"] for model in published] == ["card"]
+    board.export(db, tmp_path / "site")
+    assert "iPhone Air" not in (tmp_path / "site" / "board.json").read_text()

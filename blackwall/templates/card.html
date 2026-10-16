@@ -3,42 +3,45 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>blackwall comparison card</title>
+<title>Blackwall · share card</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000'/%3E%3Cpath fill='%2376b900' d='M6 2H26L30 6V14H6ZM2 18H26V30H6L2 26Z'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..800&family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,100..900&family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;1,400&display=swap">
 <style>
 :root {
-  color-scheme: light dark;
-  --page: #f9f9f7;
-  --ink: #0b0b0b;
-  --ink-2: #52514e;
-  --muted: #898781;
-  --border: rgba(11, 11, 11, 0.12);
+  color-scheme: dark;
+  --page: #000000;
+  --surface: #0d0d0d;
+  --ink: #ffffff;
+  --ink-2: #c6c6c6;
+  --muted: #8c8c8c;
+  --border: #2b2b2b;
+  --series: #76b900;
+  --series-hi: #a3e635;
   --ui: "Atkinson Hyperlegible Next", system-ui, -apple-system, sans-serif;
   --mono: "Atkinson Hyperlegible Mono", ui-monospace, Menlo, Consolas, monospace;
 }
-@media (prefers-color-scheme: dark) {
-  :root { --page: #0d0d0d; --ink: #ffffff; --ink-2: #c3c2b7; --border: rgba(255, 255, 255, 0.14); }
-}
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--ui); }
+body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--ui); border-top: 3px solid var(--series); }
 main { max-width: 1240px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; display: grid; gap: 1rem; }
-h1 { font-family: "Archivo", var(--ui); font-size: 1.25rem; margin: 0; font-weight: 700; }
+h1 { font-family: "Archivo", var(--ui); font-stretch: 112%; font-size: 1.25rem; margin: 0; font-weight: 700; }
+a { color: #19d3ff; }
 .controls { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
 label { font-size: 0.8rem; color: var(--ink-2); display: grid; gap: 0.2rem; }
 label[hidden] { display: none; }
 select:disabled, option:disabled { color: var(--muted); }
-select, button { font: inherit; font-size: 0.85rem; padding: 0.35rem 0.5rem; border-radius: 6px;
-  border: 1px solid var(--border); background: var(--page); color: var(--ink); }
+select, button { font: inherit; font-size: 0.85rem; padding: 0.35rem 0.5rem; border-radius: 0;
+  border: 1px solid var(--border); background: var(--surface); color: var(--ink); }
 button { cursor: pointer; font-weight: 600; }
-button:hover { border-color: var(--ink-2); }
-canvas { width: 100%; max-width: 1200px; aspect-ratio: 1200 / 675; border: 1px solid var(--border); border-radius: 8px; }
+button:hover { border-color: var(--series); }
+#download { background: var(--series); border-color: var(--series); color: #000; font-weight: 700; }
+canvas { width: 100%; max-width: 1200px; aspect-ratio: 1200 / 675; border: 1px solid var(--border); }
 .picks { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .picks[hidden] { display: none; }
-.picks button { font: inherit; font-size: 0.78rem; padding: 0.2rem 0.6rem; border-radius: 999px; cursor: pointer;
+.picks button { font: inherit; font-size: 0.78rem; padding: 0.2rem 0.6rem; border-radius: 0; cursor: pointer;
   border: 1px solid var(--border); background: var(--page); color: var(--muted); }
-.picks button[aria-pressed="true"] { color: var(--ink); border-color: currentColor; font-weight: 600; }
+.picks button[aria-pressed="true"] { color: #000; background: var(--series); border-color: var(--series); font-weight: 700; }
 .picks button:disabled { cursor: default; opacity: 0.55; }
 .hint { font-size: 0.8rem; color: var(--ink-2); margin: 0; max-width: 78ch; line-height: 1.5; }
 .hint .dim { color: var(--muted); }
@@ -63,7 +66,6 @@ body.bare canvas { width: 1200px; border: 0; border-radius: 0; }
     <label id="left-label">Left<select id="left"></select></label>
     <label id="right-label">Right<select id="right"></select></label>
     <label id="only-label">Model<select id="only"></select></label>
-    <label>Theme<select id="theme"><option value="light">Light</option><option value="dark">Dark</option></select></label>
     <button id="download" type="button">Download PNG</button>
   </div>
   <div class="picks" id="picks" hidden></div>
@@ -73,12 +75,8 @@ body.bare canvas { width: 1200px; border: 0; border-radius: 0; }
 <script>
 const DATA = /*__DATA__*/null;
 const W = 1200, H = 675, S = 2;
-const PALETTE = {
-  light: { page: "#f9f9f7", ink: "#0b0b0b", ink2: "#52514e", muted: "#898781", grid: "#e1e0d9", axis: "#c3c2b7",
-           a: "#2a78d6", b: "#c05621", tie: "#c3c2b7" },
-  dark: { page: "#0d0d0d", ink: "#ffffff", ink2: "#c3c2b7", muted: "#898781", grid: "#2c2c2a", axis: "#45443f",
-          a: "#3987e5", b: "#d4762a", tie: "#45443f" },
-};
+const PALETTE = { page: "#000000", ink: "#ffffff", ink2: "#c6c6c6", muted: "#8c8c8c", grid: "#232323", axis: "#3b3b3b",
+                  a: "#76b900", b: "#19d3ff", tie: "#3b3b3b", wall: "#76b900", cyan: "#19d3ff", red: "#ff2d55" };
 const SUITES = DATA.suites || {};
 const CURRENT = DATA.current || Object.keys(SUITES)[0];
 const view = SUITES[CURRENT] || { efforts: [], rankings: {}, indexTasks: [], taskShort: {} };
@@ -88,8 +86,7 @@ const context = canvas.getContext("2d");
 const MODES = ["many", "two", "one"];
 const NEEDS = { many: 3, two: 2, one: 1 };
 const CLASS_LABELS = { gpu: "GPU", phone: "Phone" };
-const state = { effort: null, klass: null, mode: "two", models: [],
-                theme: matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light" };
+const state = { effort: null, klass: null, mode: "two", models: [] };
 
 function classOf(model) {
   return (model && model.deviceClass) || "gpu";
@@ -119,30 +116,27 @@ function half(entry) {
 }
 
 function text(value, x, y, options) {
-  const { size = 16, weight = 400, family = "ui", color = "ink", align = "left" } = options || {};
+  const { size = 16, weight = 400, family = "ui", color = "ink", align = "left", stretch = "", spacing = 0 } = options || {};
   const stack = family === "display" ? '"Archivo", system-ui, sans-serif'
     : family === "mono" ? '"Atkinson Hyperlegible Mono", ui-monospace, monospace'
     : '"Atkinson Hyperlegible Next", system-ui, sans-serif';
-  context.font = `${weight} ${size * S}px ${stack}`;
-  context.fillStyle = PALETTE[state.theme][color] || color;
+  context.font = `${stretch ? stretch + " " : ""}${weight} ${size * S}px ${stack}`;
+  context.letterSpacing = `${spacing * S}px`;
+  context.fillStyle = PALETTE[color] || color;
   context.textAlign = align;
   context.textBaseline = "alphabetic";
   context.fillText(value, x * S, y * S);
   return context.measureText(value).width / S;
 }
 
-function box(x, y, width, height, color, radius = 0) {
-  context.fillStyle = PALETTE[state.theme][color] || color;
-  context.beginPath();
-  context.roundRect(x * S, y * S, width * S, height * S, radius * S);
-  context.fill();
+function box(x, y, width, height, color) {
+  context.fillStyle = PALETTE[color] || color;
+  context.fillRect(x * S, y * S, width * S, height * S);
 }
 
 function dot(x, y, color) {
-  context.fillStyle = PALETTE[state.theme][color] || color;
-  context.beginPath();
-  context.arc(x * S, y * S, 5 * S, 0, Math.PI * 2);
-  context.fill();
+  context.fillStyle = PALETTE[color] || color;
+  context.fillRect((x - 5) * S, (y - 5) * S, 10 * S, 10 * S);
 }
 
 function fit(value, limit, size, weight, family) {
@@ -153,6 +147,41 @@ function fit(value, limit, size, weight, family) {
     step -= 1;
   }
   return step;
+}
+
+function cardName(name) {
+  return (name || "").replace(/^NVIDIA /, "").replace(/ Workstation Edition$/, "");
+}
+
+function mark(x, y, size) {
+  /* The Blackwall mark: two slabs split by a slit and slipped against each other. */
+  const k = size / 32;
+  const slab = points => {
+    context.beginPath();
+    points.forEach(([px, py], index) => context[index ? "lineTo" : "moveTo"]((x + px * k) * S, (y + py * k) * S));
+    context.closePath();
+    context.fill();
+  };
+  context.fillStyle = PALETTE.wall;
+  slab([[6, 2], [26, 2], [30, 6], [30, 14], [6, 14]]);
+  slab([[2, 18], [26, 18], [26, 30], [6, 30], [2, 26]]);
+}
+
+function wallLine(y) {
+  context.save();
+  context.shadowColor = "rgba(118, 185, 0, 0.7)";
+  context.shadowBlur = 14 * S;
+  context.fillStyle = PALETTE.wall;
+  context.fillRect(0, (y - 1) * S, canvas.width, 2 * S);
+  context.restore();
+}
+
+function masthead(right) {
+  box(0, 0, W, 3, "wall");
+  mark(56, 34, 28);
+  text("BLACKWALL", 94, 58, { size: 24, weight: 900, family: "display", stretch: "expanded", spacing: 1 });
+  text(right, W - 56, 58, { size: 14, family: "mono", color: "muted", align: "right" });
+  wallLine(84);
 }
 
 function header(model, x, side, colour) {
@@ -189,7 +218,7 @@ function rows(left, right) {
     const width = Math.max(3, (Math.abs(entry.delta) / peak) * reach);
     const colour = entry.tied ? "tie" : entry.delta > 0 ? "a" : "b";
     const x = entry.delta > 0 ? axis - width - 1 : axis + 1;
-    box(x, y + 3, width, 14, colour, 4);
+    box(x, y + 3, width, 14, colour);
     const label = (entry.delta > 0 ? "+" : "−") + Math.abs(entry.delta).toFixed(1) + (entry.tied ? "  tied" : "");
     const inside = width > 96 && !entry.tied;
     const at = entry.delta > 0 ? (inside ? x + 10 : x - 8) : (inside ? x + width - 10 : x + width + 8);
@@ -243,13 +272,10 @@ function chosen() {
 }
 
 function chrome(models) {
-  text("blackwall", 56, 62, { size: 24, weight: 700, family: "display" });
   const first = models[0] || {};
   const where = classOf(first) === "phone" ? ((first.stack || {}).device || "a phone")
-    : (first.stack && first.stack.gpu ? first.stack.gpu.replace("NVIDIA ", "") : "one GPU");
-  text(`suite ${DATA.suite || "full"} · ${state.effort} effort · ${where}`, W - 56, 62,
-    { size: 14, family: "mono", color: "muted", align: "right" });
-  box(56, 84, W - 112, 1, "grid");
+    : (first.stack && first.stack.gpu ? cardName(first.stack.gpu) : "RTX PRO 6000 Blackwell");
+  masthead(`suite ${DATA.suite || "full"} · ${state.effort} effort · ${where}`);
   const newest = Math.max(...models.map(model => (model.run || {}).finished || 0));
   const when = newest > 0 ? new Date(newest * 1000)
     .toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "";
@@ -299,8 +325,8 @@ function drawMany(list) {
     const value = (model.index || {}).value;
     text(value == null ? "–" : value.toFixed(1), indexX, y,
       { size: 30, weight: 700, family: "display", align: "right" });
-    box(barStart, y - 10, barEnd - barStart, 10, "grid", 5);
-    if (value != null) box(barStart, y - 10, (barEnd - barStart) * Math.max(0.015, value / best), 10, "a", 5);
+    box(barStart, y - 10, barEnd - barStart, 10, "grid");
+    if (value != null) box(barStart, y - 10, (barEnd - barStart) * Math.max(0.015, value / best), 10, "a");
     columns.forEach(([, read, format], column) => {
       const measure = read(model);
       text(measure == null ? "–" : format(measure), firstX + column * gap, y,
@@ -335,9 +361,9 @@ function curve(model, x, y, width, height) {
   series.forEach((value, index) => context.lineTo(point(index)[0] * S, point(index)[1] * S));
   context.lineTo((x + width) * S, (y + height) * S);
   context.closePath();
-  context.fillStyle = PALETTE[state.theme].grid;
+  context.fillStyle = PALETTE.grid;
   context.fill();
-  context.strokeStyle = PALETTE[state.theme].a;
+  context.strokeStyle = PALETTE.a;
   context.lineWidth = 3 * S;
   context.lineJoin = "round";
   context.beginPath();
@@ -369,8 +395,8 @@ function drawOne(model) {
     const entry = model.tasks[task];
     text(view.taskShort[task] || task, x, 308, { size: 14, family: "mono", color: "muted" });
     text(entry.value.toFixed(1), x, 350, { size: 32, weight: 700, family: "display" });
-    box(x, 368, span - 36, 9, "grid", 5);
-    box(x, 368, (span - 36) * Math.max(0, Math.min(1, entry.value / 100)), 9, "a", 5);
+    box(x, 368, span - 36, 9, "grid");
+    box(x, 368, (span - 36) * Math.max(0, Math.min(1, entry.value / 100)), 9, "a");
     if (entry.truncated >= 25) {
       text(`${Math.round(entry.truncated)}% cut off`, x, 394, { size: 12, family: "mono", color: "muted" });
     }
@@ -389,7 +415,7 @@ function drawOne(model) {
 
 function draw() {
   const list = chosen();
-  context.fillStyle = PALETTE[state.theme].page;
+  context.fillStyle = PALETTE.page;
   context.fillRect(0, 0, canvas.width, canvas.height);
   if (!list.length) {
     text("No finished run to show.", 56, 100, { size: 20, family: "display" });
@@ -398,11 +424,8 @@ function draw() {
   if (list.length === 1) return drawOne(list[0]);
   if (list.length > 2) return drawMany(list);
   const left = list[0], right = list[1];
-  text("blackwall", 56, 62, { size: 24, weight: 700, family: "display" });
-  const stack = left.stack && left.stack.gpu ? left.stack.gpu.replace("NVIDIA ", "") : "one GPU";
-  text(`suite ${DATA.suite || "full"} · ${state.effort} effort · ${stack}`, W - 56, 62,
-    { size: 14, family: "mono", color: "muted", align: "right" });
-  box(56, 84, W - 112, 1, "grid");
+  const stack = left.stack && left.stack.gpu ? cardName(left.stack.gpu) : "RTX PRO 6000 Blackwell";
+  masthead(`suite ${DATA.suite || "full"} · ${state.effort} effort · ${stack}`);
   header(left, 56, "left", "a");
   header(right, W / 2 + 20, "right", "b");
   box(56, 240, W - 112, 1, "grid");
@@ -494,7 +517,6 @@ function fillControls() {
   }
   document.getElementById("only-label").hidden = state.mode !== "one";
   fill("only", names, state.models[0]);
-  document.getElementById("theme").value = state.theme;
 }
 
 function newest() {
@@ -523,13 +545,12 @@ function readHash() {
   state.klass = params.get("class") || (first ? classOf(first) : start.klass);
   state.mode = params.get("show") || (params.get("m") ? (state.models.length === 1 ? "one"
     : state.models.length === 2 ? "two" : "many") : "two");
-  if (params.get("theme")) state.theme = params.get("theme");
 }
 
 function writeHash() {
   history.replaceState(null, "", "#" + new URLSearchParams({
     effort: state.effort || "", class: state.klass || "", show: state.mode,
-    m: state.models.join(","), theme: state.theme,
+    m: state.models.join(","),
   }).toString());
 }
 
@@ -561,7 +582,6 @@ function onChange(id, apply) {
 
 onChange("effort", value => { state.effort = value; });
 onChange("where", value => { state.klass = value; });
-onChange("theme", value => { state.theme = value; });
 onChange("show", value => { state.mode = value; });
 onChange("count", value => {
   if (value !== "custom") state.models = pool().slice(0, Number(value)).map(model => model.id);
@@ -589,7 +609,11 @@ window.addEventListener("hashchange", () => {
 
 if (new URLSearchParams(location.search).get("bare") === "1") document.body.classList.add("bare");
 readHash();
-(document.fonts ? document.fonts.ready : Promise.resolve()).then(render);
+/* Fonts only the canvas draws with are never requested by the page, so ask for each face before the first paint. */
+const FACES = ['900 24px "Archivo"', '700 24px "Archivo"', '600 24px "Archivo"', '400 16px "Atkinson Hyperlegible Next"',
+               '600 16px "Atkinson Hyperlegible Next"', '400 16px "Atkinson Hyperlegible Mono"'];
+Promise.all(FACES.map(face => (document.fonts ? document.fonts.load(face) : Promise.resolve()).catch(() => null)))
+  .then(() => document.fonts && document.fonts.ready).then(render, render);
 </script>
 </body>
 </html>

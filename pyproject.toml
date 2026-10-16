@@ -1,12 +1,12 @@
 [project]
 name = "blackwall"
 version = "2.0.0"
-description = "Benchmark the local LLMs behind llama-swap and rank them on one leaderboard."
+description = "Rank open models on an NVIDIA RTX PRO 6000 Blackwell: speed and answer quality, one leaderboard."
 readme = "README.md"
 license = "GPL-3.0-or-later"
 requires-python = ">=3.12"
 authors = [{ name = "guitaripod" }]
-keywords = ["llm", "benchmark", "leaderboard", "llama-swap", "llama.cpp", "sglang", "local-llm"]
+keywords = ["llm", "benchmark", "leaderboard", "rtx-pro-6000", "blackwell", "nvidia", "llama-swap", "llama.cpp", "sglang", "local-llm"]
 classifiers = [
   "Environment :: Console",
   "Intended Audience :: Developers",
