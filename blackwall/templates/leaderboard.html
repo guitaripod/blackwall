@@ -46,16 +46,17 @@
 }
 * { box-sizing: border-box; }
 html { overflow-x: clip; }
-body { margin: 0; background: var(--page); color: var(--ink); font: 400 15px/1.55 var(--ui); overflow-x: clip; border-top: 3px solid var(--series); }
-main { max-width: min(118rem, 100%); margin: 0 auto; padding: clamp(1.25rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2.25rem) 3.5rem; display: grid; gap: 2.25rem; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 400 15px/1.55 var(--ui); overflow-x: clip; border-top: 3px solid var(--series); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+main { max-width: min(118rem, 100%); margin: 0 auto; padding: clamp(1.25rem, 3vw, 2.5rem) clamp(0px, 2vw, 1.5rem) 3.5rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.25rem; }
+#content { grid-template-columns: minmax(0, 1fr); }
 h1, h2, h3 { margin: 0; text-wrap: balance; }
 h2 { font-family: var(--display); font-stretch: 112%; font-weight: 700; font-size: 1.25rem; }
 h3 { font-size: 1rem; font-weight: 600; }
 p { margin: 0; max-width: 68ch; }
 a { color: var(--cyan); }
 code, pre, .mono { font-family: var(--mono); }
-.hero { display: grid; gap: 1.5rem; }
-.wordmark-row { position: relative; padding: 0.12em 0; font-size: clamp(2.5rem, 8.6vw, 9rem); }
+.hero { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.1rem; }
+.wordmark-row { position: relative; padding: 0.12em 0; font-size: min(9rem, calc((100vw - 32px) / 8.15)); }
 .wordmark-row::after { content: ""; position: absolute; top: -0.5rem; bottom: -0.5rem; left: 50%; width: 100vw; transform: translateX(-50%); pointer-events: none;
   background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 4px);
   -webkit-mask-image: linear-gradient(#000 40%, transparent); mask-image: linear-gradient(#000 40%, transparent); }
@@ -77,7 +78,7 @@ code, pre, .mono { font-family: var(--mono); }
 @keyframes slip-a { 0% { transform: translateX(-0.2em); } 20% { transform: translateX(0.12em); } 40% { transform: translateX(-0.1em); } 60% { transform: translateX(-0.07em); } 100% { transform: translateX(-0.045em); } }
 @keyframes slip-b { 0% { transform: translateX(0.2em); } 25% { transform: translateX(-0.1em); } 50% { transform: translateX(0.14em); } 75% { transform: translateX(0.07em); } 100% { transform: translateX(0.05em); } }
 @keyframes strike { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
-.hero-foot { display: grid; gap: 1.5rem 3rem; align-items: end; }
+.hero-foot { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem 3rem; align-items: end; }
 @media (min-width: 62rem) { .hero-foot { grid-template-columns: minmax(0, 1fr) minmax(19rem, 25rem); } }
 .hero-copy { display: grid; gap: 0.8rem; }
 .tagline { font-family: var(--display); font-stretch: 112%; font-weight: 700; font-size: clamp(1.15rem, 0.9rem + 1vw, 1.6rem); line-height: 1.2; max-width: 30ch; }
@@ -88,7 +89,7 @@ code, pre, .mono { font-family: var(--mono); }
 .readout dt { color: var(--muted); }
 .readout dd { margin: 0; font-family: var(--mono); text-align: right; }
 .readout .card-name { color: var(--series-hi); font-weight: 600; }
-.panel { position: relative; background: var(--surface); border: 1px solid var(--border); }
+.panel { position: relative; min-width: 0; background: var(--surface); border: 1px solid var(--border); }
 .panel::before, .panel::after { content: ""; position: absolute; width: var(--cut); height: var(--cut); pointer-events: none; }
 .panel::before { top: -1px; right: -1px;
   background: linear-gradient(to bottom left, var(--page) 0, var(--page) calc(50% - 0.7px), var(--axis) calc(50% - 0.7px), var(--axis) calc(50% + 0.7px), transparent calc(50% + 0.7px)); }
@@ -96,26 +97,39 @@ code, pre, .mono { font-family: var(--mono); }
   background: linear-gradient(to top right, var(--page) 0, var(--page) calc(50% - 0.7px), var(--axis) calc(50% - 0.7px), var(--axis) calc(50% + 0.7px), transparent calc(50% + 0.7px)); }
 .frontier { padding: 1rem 1.1rem 0.6rem; display: grid; gap: 0.5rem; }
 .frontier svg { max-width: 62rem; }
-.frontier-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.3rem 1.5rem; align-items: baseline; }
-.frontier-head span { color: var(--muted); font-size: 0.84rem; max-width: 62ch; }
+.frontier-head { display: grid; gap: 0.3rem; }
+.frontier-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem 2rem; align-items: start; }
+@media (min-width: 64rem) { .frontier-body { grid-template-columns: minmax(0, 46rem) minmax(15rem, 1fr); } }
+.wall-list { display: grid; gap: 0.6rem; align-content: start; border-left: 2px solid var(--series); padding: 0.1rem 0 0.1rem 1rem; }
+.wall-list ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.35rem; }
+.wall-item { all: unset; box-sizing: border-box; display: grid; gap: 0.1rem; cursor: pointer; padding: 0.4rem 0.6rem; margin: 0 -0.6rem; }
+.wall-item:hover { background: var(--select); }
+.wall-item:focus-visible { outline: 2px solid var(--series-hi); outline-offset: -2px; }
+.wall-item b { font-weight: 600; }
+.wall-item span { color: var(--ink-2); font-size: 0.82rem; }
+.frontier-head span { color: var(--muted); font-size: 0.84rem; max-width: 72ch; }
 .chip.verdict { border-color: transparent; font-weight: 600; }
 .chip.verdict.holds { background: var(--ok-wash); color: var(--ok); }
 .chip.verdict.fades { background: var(--warn-wash); color: var(--warn); }
 .chip.verdict.barely { background: var(--bad-wash); color: var(--bad); }
 svg { display: block; width: 100%; height: auto; overflow: visible; }
-svg text { font-family: var(--mono); font-size: 11px; }
+svg text { font-family: var(--mono); font-size: 12px; }
 .grid { stroke: var(--grid); stroke-width: 1; }
 .axis { stroke: var(--axis); stroke-width: 1; }
 .tick { fill: var(--muted); }
-.axis-title { fill: var(--muted); font-family: var(--ui); font-size: 11.5px; }
+.axis-title { fill: var(--muted); font-family: var(--ui); font-size: 12.5px; }
 .pt { fill: var(--deemph); stroke: var(--surface); stroke-width: 2; }
 .pt.selected { fill: var(--series); }
-.pt-label { fill: var(--ink-2); font-family: var(--ui); font-size: 12px; }
+.pt-label { fill: var(--ink-2); font-family: var(--ui); font-size: 12.5px; }
 .pt-label.selected { fill: var(--ink); font-weight: 600; }
 .frontier-line { fill: none; stroke: var(--series); stroke-width: 2; opacity: 0.85; filter: drop-shadow(0 0 4px rgba(118, 185, 0, 0.6)); }
 .hit { fill: transparent; cursor: pointer; }
 .hit:focus-visible { outline: none; stroke: var(--series-hi); stroke-width: 2; }
-.table-wrap { overflow-x: auto; }
+.table-wrap { overflow-x: auto;
+  background: linear-gradient(to right, var(--surface) 30%, transparent) left / 28px 100% no-repeat local,
+    linear-gradient(to left, var(--surface) 30%, transparent) right / 28px 100% no-repeat local,
+    linear-gradient(to right, rgba(118, 185, 0, 0.2), transparent) left / 8px 100% no-repeat scroll,
+    linear-gradient(to left, rgba(118, 185, 0, 0.2), transparent) right / 8px 100% no-repeat scroll; }
 table { border-collapse: collapse; width: 100%; min-width: 58rem; font-variant-numeric: tabular-nums; }
 th, td { padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--grid); text-align: right; vertical-align: middle; white-space: nowrap; }
 th:first-child, td:first-child, th.model, td.model { text-align: left; }
@@ -207,7 +221,7 @@ pre { margin: 0; padding: 0.9rem 1rem; background: var(--surface); border: 1px s
 .tooltip .key.me { background: var(--series); }
 footer { color: var(--muted); font-size: 0.8rem; display: grid; gap: 0.35rem; border-top: 1px solid var(--grid); padding-top: 1.1rem; }
 footer p { max-width: 90ch; }
-.mark { width: 1.1rem; height: 1.1rem; vertical-align: -0.15rem; margin-right: 0.4rem; }
+.mark { display: inline-block; width: 1.1rem; height: 1.1rem; vertical-align: -0.2rem; margin-right: 0.5rem; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -220,7 +234,7 @@ footer p { max-width: 90ch; }
     </div>
     <div class="hero-foot">
       <div class="hero-copy">
-        <p class="tagline">Open models, ranked on one RTX PRO 6000 Blackwell.</p>
+        <p class="tagline">Open models, ranked on one RTX&nbsp;PRO&nbsp;6000&nbsp;Blackwell.</p>
         <p class="lede" id="lede"></p>
       </div>
       <dl class="panel readout" id="readout"></dl>
@@ -229,11 +243,11 @@ footer p { max-width: 90ch; }
   <div id="content"></div>
   <section class="howto" aria-labelledby="howto-title">
     <h2 id="howto-title">Benchmark another model</h2>
-    <pre>blackwall run &lt;llama-swap id&gt;          full suite, 2–5 hours, runs in the background
-blackwall run &lt;id&gt; --quick             45–90 minutes, ranked as provisional
-blackwall run &lt;id&gt; --reuse             keep what still applies from the last run
-blackwall run &lt;id&gt; --submit            also submit to localmaxxing
-blackwall compare &lt;id&gt; &lt;id&gt;           which differences are real, task by task
+    <pre>blackwall run &lt;llama-swap id&gt;    full suite, 2–5 hours, runs in the background
+blackwall run &lt;id&gt; --quick       45–90 minutes, ranked as provisional
+blackwall run &lt;id&gt; --reuse       keep what still applies from the last run
+blackwall run &lt;id&gt; --submit      also submit to localmaxxing
+blackwall compare &lt;id&gt; &lt;id&gt;      which differences are real, task by task
 blackwall status · blackwall logs -f · blackwall ls · blackwall board --open</pre>
   </section>
   <footer>
@@ -495,6 +509,17 @@ function tierSetups() {
   return [...new Set(current().map(model => (model.stack || {}).hostLabel).filter(Boolean))];
 }
 
+function setupNotice() {
+  const list = setups();
+  const cards = list.map(setup => setup.label.split(" · driver ")[0]);
+  const drivers = list.every(setup => setup.label.includes(" · driver "));
+  const same = drivers && new Set(cards).size === 1;
+  const count = setup => `${setup.models} ${setup.models === 1 ? "model" : "models"}`;
+  const items = list.map((setup, index) => `${same ? setup.label.split(" · driver ")[1] : cardName(setup.label)} (${count(setup)})`);
+  return `Measured on ${same ? `${cardName(cards[0])} with ${list.length} drivers` : `${list.length} setups`}: ${items.join(", ")}. `
+    + "Quality compares across them; decode, peak and energy only compare within one.";
+}
+
 function health() {
   return (view().health || {})[state.effort] || {};
 }
@@ -512,10 +537,19 @@ function sortedModels() {
   });
 }
 
+function setupMarks(model) {
+  /* When a tier spans setups, only what differs says where a row came from: the same card on every row has nothing to
+     tell, a different driver does. */
+  const stacks = current().map(entry => entry.stack || {});
+  const differs = key => new Set(stacks.map(entry => entry[key])).size > 1;
+  return [differs("gpu") ? model.stack.gpu : null, differs("device") ? model.stack.device : null,
+          differs("driver") && model.stack.driver ? "driver " + model.stack.driver : null].filter(Boolean);
+}
+
 function modelMeta(model, withVerdict = true) {
   const parts = [model.engine, model.quantization, model.spec, model.context ? fmt.ctx(model.context) + " context" : null].filter(Boolean);
   const chips = [];
-  if (tierSetups().length > 1) parts.push(model.stack.gpu || model.stack.device);
+  if (tierSetups().length > 1) parts.push(...setupMarks(model));
   if (model.run.kind === "quick") chips.push(h("span", { className: "chip", text: "quick run", title: model.run.notes || "Smaller sample; ranked as provisional." }));
   if (model.run.contended && model.run.contended.length) chips.push(h("span", { className: "chip", text: "GPU was shared", title: "Other GPU work during the run: " + model.run.contended.join(", ") }));
   if (model.run.failedItems) chips.push(h("span", { className: "chip", text: `${model.run.failedItems} requests failed` }));
@@ -701,7 +735,8 @@ function renderFrontier(host) {
     host.appendChild(figure);
     return;
   }
-  const width = 760, height = 320, left = 62, right = 150, top = 16, bottom = 44;
+  const width = Math.max(280, Math.min(760, (host.clientWidth || 760) - 40)), roomy = width >= 520;
+  const height = 320, left = roomy ? 62 : 56, right = roomy ? 150 : 16, top = 16, bottom = 44;
   const maxX = niceCeil(Math.max(...points.map(decodeOf)) * 1.12, 50);
   const ys = points.flatMap(p => [p.index.value, p.index.lo, p.index.hi].filter(value => value != null));
   const minY = Math.max(0, Math.floor((Math.min(...ys) - 4) / 5) * 5);
@@ -721,15 +756,16 @@ function renderFrontier(host) {
   }
   s("line", { x1: left, x2: width - right, y1: height - bottom, y2: height - bottom, class: "axis" }, svgNode);
   s("text", { x: (left + width - right) / 2, y: height - 6, "text-anchor": "middle", class: "axis-title" }, svgNode, decodeAxis());
-  const yTitle = s("text", { x: 14, y: (top + height - bottom) / 2, "text-anchor": "middle", class: "axis-title",
-    transform: `rotate(-90 14 ${(top + height - bottom) / 2})` }, svgNode, "Quality index");
+  const titleX = roomy ? 14 : 9;
+  s("text", { x: titleX, y: (top + height - bottom) / 2, "text-anchor": "middle", class: "axis-title",
+    transform: `rotate(-90 ${titleX} ${(top + height - bottom) / 2})` }, svgNode, "Quality index");
   const frontier = frontierOf(points);
   if (frontier.length > 1) {
     const path = frontier.map((point, index) => `${index ? "L" : "M"}${x(decodeOf(point)).toFixed(1)},${y(point.index.value).toFixed(1)}`).join("");
     s("path", { d: path, class: "frontier-line" }, svgNode);
   }
   const overlay = s("rect", { x: left, y: top, width: width - left - right, height: height - top - bottom, fill: "transparent" }, svgNode);
-  const labelAll = points.length <= 10;
+  const labelAll = roomy && points.length <= 10;
   const placed = [];
   const labelY = (px, py) => {
     let candidate = py + 4;
@@ -749,7 +785,9 @@ function renderFrontier(host) {
     }
     s("circle", { cx: px, cy: py, r: selected ? 6 : 5, class: "pt" + (selected ? " selected" : "") }, svgNode);
     if (labelAll || selected) {
-      s("text", { x: px + 11, y: labelY(px, py), class: "pt-label" + (selected ? " selected" : "") }, svgNode, shortName(point));
+      const flip = !roomy && px > width / 2;
+      s("text", { x: flip ? px - 11 : px + 11, y: labelY(px, py), "text-anchor": flip ? "end" : "start",
+        class: "pt-label" + (selected ? " selected" : "") }, svgNode, shortName(point));
     }
     const hit = s("circle", { cx: px, cy: py, r: 16, class: "hit", tabindex: "0", role: "button",
       "aria-label": `${shortName(point)}: quality ${fmt.pct(point.index.value)}%, ${fmt.int(decodeOf(point))} tok/s` }, svgNode);
@@ -772,8 +810,22 @@ function renderFrontier(host) {
     showTooltip(event, modelRows(nearest));
   });
   overlay.addEventListener("pointerleave", hideTooltip);
-  figure.appendChild(svgNode);
+  figure.appendChild(h("div", { className: "frontier-body" }, [svgNode, wallList(frontier)]));
   host.appendChild(figure);
+}
+
+function wallList(frontier) {
+  /* The wall as a list: what to run if you want the most of one thing without giving up the other. */
+  const members = [...frontier].sort((one, two) => two.index.value - one.index.value);
+  return h("aside", { className: "wall-list", "aria-label": "Models on the wall" }, [
+    h("h3", { text: "On the wall" }),
+    h("p", { className: "strip-note", text: "Nothing else here is both faster and smarter than " + (members.length > 1 ? "these." : "this.") }),
+    h("ol", {}, members.map(model => h("li", {}, [h("button", { type: "button", className: "wall-item", onclick: () => select(model.id) }, [
+      h("b", { text: shortName(model) }),
+      h("span", { className: "mono", text: `${fmt.pct(model.index.value)} quality · ${fmt.int(decodeOf(model))} tok/s`
+        + (model.energy && model.energy.perCorrect ? ` · ${model.energy.perCorrect.value.toFixed(2)} Wh` : "") }),
+    ])]))),
+  ]);
 }
 
 function strip(task, model) {
@@ -874,7 +926,7 @@ function lineChart(model, points, options) {
   if (!points.length || !all.length) {
     return null;
   }
-  const width = 420, height = 230, left = 48, right = 58, top = 12, bottom = 40;
+  const width = 420, height = 230, left = 48, right = 74, top = 12, bottom = 40;
   const x = index => left + (width - left - right) * (points.length === 1 ? 0.5 : index / (points.length - 1));
   let y, ticks;
   if (options.log) {
@@ -1163,11 +1215,7 @@ function render() {
         + "settles below reading speed; everything faster scores lower." }));
     }
   }
-  if (setups().length > 1) {
-    notes.appendChild(h("p", { className: "notice", text: `Measured on ${setups().length} setups — `
-      + setups().map(setup => `${setup.label} (${setup.models} ${setup.models === 1 ? "model" : "models"})`).join(", ")
-      + ". Quality compares across them; decode, peak and energy only compare within one." }));
-  }
+  if (setups().length > 1) notes.appendChild(h("p", { className: "notice", text: setupNotice() }));
   if (!current().some(model => model.id === state.selected)) state.selected = sortedModels()[0].id;
   renderMeta();
   renderTable(host);
@@ -1193,7 +1241,7 @@ function renderMeta() {
   document.getElementById("readout").replaceChildren(...rows.filter(row => row[1])
     .map(([key, value, cls]) => h("div", {}, [h("dt", { text: key }), h("dd", { text: value, className: cls || null, title: key === "Card" ? hw.gpu : null })])));
 }
-document.getElementById("footer").textContent = `Data: ${DATA.database}. Rebuilt after every run, or with blackwall board.`;
+document.getElementById("footer").textContent = "Rebuilt from the results database after every run, or with blackwall board.";
 render();
 </script>
 </body>
