@@ -32,12 +32,12 @@ It measures the model as your server actually runs it — quantization, chat tem
 | Qwen 3.8 27B · SGLang · DFlash2 · 524K | 81.0 | 61.2 | 81.0 | 76.2 | 78.4 | 94.5 | 100.0 | 157 | 400 | 5.0 | 2.67 | 12 Sep |
 | Muse Glimmer 30B · SGLang · FP8 · DFlash2 · 128K | 71.6 | 57.8 | 84.1 | 62.4 | 33.9 | 78.8 | 97.4 | 143 | 680 | 4.0 | 2.73 | 13 Sep |
 | GPT-OSS 120B · SGLang · MXFP4 · DFlash · 128K | 71.2 | 51.4 | 87.3 | 83.2 | 11.0 | 64.4 | 96.5 | 206 | 432 | 1.8 | 5.99 | 12 Sep |
+| Kolibri 1 78B-A3B · llama.cpp · Q5_K_M · 160k | 67.7 | 46.4 | 86.5 | 78.2 | 13.6 | 53.3 | 93.9 | 172 | 470 | 7.9 | 12.00 | 10 Oct |
 | MiMo-V2.6 Distill Qwen 9B · llama.cpp · Q5_K_M · 262k | 50.0 | 39.7 | 41.3 | 35.6 | 34.3 | 76.2 | 78.1 | 164 | 419 | 3.8 | 17.92 | 25 Sep |
 
-_4 models on 2 setups, suite full/v1, max effort, newest run 25 Sep 2026._
+_5 models on 2 setups, suite full/v1, max effort, newest run 10 Oct 2026._
 
-_tok/s, Peak and Wh/correct come from 2 setups — NVIDIA RTX PRO 6000 Blackwell Workstation Edition · driver 610.57.04 (3), NVIDIA RTX PRO 6000 Blackwell Workstation Edition · driver 615.71.09 (1) — and only compare within one_
-
+_tok/s, Peak and Wh/correct come from 2 setups — NVIDIA RTX PRO 6000 Blackwell Workstation Edition · driver 610.57.04 (3), NVIDIA RTX PRO 6000 Blackwell Workstation Edition · driver 615.71.09 (2) — and only compare within one_
 <!--/LEADERBOARD-->
 
 Quality is the index; then one column per task, single-request decode speed, peak throughput across all requests, first-token wait on a 32k prompt, and board watt-hours per correct answer. The [live page](https://guitaripod.github.io/blackwall/) adds 95% intervals, per-length breakdowns and every server setting behind each run. Those are one card's numbers; a different card, quantization or server setting will move them.

@@ -249,7 +249,7 @@ const SUITES = DATA.suites || { [DATA.current || "1"]: { indexTasks: DATA.indexT
 const CURRENT = DATA.current || Object.keys(SUITES)[0];
 const WITH_RUNS = Object.keys(SUITES).filter(name => SUITES[name].efforts.length).sort((a, b) => Number(b) - Number(a));
 const WANTED_CLASS = (location.hash.match(/(?:^|[#&])(gpu|phone)\b/) || [])[1] || null;
-const state = { sortKey: "index", sortDir: "desc", columns: "scores", selected: null, effort: "medium", deviceClass: WANTED_CLASS, suite: SUITES[CURRENT].efforts.length ? CURRENT : (WITH_RUNS[0] || CURRENT) };
+const state = { sortKey: "index", sortDir: "desc", columns: "scores", selected: null, effort: null, deviceClass: WANTED_CLASS, suite: SUITES[CURRENT].efforts.length ? CURRENT : (WITH_RUNS[0] || CURRENT) };
 const CLASS_LABELS = { gpu: "GPU", phone: "Phone" };
 const THERMAL_NAMES = ["nominal", "fair", "serious", "critical"];
 const VERDICTS = {
@@ -481,10 +481,12 @@ function setups() {
 }
 
 function effortsByWeight(current) {
-  /* The effort with the most models ranked is the one worth opening on; the order they were declared in says
-     nothing about which has data. */
-  return [...current.efforts].sort((one, two) =>
-    (current.rankings[two] || []).length - (current.rankings[one] || []).length);
+  /* The effort with the most timed models ranked is the one worth opening on: those rows carry the card's speed, which
+     is what this board is about. Models scored without a timing, and the order efforts were declared in, say
+     nothing about which has the data. */
+  const timed = effort => (current.rankings[effort] || []).filter(model => model.speed && model.speed.decode).length;
+  const total = effort => (current.rankings[effort] || []).length;
+  return [...current.efforts].sort((one, two) => timed(two) - timed(one) || total(two) - total(one));
 }
 
 function tierSetups() {
