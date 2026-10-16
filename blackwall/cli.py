@@ -676,7 +676,7 @@ def cmd_resume(args):
     if run["status"] == "complete":
         fail(f"{run['id']} already finished")
     if suite.version_of(run["suite"]) != suite.VERSION:
-        fail(f"{run['id']} was measured under suite v{suite.version_of(run['suite'])} and this blackwall runs v{suite.VERSION}; "
+        fail(f"{run['id']} was measured under suite v{suite.version_of(run['suite'])} and this Blackwall runs v{suite.VERSION}; "
              f"`blackwall run {run['model']} --reuse {run['id']}` starts a v{suite.VERSION} run that keeps what still applies")
     at, window = window_of(args)
     flags = {key: value for key, value in (run.get("flags") or {}).items() if key not in ("parked", "stall")}
@@ -746,9 +746,15 @@ def print_columns(header, rows):
 
 
 def setups_note(setups):
-    """Quality compares across cards; the speed columns only compare within one, so a mixed ranking says which is which."""
-    detail = ", ".join(f"{entry['label']} ({entry['models']})" for entry in setups)
-    return f"tok/s, Peak and Wh/correct come from {len(setups)} setups — {detail} — and only compare within one"
+    """Quality compares across cards; the speed columns only compare within one, so a mixed ranking says which is which.
+    Two drivers on the same card are named by driver alone, because repeating the card says nothing."""
+    cards = {entry["label"].split(" · driver ")[0] for entry in setups}
+    by_driver = len(cards) == 1 and all(" · driver " in entry["label"] for entry in setups)
+    names = [entry["label"].split(" · driver ")[1] if by_driver else entry["label"] for entry in setups]
+    detail = ", ".join(f"{name} ({entry['models']} {'model' if entry['models'] == 1 else 'models'})"
+                       for name, entry in zip(names, setups))
+    where = f"{len(setups)} drivers on one {cards.pop()}" if by_driver else f"{len(setups)} setups"
+    return f"tok/s, Peak and Wh/correct come from {where}: {detail}. They only compare within one"
 
 
 def cmd_ls(args):
@@ -927,10 +933,10 @@ ROOT_EPILOG = """\
 examples:
   blackwall run qwen3-32b                          full suite at medium effort (3–6 h, in the background)
   blackwall run qwen3-32b --effort max --submit
-                                                the model at its maximum effort, recorded and submitted
+                                                   the model at its maximum effort, recorded and submitted
   blackwall run qwen3-32b --quick                  45–90 min, ranked as provisional
   blackwall run qwen3-32b gpt-oss-120b --at 03:00 --until 08:00
-                                                both models, one after the other, only at night
+                                                   both models, one after the other, only at night
   blackwall status                                 what is running, how far along it is and how long it has left
   blackwall wait                                   block until the latest run finishes, however often it gives way
   blackwall ls --effort max                        ranked table for one effort level
@@ -938,7 +944,8 @@ examples:
   blackwall doctor qwen3-32b                       check a model's server before spending a night on it
   blackwall sources                                newer question sets, or pinned files that moved upstream
   blackwall board --open                           the leaderboard page
-  blackwall export --out site                      the page plus board.json, ready to publish
+  blackwall export --out site --site-url https://you.example/bench/
+                                                   the page, board.json and an Atom feed, ready to publish
 
 A model is any llama-swap id (see `blackwall profile <id>`). Only one run at a time; a run
 swaps its model into the GPU and unloads whatever llama-swap had loaded.
@@ -998,7 +1005,7 @@ reuse (--reuse [RUN]):
 
 localmaxxing (--submit [all|speed|evals], needs hf_id and quantization in
 ~/.config/blackwall/models.toml):
-  speed  lmx measures the two canonical prompts, then blackwall submits them through the
+  speed  lmx measures the two canonical prompts, then Blackwall submits them through the
          API with the prompt hash, output sample and timings, so they earn Verified
   evals  GSM8K and HellaSwag shards the site doesn't have yet for this model and
          quantization, answered at the run's effort
@@ -1028,8 +1035,7 @@ def parser():
     root = argparse.ArgumentParser(prog="blackwall", description="Rank open models on an NVIDIA RTX PRO 6000 Blackwell: speed and answer quality, one leaderboard.",
                                    epilog=ROOT_EPILOG, formatter_class=formatter)
     root.add_argument("--version", action="version", version=f"blackwall {__version__}")
-    commands = root.add_subparsers(dest="command", required=True, title="commands",
-                                   metavar="{run,status,wait,logs,cancel,resume,ls,compare,doctor,sources,export,board,profile}")
+    commands = root.add_subparsers(dest="command", required=True, title="commands")
 
     run = commands.add_parser("run", help="benchmark a llama-swap model", description=RUN_DESCRIPTION,
                               epilog=RUN_EPILOG, formatter_class=formatter)
@@ -1082,7 +1088,7 @@ def parser():
     resume.set_defaults(handler=cmd_resume)
     ls = commands.add_parser("ls", help="ranked table of every model in the terminal")
     ls.add_argument("--device", choices=("gpu", "phone", "mac"), default="gpu",
-                    help="which tier to rank: the card's models or the phone's (default: gpu)")
+                    help="which tier to rank: the card's models, a phone's or a Mac's (default: gpu)")
     ls.add_argument("--effort", default="medium", metavar="LEVEL", help="which effort's ranking, e.g. medium or max (default medium)")
     ls.add_argument("--suite", metavar="VERSION", help=f"which suite version's ranking (default {suite.VERSION})")
     ls.add_argument("--markdown", action="store_true", help="print the table as markdown, for a README or an issue")
@@ -1107,7 +1113,7 @@ def parser():
     board_parser = commands.add_parser("board", help="rebuild the leaderboard page and print its path")
     board_parser.add_argument("--open", action="store_true", help="also open it in the browser")
     board_parser.set_defaults(handler=cmd_board)
-    profile = commands.add_parser("profile", help="what blackwall knows about a model and where each fact came from")
+    profile = commands.add_parser("profile", help="what Blackwall knows about a model and where each fact came from")
     profile.add_argument("model", help="llama-swap model id or alias")
     profile.set_defaults(handler=cmd_profile)
     phone_parser = commands.add_parser("phone", help="the phone mbenchd runs on: forward its ports, push models, read its logs")

@@ -75,7 +75,14 @@ def test_the_markdown_table_is_a_github_table(capsys):
 def test_a_ranking_measured_on_two_cards_says_the_speed_columns_dont_compare():
     note = cli.setups_note([{"label": "RTX PRO 6000 · driver 610", "models": 2}, {"label": "RTX 4090 · driver 570", "models": 1}])
     assert note.startswith("tok/s, Peak and Wh/correct come from 2 setups")
-    assert "RTX PRO 6000 · driver 610 (2), RTX 4090 · driver 570 (1)" in note
+    assert "RTX PRO 6000 · driver 610 (2 models), RTX 4090 · driver 570 (1 model)" in note
+
+
+def test_two_drivers_on_one_card_are_named_by_driver_alone():
+    card = "NVIDIA RTX PRO 6000 Blackwell Workstation Edition"
+    note = cli.setups_note([{"label": f"{card} · driver 610.57.04", "models": 3}, {"label": f"{card} · driver 615.71.09", "models": 1}])
+    assert note.startswith(f"tok/s, Peak and Wh/correct come from 2 drivers on one {card}: 610.57.04 (3 models), 615.71.09 (1 model)")
+    assert note.count(card) == 1
 
 
 def test_time_left_counts_the_time_spent_answering_and_never_the_time_parked():

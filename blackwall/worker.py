@@ -268,7 +268,7 @@ def park_for_window(db, run, events, window, host):
     count = schedule.park(db, run["id"], resumes, f"the {window['start']}–{window['end']} window was closing", "paused")
     events.emit("paused", until=schedule.describe(resumes))
     if count == 1:
-        notify.send("blackwall paused", f"{run['model']}: stopped before {window['end']}; continues {schedule.describe(resumes)}",
+        notify.send("Blackwall paused", f"{run['model']}: stopped before {window['end']}; continues {schedule.describe(resumes)}",
                     run=run["id"], status="paused")
 
 
@@ -307,7 +307,7 @@ def give_way(db, run, events, found, host):
     schedule.install_timer()
     events.emit("yielded", to=names, retry=schedule.describe(resumes))
     if count == 1:
-        notify.send("blackwall gave way", f"{run['model']} paused while {names} uses the GPU; it tries again every ten minutes",
+        notify.send("Blackwall gave way", f"{run['model']} paused while {names} uses the GPU; it tries again every ten minutes",
                     run=run["id"], status="yielded")
 
 
@@ -364,7 +364,7 @@ def execute(run_id):
     contention = []
     try:
         if suite.version_of(run["suite"]) != suite.VERSION:
-            raise RuntimeError(f"this run was started under suite v{suite.version_of(run['suite'])} and this blackwall runs "
+            raise RuntimeError(f"this run was started under suite v{suite.version_of(run['suite'])} and this Blackwall runs "
                                f"v{suite.VERSION}; start a new run, with --reuse {run_id} to carry over what still applies")
         deadline = schedule.window_deadline(window, datetime.now())
         if deadline and deadline - time.time() < MIN_WINDOW_S:
@@ -461,7 +461,7 @@ def execute(run_id):
         flags.pop("parked", None)
         store.update_run(db, run_id, status="complete", finished=time.time(), flags=flags)
         events.emit("complete")
-        notify.send("blackwall finished", finished_note(db, run_id, profile.id), run=run_id, status="complete")
+        notify.send("Blackwall finished", finished_note(db, run_id, profile.id), run=run_id, status="complete")
     except engine.ServerGone as error:
         events.emit("server gone", reason=str(error)[:200])
         if stalled(db, run_id, run_dir) < STALL_LIMIT:
@@ -471,12 +471,12 @@ def execute(run_id):
         store.update_run(db, run_id, status="failed", finished=time.time(), error=fault[:500])
         events.emit("failed", error=fault[:300])
         host.unload()
-        notify.send("blackwall failed", f"{profile.id}: {fault[:200]}", run=run_id, status="failed")
+        notify.send("Blackwall failed", f"{profile.id}: {fault[:200]}", run=run_id, status="failed")
     except Exception as error:
         store.update_run(db, run_id, status="failed", finished=time.time(), error=str(error)[:500])
         events.emit("failed", error=str(error)[:300])
         events.log(traceback.format_exc())
-        notify.send("blackwall failed", f"{profile.id}: {str(error)[:200]}", run=run_id, status="failed")
+        notify.send("Blackwall failed", f"{profile.id}: {str(error)[:200]}", run=run_id, status="failed")
     finally:
         for each in guards:
             each.stop()

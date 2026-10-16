@@ -10,17 +10,15 @@
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/github/license/guitaripod/blackwall?style=flat-square&labelColor=000&color=76b900"></a>
 </p>
 
-Blackwall ranks open models on one NVIDIA RTX PRO 6000 Blackwell. It measures every model [llama-swap](https://github.com/mostlygeek/llama-swap) serves from the card — speed and answer quality — the same way each time, and builds one leaderboard page out of the results.
+Blackwall ranks open models on one NVIDIA RTX PRO 6000 Blackwell. It measures every model [llama-swap](https://github.com/mostlygeek/llama-swap) serves from the card, speed and answer quality, the same way each time, and builds one leaderboard from the results.
 
 ```
 blackwall run gpt-oss-120b
 ```
 
-Ninety-six gigabytes of VRAM is a different place from a 24 GB gaming card: gpt-oss-120b fits at MXFP4, a 27B fits at 512k of context, and the question becomes which of them is worth the watts. That question only has an answer when every number comes off the same hardware, so Blackwall is built around one card instead of trying to rank every GPU: the page, the power and VRAM readings and the defaults are all about it. It runs on any NVIDIA GPU llama-swap can serve; the board then labels the rows with the card they came from and never compares speed across cards.
+Ninety-six gigabytes is a different place from a 24 GB gaming card: gpt-oss-120b fits at MXFP4, a 27B fits at 512k of context, and the question becomes which of them is worth the watts. That question only has an answer when every number comes off the same hardware, so Blackwall is built around one card instead of ranking every GPU. It runs on any NVIDIA GPU llama-swap can serve; the board labels each row with the card it came from and never compares speed across cards.
 
-One command per model. It loads the model through llama-swap, checks the server, measures, stores everything in SQLite and rebuilds a self-contained page: quality against speed, a sortable table with 95% intervals, a detail view per model. The run lives in a systemd user unit, so closing the terminal only detaches you from it, and `blackwall resume` continues from the last saved answer.
-
-It measures the model as your server actually runs it — quantization, chat template, tool-call parser, speculative decoding, context window and all — not the weights in a vacuum.
+One command per model: Blackwall loads it through llama-swap, checks the server, measures, stores everything in SQLite and rebuilds a self-contained page. The run lives in a systemd user unit, so closing the terminal only detaches you, and `blackwall resume` continues from the last saved answer. It measures the model as your server actually runs it (quantization, chat template, tool-call parser, speculative decoding, context window), not the weights in a vacuum.
 
 <img src="docs/leaderboard.png" alt="The Blackwall leaderboard: a table of task scores with 95% intervals, then quality against speed with the wall drawn through the models nothing else beats on both">
 
@@ -37,14 +35,14 @@ It measures the model as your server actually runs it — quantization, chat tem
 
 _5 models on 2 setups, suite full/v1, max effort, newest run 10 Oct 2026._
 
-_tok/s, Peak and Wh/correct come from 2 setups — NVIDIA RTX PRO 6000 Blackwell Workstation Edition · driver 610.57.04 (3), NVIDIA RTX PRO 6000 Blackwell Workstation Edition · driver 615.71.09 (2) — and only compare within one_
+_tok/s, Peak and Wh/correct come from 2 drivers on one NVIDIA RTX PRO 6000 Blackwell Workstation Edition: 610.57.04 (3 models), 615.71.09 (2 models). They only compare within one_
 <!--/LEADERBOARD-->
 
 Quality is the index; then one column per task, single-request decode speed, peak throughput across all requests, first-token wait on a 32k prompt, and board watt-hours per correct answer. The [live page](https://guitaripod.github.io/blackwall/) adds 95% intervals, per-length breakdowns and every server setting behind each run. Those are one card's numbers; a different card, quantization or server setting will move them.
 
 ## Following the board
 
-The site rebuilds after every run, and the same results come three ways so you can follow them however you like:
+The site is republished whenever new results land, and the same results come three ways, so you can follow them however you like:
 
 - **Atom feed.** [`feed.xml`](https://guitaripod.github.io/blackwall/feed.xml) has one entry per finished run, marked *new best* or *debut*. Add it to any feed reader.
 - **Data.** [`board.json`](https://guitaripod.github.io/blackwall/board.json) holds every number on the page plus a `history` of all finished runs, under a `schema` number whose keys are only ever added. [docs/data.md](docs/data.md) describes it.
@@ -60,7 +58,7 @@ To publish a board of your own, `blackwall export --out site --site-url https://
 |---|---|---|
 | Speed | 3 prompts × 3 repeats at 1,024 tokens; 1 up to 32 requests at once, as many as the server takes; first-token wait and decode speed from 1k to 250k-token prompts; GPU power | greedy decoding, streamed timings, `nvidia-smi` |
 | SuperGPQA | 521 graduate-level questions, ten options, spread over its 13 disciplines like the full set | final `Answer: X` line |
-| AIME + HMMT 2026 | 63 problems × 2 samples, 64k-token budget | last `\boxed{{}}`, compared symbolically with [Math-Verify](https://github.com/huggingface/Math-Verify) |
+| AIME + HMMT 2026 | 63 problems × 2 samples, 64k-token budget | last `\boxed{}`, compared symbolically with [Math-Verify](https://github.com/huggingface/Math-Verify) |
 | LiveCodeBench v6 | 101 problems (Jan–Apr 2025), 64k-token budget | hidden tests, run in a network-less Docker container |
 | MRCR, 8 needles | 60 conversations, 15 each at 16k, 32k, 64k and 128k tokens | OpenAI's grade: the requested prefix, then the difflib ratio |
 | Graphwalks | 48 graphs, BFS and parent queries from 8k to 64k tokens | F1 of the node set on the last line |
@@ -81,13 +79,13 @@ LiveCodeBench has published nothing newer than April 2025, so models trained aft
 - **One stack per speed number.** Every run records the card, its driver and the build of the server that answered — SGLang's version or the commit of the checkout it runs from, llama.cpp's build string. Quality compares across those; decode, peak and watt-hours only compare within one, so the board says when a ranking spans two setups, and `blackwall doctor` says when the stack moved under a model since its last run.
 - **Intervals, not point scores.** Every task carries a 95% interval (Wilson, or the spread of per-question means), and the index bootstraps questions within each task. `blackwall compare` pairs two runs question by question and says which differences survive the noise.
 - **A dead server is not a bad score.** When the model server stops answering — it crashed, or the card fell off the bus — the run stops and says so, with the kernel's Xid line if there is one, instead of recording the silence as wrong answers. The card is watched the whole way through, and a run keeps its answers so it continues once the machine is well again.
-- **Nothing quietly skipped.** A prompt that doesn't fit the model's context scores zero instead of disappearing, and the board says which task that cost. When the server refuses a request for its length, blackwall reads the window and prompt size out of the refusal, retries once with a smaller answer budget, then scores zero.
+- **Nothing quietly skipped.** A prompt that doesn't fit the model's context scores zero instead of disappearing, and the board says which task that cost. When the server refuses a request for its length, Blackwall reads the window and prompt size out of the refusal, retries once with a smaller answer budget, then scores zero.
 - **Cost as well as speed.** Board energy is integrated across the quality tasks and divided by correct answers, so a fast-but-wasteful model is visible as watt-hours per correct answer.
 - **Saturation is flagged.** With three or more models ranked, the board marks any task that isn't separating them — all near the ceiling, all near the floor, or apart by less than the noise.
 
 ## Benchmarking a model
 
-You need Linux with systemd user units and an NVIDIA GPU, llama-swap in front of SGLang or llama.cpp, Docker for grading LiveCodeBench, Python 3.12 with [uv](https://docs.astral.sh/uv/), and about 1 GB of disk for the pinned datasets. vLLM speaks the same API but is untested: it doesn't report how many requests it takes at once, so blackwall sends 4.
+You need Linux with systemd user units and an NVIDIA GPU, llama-swap in front of SGLang or llama.cpp, Docker for grading LiveCodeBench, Python 3.12 with [uv](https://docs.astral.sh/uv/), and about 1 GB of disk for the pinned datasets. vLLM speaks the same API but is untested: it doesn't report how many requests it takes at once, so Blackwall sends 4.
 
 ```
 uv tool install git+https://github.com/guitaripod/blackwall
@@ -95,7 +93,7 @@ uv tool install git+https://github.com/guitaripod/blackwall
 
 Each [release](https://github.com/guitaripod/blackwall/releases) also carries a wheel. Coming from mbench, the [changelog](CHANGELOG.md#migrating-from-mbench) lists the three `mv` commands, and Blackwall prints them itself while the old directories are still there.
 
-**1. Describe the model.** blackwall reads its launch command from llama-swap's config; anything that command doesn't say goes in `~/.config/blackwall/models.toml`, keyed by llama-swap model id. `blackwall profile <id>` shows what was resolved and where each value came from.
+**1. Describe the model.** Blackwall reads its launch command from llama-swap's config; anything that command doesn't say goes in `~/.config/blackwall/models.toml`, keyed by llama-swap model id. `blackwall profile <id>` shows what was resolved and where each value came from.
 
 ```toml
 [gpt-oss-120b]
@@ -109,7 +107,7 @@ spec = { method = "EAGLE3", draft = "lmsys/EAGLE3-gpt-oss-120b-bf16", tokens_per
 
 - `thinking` is how the model takes a reasoning level: `openai` sends `reasoning_effort`, `qwen` sends `chat_template_kwargs` with `enable_thinking` and `reasoning_effort`, `muse` sends `chat_template_kwargs` with `reasoning_strength`, `nemotron` sends `chat_template_kwargs` with `enable_thinking` and, at medium, `medium_effort`, `none` sends nothing.
 - `efforts` lists the levels the chat template accepts, lowest first; `--effort max`/`min` pick the ends.
-- `context` caps the long-prompt tests. Without it, blackwall asks the server once the model is loaded.
+- `context` caps the long-prompt tests. Without it, Blackwall asks the server once the model is loaded.
 - `hf_id`, `quantization`, `spec` and `engine` only matter for `--submit`.
 - [Oh My Pi](https://github.com/can1357/oh-my-pi) users: `compat.thinkingFormat`, `thinking.efforts` and `contextWindow` are read from its `models.yml` too; `models.toml` wins.
 
@@ -117,37 +115,38 @@ spec = { method = "EAGLE3", draft = "lmsys/EAGLE3-gpt-oss-120b-bf16", tokens_per
 
 **3. Run it.** `blackwall run <id> --effort max`, or `blackwall run <a> <b> --at 02:00 --until 09:00` for a nightly window. Extra models queue and run one at a time. Answers are written as they arrive, so a pause costs nothing, and the local page rebuilds when the run ends.
 
-**4. Read it.** `blackwall ls --effort max` in the terminal, `blackwall board --open` for the page, `blackwall compare <a> <b>` when two models look close and you want to know whether the gap is real. The table shows the scores or what running them cost, whichever tab you pick, and every one of its links opens a 1200 × 675 card that downloads as a PNG for posting: *share this table ↗* ranks everything in the tab, *share this ↗* profiles one model — its per-question scores — and *share a comparison ↗* sets two models against each other with ties greyed out.
+**4. Read it.** `blackwall ls --effort max` in the terminal, `blackwall board --open` for the page, `blackwall compare <a> <b>` when two models look close and you want to know whether the gap is real. The table shows the scores or what running them cost, whichever tab you pick. Its share links open a 1200 × 675 card you can download as a PNG: *share this table ↗* ranks everything in the tab, *share this ↗* profiles one model, and *share a comparison ↗* sets two models against each other with ties greyed out.
 
-**5. Publish it.** `scripts/publish.sh max` exports `site/index.html` and `site/board.json`, re-renders the banner, the leaderboard and the share card, and rewrites the table above between its markers. Commit and push: the `pages` workflow redeploys the site on any change under `site/`. The database is the record; the page, the JSON and that table are all projections of it, so nothing is typed by hand.
+**5. Publish it.** `scripts/publish.sh max` exports the page, `board.json` and `feed.xml` into `site/`, re-renders the banner, the leaderboard and the share card, and rewrites the table above between its markers. It addresses the feed to `SITE_URL`, which defaults to this project's own site, so set it for a board of your own. Commit and push: the `pages` workflow redeploys on any change under `site/`. The database is the record; the page, the JSON, the feed and that table are all projections of it, so nothing is typed by hand.
 
 A model only joins an existing ranking if it ran at the same effort level, and changing the question set means bumping the suite version so old and new runs are ranked apart rather than mixed.
 
 ### Every command
 
 ```
-blackwall run <id>                       full suite at medium effort
-blackwall run <id> --effort max          the model's highest declared effort, ranked separately
-blackwall run <id> --quick --detach      smaller samples; start and return at once
-blackwall run <id> --only speed          one task; --skip leaves tasks out
-blackwall run <id> --reuse               carry over answers that still apply
+blackwall run <id>                    full suite at medium effort
+blackwall run <id> --effort max       the model's highest declared effort, ranked separately
+blackwall run <id> --quick --detach   smaller samples; start and return at once
+blackwall run <id> --only speed       one task; --skip leaves tasks out
+blackwall run <id> --reuse            carry over answers that still apply
 blackwall run <a> <b> --at 03:00 --until 08:00
                                       several models, one after another, only at night
-blackwall run <id> --submit              also submit to localmaxxing (all, speed or evals)
-blackwall status                         what is running, how long its task has left, what is scheduled
-blackwall wait [<run>]                   block until a run finishes, however often it gives way
-blackwall logs -f                        follow the worker log
-blackwall cancel / blackwall resume         stop a run; continue it later
+blackwall run <id> --submit           also submit to localmaxxing (all, speed or evals)
+blackwall status                      what is running, how long its task has left, what is scheduled
+blackwall wait [<run>]                block until a run finishes, however often it gives way
+blackwall logs -f                     follow the worker log
+blackwall cancel · blackwall resume   stop a run; continue it later
 blackwall ls [--effort max] [--markdown]
                                       ranked table in the terminal
-blackwall compare <a> <b>                paired differences, task by task, with 95% intervals
-blackwall doctor <id>                    check a model's server before spending a night on it
-blackwall sources                        newer question sets, or pinned files that moved
-blackwall board --open                   the leaderboard page
-blackwall export --out site              the page plus board.json, ready to publish
-blackwall profile <id>                   what blackwall knows about a model
-blackwall rescore [<run>]                score a finished run again from the answers it kept
-blackwall rm <run|model> [--dry-run]     forget runs and everything they measured
+blackwall compare <a> <b>             paired differences, task by task, with 95% intervals
+blackwall doctor <id>                 check a model's server before spending a night on it
+blackwall sources                     newer question sets, or pinned files that moved
+blackwall board --open                the leaderboard page
+blackwall export --out site --site-url URL
+                                      the page, board.json and an Atom feed, ready to publish
+blackwall profile <id>                what Blackwall knows about a model
+blackwall rescore [<run>]             score a finished run again from the answers it kept
+blackwall rm <run|model> [--dry-run]  forget runs and everything they measured
 ```
 
 `blackwall -h` and `blackwall run -h` cover every option.
@@ -159,9 +158,13 @@ A full run takes hours, so it stays out of the way:
 - **`--at 03:00 --until 08:00`** runs models one after another inside a nightly window. Whatever is unfinished at 08:00 stops, llama-swap unloads the model, and the run continues from its saved answers the next night. Near the end of a window a run stops taking questions that couldn't finish in time.
 - **Runs give way.** When a game or another GPU job holds the card for a minute, the run unloads the model, pauses and retries every ten minutes, whether it was scheduled or started by hand. `--keep-gpu` turns that off.
 - **Every run starts with the doctor checks**, so a misconfigured server fails in the first minute instead of producing a night of zeros.
-- **The request count matches the server.** blackwall reads how many requests it accepts at once and how much context they share, then sends many short questions in parallel and long conversations one at a time.
+- **The request count matches the server.** Blackwall reads how many requests it accepts at once and how much context they share, then sends many short questions in parallel and long conversations one at a time.
 - **`--reuse`** starts a fresh run that keeps the answers of an earlier one for every task whose questions and scoring didn't change, and measures only the rest.
 - **Notifications.** Finishing, failing or pausing sends a desktop notification; set `notify` in `~/.config/blackwall/config.toml` (or `BLACKWALL_NOTIFY`) to forward it anywhere, e.g. `notify = 'curl -d "$BLACKWALL_MESSAGE" https://ntfy.sh/your-topic'`.
+
+## Phones
+
+The iPhone harness that came before the RTX PRO 6000 focus is documented in [docs/phone.md](docs/phone.md). Its runs stay in the database and in `blackwall ls --device phone`; the published board does not carry them.
 
 ## localmaxxing
 
@@ -171,8 +174,8 @@ A full run takes hours, so it stays out of the way:
 
 - `~/.local/share/blackwall/bench.db`: runs, metrics and submissions
 - `~/.local/share/blackwall/runs/<run>/`: every answer as JSONL (tool episodes with their calls and results), speed samples, the doctor report, server settings, the worker log
-- `~/.local/share/blackwall/leaderboard.html`: rebuilt after every run
-- `~/.config/blackwall/models.toml`: model facts · `config.toml`: the notify command
+- `~/.local/share/blackwall/leaderboard.html`: the local page, rebuilt after every run
+- `~/.config/blackwall/models.toml`: model facts · `config.toml`: `notify`, the command that forwards notifications, and `site_url`, the address `export` builds the feed for · `hardware.json`: the card description lmx submits, written on first use
 - `~/.cache/blackwall/`: pinned datasets, their token counts and the LiveCodeBench harness
 
 Environment overrides: `BLACKWALL_HOME`, `BLACKWALL_SWAP_URL` (default `http://127.0.0.1:8081`), `BLACKWALL_SWAP_CONFIG`, `BLACKWALL_OMP_MODELS`, `BLACKWALL_NOTIFY`, `XDG_CONFIG_HOME`, `XDG_CACHE_HOME`.
@@ -181,8 +184,7 @@ Environment overrides: `BLACKWALL_HOME`, `BLACKWALL_SWAP_URL` (default `http://1
 
 Blackwall is Blackwell with one letter changed, and a nod to the barrier in *Cyberpunk 2077* that keeps the rogue AIs out of the Net. Here the models run behind the wall and the leaderboard is what comes back. The green line through the quality-against-speed chart is the wall too: it joins the models nothing else beats on both.
 
-Blackwall is an independent project and is not affiliated with or endorsed by NVIDIA or CD PROJEKT RED. NVIDIA, RTX and Blackwell are trademarks of NVIDIA Corporation; *Cyberpunk 2077* is a trademark of CD PROJEKT S.A. Phone benchmarking, the project's earlier side road, lives in [docs/phone.md](docs/phone.md).
-
+Blackwall is an independent project and is not affiliated with or endorsed by NVIDIA or CD PROJEKT RED. NVIDIA, RTX and Blackwell are trademarks of NVIDIA Corporation; *Cyberpunk 2077* is a trademark of CD PROJEKT S.A. 
 ## Credits
 
 Questions come from [SuperGPQA](https://huggingface.co/datasets/m-a-p/SuperGPQA) (ODC-BY), [MathArena's AIME 2026 and HMMT February 2026](https://matharena.ai) (CC BY-NC-SA 4.0), [LiveCodeBench](https://livecodebench.github.io), and OpenAI's [MRCR](https://huggingface.co/datasets/openai/mrcr) and [Graphwalks](https://huggingface.co/datasets/openai/graphwalks) (MIT) — downloaded at run time, never redistributed. Code grading uses LiveCodeBench's own harness at a pinned commit. The long speed prompts are built from MMLU-Pro question text; the two canonical speed prompts are localmaxxing's.
@@ -195,6 +197,6 @@ uv tool install --editable .
 scripts/publish.sh max         # site/, docs/*.png and the table above
 ```
 
-To release: set `__version__` in `blackwall/__init__.py`, write the version's section in `CHANGELOG.md`, commit, then `git tag X.Y.Z && git push --tags`. The `release` workflow checks the tag against the version, runs the tests, builds the wheel and sdist, and publishes the release with that section as its notes.
+To release: set `__version__` in `blackwall/__init__.py`, write the version's section in `CHANGELOG.md`, run `scripts/publish.sh max`, commit and push, then `git tag -a X.Y.Z -m "Blackwall X.Y.Z" && git push origin X.Y.Z`. The `release` workflow checks the tag against the version, runs the tests, builds the wheel and sdist, and publishes the release with that section as its notes. Tags have no `v`.
 
 Licensed under GPL-3.0-or-later.

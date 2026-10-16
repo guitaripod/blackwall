@@ -23,7 +23,7 @@ blackwall run <id> --quality-from <run>   measure the phone
 
 | Port | What answers |
 |---|---|
-| 8080 | `llama-server` itself, unproxied — blackwall measures straight against it, so no timing passes through code of ours |
+| 8080 | `llama-server` itself, unproxied — Blackwall measures straight against it, so no timing passes through code of ours |
 | 8081 | mbenchd: `/mb/health`, `/mb/models`, `/mb/load`, `/mb/unload`, and llama-swap's `/running` and `/unload` |
 
 blackwall reaches both over the cable (`pymobiledevice3 usbmux forward`), loads the model by POSTing the `phone` table to `/mb/load`, and then talks plain OpenAI to the phone as if it were any other server. In place of the driver's power and VRAM, it polls `/mb/health` once a second for thermal state, the memory the process holds and the battery, so every speed row carries the conditions it was measured under. If the app stops answering — backgrounded, jetsammed, cable out — the run stops and says so rather than scoring the silence.
@@ -61,6 +61,6 @@ efforts = ["none", "medium"]
 phone = { file = "Qwen3-1.7B-Q4_K_M.gguf", n_ctx = 16384, parallel = 4, flash_attn = "on", cache_type_k = "q8_0", cache_type_v = "q8_0", extra_args = ["-kvu"] }
 ```
 
-`control_url` and `server_url` in the same table point blackwall at a phone that is not on this cable.
+`control_url` and `server_url` in the same table point Blackwall at a phone that is not on this cable.
 
 </details>

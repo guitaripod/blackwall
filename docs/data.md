@@ -44,6 +44,10 @@ The published site carries every number on the page as `board.json`, so a script
 | `stack` | The card (`gpu`), `driver`, `vramMib` and server `build` that answered. Quality compares across stacks; speed and energy only compare within one. |
 | `capacity` | Requests the server took at once and the context they shared. |
 | `warnings` | Settings that capped a score, in words. |
+| `fingerprint` | A hash of the server's launch settings. A changed launcher or flag is a new configuration, so it is a new fingerprint. |
+| `repeats` | `runs`, how many complete runs share this fingerprint, and `spread`, how far apart their decode speeds landed as a percentage, or `null` with one run. |
+| `lmx`, `submissions` | Scores and submission ids from [localmaxxing](https://www.localmaxxing.com), when the run was submitted. Empty otherwise. |
+| `deviceClass`, `thermal`, `battery`, `verdict`, `qualityFrom` | Phone-run fields. `deviceClass` is always `gpu` on the published board, and the others are empty, because phone runs are not published. |
 | `run` | The run behind the row: `id`, `suite`, `kind` (`full` or `quick`), `finished`, `effort`, `harness`, notes and what was shared or failed. |
 | `history` | The model's runs at any effort in this suite version, newest first and including the one behind the row: `id`, `suite`, `effort`, `finished`, `index`, `decode`. |
 | `server` | The server settings recorded with the run. Paths on the measuring machine appear as recorded, with its home directory written `~`. |

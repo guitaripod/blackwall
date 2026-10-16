@@ -160,7 +160,7 @@ def changed(previous, hardware, found):
 
 
 def checkout_commit(root):
-    """The commit of the source checkout blackwall runs from (an editable install), marked -dirty when its package files changed."""
+    """The commit of the source checkout Blackwall runs from (an editable install), marked -dirty when its package files changed."""
     def git(*args):
         return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True).stdout.strip()
 
@@ -183,7 +183,7 @@ def installed_commit():
 
 
 def harness():
-    """The blackwall that is measuring: a run records it when it starts, not when it was queued, because the code can move
+    """The Blackwall that is measuring: a run records it when it starts, not when it was queued, because the code can move
     between the two."""
     return f"{VERSION}+{checkout_commit(paths.PACKAGE.parent) or installed_commit() or 'nogit'}"
 

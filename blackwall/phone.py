@@ -266,7 +266,7 @@ TOOL_PATHS = ("~/.local/bin/pymobiledevice3", "~/.local/share/pmd-venv/bin/pymob
 
 
 def tool():
-    """pymobiledevice3 carries files and ports over the cable; it is not a dependency of blackwall itself. A worker runs
+    """pymobiledevice3 carries files and ports over the cable; it is not a dependency of Blackwall itself. A worker runs
     as a systemd unit, whose PATH is the system's and not the shell's, so the usual places are searched by hand
     rather than trusted to `which`."""
     found = os.environ.get("BLACKWALL_PMD") or shutil.which("pymobiledevice3")

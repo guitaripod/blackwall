@@ -115,7 +115,7 @@ def created(response):
 
 
 def speed_runs(profile, run_dir, run_id, log):
-    """lmx measures the two canonical prompts; blackwall submits them itself, with evidence, so they can earn the Verified badge."""
+    """lmx measures the two canonical prompts; Blackwall submits them itself, with evidence, so they can earn the Verified badge."""
     engine = LMX_ENGINES.get(profile.engine)
     if not engine:
         log(f"localmaxxing: no speed-test engine for {profile.engine}, skipped")

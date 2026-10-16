@@ -74,11 +74,11 @@ def describe(timestamp):
 def unit_files():
     environment = {key: value for key, value in os.environ.items() if key.startswith("BLACKWALL_") or key in PASSED_ENV}
     service = (
-        "[Unit]\nDescription=Start due blackwall runs and pause runs outside their window\n\n[Service]\nType=oneshot\n"
+        "[Unit]\nDescription=Start due Blackwall runs and pause runs outside their window\n\n[Service]\nType=oneshot\n"
         + "".join(f'Environment="{key}={value}"\n' for key, value in sorted(environment.items()))
         + f"WorkingDirectory={paths.DATA}\nExecStart={sys.executable} -m blackwall.cli tick\n"
     )
-    timer = ("[Unit]\nDescription=Check the blackwall schedule every five minutes\n\n[Timer]\nOnCalendar=*:0/5\n"
+    timer = ("[Unit]\nDescription=Check the Blackwall schedule every five minutes\n\n[Timer]\nOnCalendar=*:0/5\n"
              "AccuracySec=1s\n\n[Install]\nWantedBy=timers.target\n")
     return {f"{TIMER}.service": service, f"{TIMER}.timer": timer}
 
@@ -131,7 +131,7 @@ def pause(db, run, moment):
     swap.unload()
     resumes = next_start(moment, window["start"]).timestamp()
     if park(db, run["id"], resumes, f"the window closed at {window['end']}", "paused") == 1:
-        notify.send("blackwall paused", f"{run['model']}: the window closed at {window['end']}; continues {describe(resumes)}",
+        notify.send("Blackwall paused", f"{run['model']}: the window closed at {window['end']}; continues {describe(resumes)}",
                     run=run["id"], status="paused")
 
 

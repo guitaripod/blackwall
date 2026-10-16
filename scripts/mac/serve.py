@@ -1,4 +1,4 @@
-"""One MLX model, one request at a time, over the OpenAI shape blackwall speaks.
+"""One MLX model, one request at a time, over the OpenAI shape Blackwall speaks.
 
 mlx_lm.server batches requests through a generator that keeps buffers alive across them; after a few dozen long
 answers the Metal device's resource limit (499000 live buffers) is reached and the generation thread dies while the
@@ -131,7 +131,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
     def do_GET(self):
         """Only the two paths this server really answers. A server that says something to every GET is read by a
-        client as whichever kind of server asked first, and blackwall then believes it has no slots."""
+        client as whichever kind of server asked first, and Blackwall then believes it has no slots."""
         path = self.path.rstrip("/")
         if path.endswith("models"):
             self.reply(200, {"object": "list", "data": [{"id": MODEL_PATH, "object": "model"}]})

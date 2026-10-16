@@ -2,7 +2,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 effort="${1:-max}"
-blackwall export --out site --site-url https://guitaripod.github.io/blackwall/ >/dev/null
+blackwall export --out site --site-url "${SITE_URL:-https://guitaripod.github.io/blackwall/}" >/dev/null
 scripts/screenshots.sh site/index.html >/dev/null
 cp docs/banner.png docs/leaderboard.png site/
 [[ -f docs/card.png ]] && cp docs/card.png site/

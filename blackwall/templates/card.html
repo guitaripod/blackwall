@@ -56,7 +56,6 @@ body.bare canvas { width: 1200px; border: 0; border-radius: 0; }
   <h1 id="title">Comparison card</h1>
   <div class="controls">
     <label>Effort<select id="effort"></select></label>
-    <label id="where-label">Ran on<select id="where"></select></label>
     <label>Show<select id="show">
       <option value="many">A ranking</option>
       <option value="two">Head to head</option>
@@ -80,31 +79,15 @@ const PALETTE = { page: "#000000", ink: "#ffffff", ink2: "#c6c6c6", muted: "#8c8
 const SUITES = DATA.suites || {};
 const CURRENT = DATA.current || Object.keys(SUITES)[0];
 const view = SUITES[CURRENT] || { efforts: [], rankings: {}, indexTasks: [], taskShort: {} };
-const VERDICT_LABELS = { holds: "holds up", fades: "fades", barely: "barely runs" };
 const canvas = document.getElementById("card");
 const context = canvas.getContext("2d");
 const MODES = ["many", "two", "one"];
 const NEEDS = { many: 3, two: 2, one: 1 };
-const CLASS_LABELS = { gpu: "GPU", phone: "Phone" };
-const state = { effort: null, klass: null, mode: "two", models: [] };
-
-function classOf(model) {
-  return (model && model.deviceClass) || "gpu";
-}
+const state = { effort: null, mode: "two", models: [] };
 
 function ranking() {
   return (view.rankings[state.effort] || []).slice()
     .sort((one, two) => (two.index?.value ?? -1) - (one.index?.value ?? -1));
-}
-
-function classes() {
-  return [...new Set(ranking().map(classOf))];
-}
-
-function pool() {
-  /* Everything a card at these settings could show. A card only ever holds models measured the same way, so the
-     class is part of the settings rather than something each picker filters for itself. */
-  return ranking().filter(model => classOf(model) === state.klass);
 }
 
 function shortName(model) {
@@ -189,8 +172,8 @@ function header(model, x, side, colour) {
   dot(x + 6, 132, colour);
   const size = fit(name, 440, 26, 600, "display");
   text(name, x + 22, 139, { size, weight: 600, family: "display" });
-  const facts = [model.engine, model.quantization, model.spec, model.context ? Math.round(model.context / 1024) + "k ctx" : null,
-    VERDICT_LABELS[model.verdict]].filter(Boolean).join(" · ");
+  const facts = [model.engine, model.quantization, model.spec, model.context ? Math.round(model.context / 1024) + "k ctx" : null]
+    .filter(Boolean).join(" · ");
   text(facts, x + 22, 160, { size: 13, family: "mono", color: "muted" });
   const index = model.index && model.index.value != null ? model.index.value.toFixed(1) : "–";
   const width = text(index, x, 218, { size: 54, weight: 700, family: "display" });
@@ -236,12 +219,7 @@ function pair(one, two) {
 }
 
 function strip(left, right, y) {
-  const phones = classOf(left) === "phone";
-  const all = phones ? [
-    ["Decode once hot", model => model.speed.decode_steady, value => Math.round(value) + " tok/s", "high"],
-    ["Tokens at full speed", model => model.speed.tokens_to_knee, value => Math.round(value) + " tok", "high"],
-    ["Battery an hour costs", model => model.battery && model.battery.per_hour, value => Math.round(value) + "%", "low"],
-  ] : [
+  const all = [
     ["Decode, one request", model => model.speed.decode, value => Math.round(value) + " tok/s", "high"],
     ["Peak, all requests", model => model.speed.peak, value => Math.round(value) + " tok/s", "high"],
     ["Energy per correct answer", model => (model.energy || {}).perCorrect, value => value.toFixed(2) + " Wh", "low"],
@@ -264,7 +242,7 @@ function strip(left, right, y) {
 function chosen() {
   /* What the card draws: the models named, in the order the ranking puts them, topped up from the ranking when the
      link named fewer than the mode needs. */
-  const list = pool();
+  const list = ranking();
   const named = state.models.map(id => list.find(model => model.id === id)).filter(Boolean);
   const rest = list.filter(model => !named.includes(model));
   const want = state.mode === "many" ? Math.max(NEEDS.many, named.length) : NEEDS[state.mode];
@@ -273,8 +251,7 @@ function chosen() {
 
 function chrome(models) {
   const first = models[0] || {};
-  const where = classOf(first) === "phone" ? ((first.stack || {}).device || "a phone")
-    : (first.stack && first.stack.gpu ? cardName(first.stack.gpu) : "RTX PRO 6000 Blackwell");
+  const where = first.stack && first.stack.gpu ? cardName(first.stack.gpu) : "RTX PRO 6000 Blackwell";
   masthead(`suite ${DATA.suite || "full"} · ${state.effort} effort · ${where}`);
   const newest = Math.max(...models.map(model => (model.run || {}).finished || 0));
   const when = newest > 0 ? new Date(newest * 1000)
@@ -283,22 +260,14 @@ function chrome(models) {
   return when;
 }
 
-const PHONE_COLUMNS = [
-  ["settled", model => (model.speed.decode_steady || {}).value, value => Math.round(value) + " tok/s"],
-  ["cold", model => (model.speed.decode_peak || {}).value, value => Math.round(value) + " tok/s"],
-  ["holds", model => (model.speed.stability || {}).value, value => Math.round(value) + "%"],
-  ["peak RAM", model => (model.speed.footprint || {}).value, value => (value / 1024).toFixed(1) + " GB"],
-];
-
-const GPU_COLUMNS = [
+const COLUMNS = [
   ["decode", model => (model.speed.decode || {}).value, value => Math.round(value) + " tok/s"],
   ["peak", model => (model.speed.peak || {}).value, value => Math.round(value) + " tok/s"],
   ["Wh/correct", model => ((model.energy || {}).perCorrect || {}).value, value => value.toFixed(2)],
 ];
 
 function measures(list) {
-  const columns = classOf(list[0]) === "phone" ? PHONE_COLUMNS : GPU_COLUMNS;
-  return columns.filter(([, read]) => list.some(model => read(model) != null));
+  return COLUMNS.filter(([, read]) => list.some(model => read(model) != null));
 }
 
 function drawMany(list) {
@@ -320,8 +289,7 @@ function drawMany(list) {
     if ((model.index || {}).value != null) text(String(row + 1), 56, y, { size: 14, family: "mono", color: "muted" });
     const size = fit(shortName(model), 300, 22, 600, "display");
     text(shortName(model), 92, y, { size, weight: 600, family: "display" });
-    const facts = [model.quantization, VERDICT_LABELS[model.verdict]].filter(Boolean).join(" · ");
-    if (facts) text(facts, 92, y + 20, { size: 12, family: "mono", color: "muted" });
+    if (model.quantization) text(model.quantization, 92, y + 20, { size: 12, family: "mono", color: "muted" });
     const value = (model.index || {}).value;
     text(value == null ? "–" : value.toFixed(1), indexX, y,
       { size: 30, weight: 700, family: "display", align: "right" });
@@ -337,50 +305,13 @@ function drawMany(list) {
     { size: 13, family: "mono", color: "muted", align: "right" });
 }
 
-function sustainSeries(model) {
-  return Object.keys(model.speed || {}).filter(key => key.startsWith("sustain."))
-    .sort().map(key => (model.speed[key] || {}).value).filter(value => value != null);
-}
-
-function curve(model, x, y, width, height) {
-  /* The whole point of a phone score: twenty answers back to back, and where the throughput settles. */
-  const series = sustainSeries(model);
-  if (series.length < 3) return;
-  const top = Math.max(...series);
-  const at = value => y + height - (value / top) * height;
-  const knee = (model.speed.tokens_to_knee || {}).value;
-  text(`${series.length} answers back to back`, x, y - 14, { size: 13, family: "mono", color: "muted" });
-  if (knee != null) {
-    text(`slows down after ${knee >= 1024 ? (knee / 1024).toFixed(knee % 1024 ? 1 : 0) + "k" : knee} tokens`,
-      x + width, y - 14, { size: 13, family: "mono", color: "muted", align: "right" });
-  }
-  box(x, y + height, width, 1, "grid");
-  const point = index => [x + (index * width) / (series.length - 1), at(series[index])];
-  context.beginPath();
-  context.moveTo(x * S, (y + height) * S);
-  series.forEach((value, index) => context.lineTo(point(index)[0] * S, point(index)[1] * S));
-  context.lineTo((x + width) * S, (y + height) * S);
-  context.closePath();
-  context.fillStyle = PALETTE.grid;
-  context.fill();
-  context.strokeStyle = PALETTE.a;
-  context.lineWidth = 3 * S;
-  context.lineJoin = "round";
-  context.beginPath();
-  series.forEach((value, index) => {
-    const [px, py] = point(index);
-    if (index) context.lineTo(px * S, py * S); else context.moveTo(px * S, py * S);
-  });
-  context.stroke();
-}
-
 function drawOne(model) {
   /* One model on its own: what it scored, question by question, and what it cost the device to score it. */
   const when = chrome([model]);
   const size = fit(shortName(model), W - 112, 46, 700, "display");
   text(shortName(model), 56, 148, { size, weight: 700, family: "display" });
   text([model.engine, model.quantization, model.context ? Math.round(model.context / 1024) + "k ctx" : null,
-        VERDICT_LABELS[model.verdict], (model.stack || {}).hostLabel].filter(Boolean).join(" · "),
+        (model.stack || {}).hostLabel].filter(Boolean).join(" · "),
     56, 176, { size: 15, family: "mono", color: "muted" });
   const value = model.index && model.index.value != null ? model.index.value.toFixed(1) : "–";
   const width = text(value, 56, 244, { size: 64, weight: 700, family: "display" });
@@ -409,7 +340,6 @@ function drawOne(model) {
     text(format(read(model)), x, 466, { size: 32, weight: 700, family: "display" });
     text(name, x, 490, { size: 13, family: "mono", color: "muted" });
   });
-  curve(model, 56, 530, W - 112, 86);
   text(when, W - 56, H - 28, { size: 13, family: "mono", color: "muted", align: "right" });
 }
 
@@ -455,13 +385,11 @@ function fill(id, options, value) {
 }
 
 function settle() {
-  /* Keeps the settings answerable after any change: a class that no longer has models, a mode the class cannot fill,
-     and models named at another effort all resolve to the nearest thing that can actually be drawn. */
+  /* Keeps the settings answerable after any change: a mode the ranking cannot fill, and models named at another effort,
+     resolve to the nearest thing that can actually be drawn. */
   const efforts = view.efforts || [];
   if (!efforts.includes(state.effort)) state.effort = efforts[0];
-  const here = classes();
-  if (!here.includes(state.klass)) state.klass = here[0];
-  const list = pool();
+  const list = ranking();
   if (!MODES.includes(state.mode)) state.mode = "two";
   while (list.length < NEEDS[state.mode]) state.mode = MODES[MODES.indexOf(state.mode) + 1] || "one";
   state.models = chosen().map(model => model.id);
@@ -493,10 +421,7 @@ function fillPicks(list) {
 
 function fillControls() {
   fill("effort", (view.efforts || []).map(effort => [effort, effort]), state.effort);
-  const here = classes();
-  document.getElementById("where-label").hidden = here.length < 2;
-  fill("where", here.map(name => [name, CLASS_LABELS[name] || name]), state.klass);
-  const list = pool();
+  const list = ranking();
   for (const option of document.getElementById("show").options) {
     option.disabled = list.length < NEEDS[option.value];
   }
@@ -520,42 +445,37 @@ function fillControls() {
 }
 
 function newest() {
-  /* The card is the page's own og:image, so with nothing asked for it shows the most recent work — and a comparison
-     needs two models measured the same way, so an effort and class holding only one is not the answer. */
+  /* The card is the page's own og:image, so with nothing asked for it shows the most recent work, and a comparison
+     needs two models, so an effort holding only one is not the answer. */
   let best = null;
   for (const effort of view.efforts || []) {
-    const groups = {};
-    for (const model of view.rankings[effort] || []) (groups[classOf(model)] ||= []).push(model);
-    for (const [klass, group] of Object.entries(groups)) {
-      if (group.length < 2) continue;
-      const when = Math.max(...group.map(model => (model.run || {}).finished || 0));
-      if (!best || when > best.when) best = { effort, klass, when };
-    }
+    const group = view.rankings[effort] || [];
+    if (group.length < 2) continue;
+    const when = Math.max(...group.map(model => (model.run || {}).finished || 0));
+    if (!best || when > best.when) best = { effort, when };
   }
   return best;
 }
 
 function readHash() {
   const params = new URLSearchParams(location.hash.slice(1));
-  const start = newest() || { effort: (view.efforts || [])[0], klass: classes()[0] };
+  const start = newest() || { effort: (view.efforts || [])[0] };
   state.effort = params.get("effort") || start.effort;
   state.models = (params.get("m") || [params.get("a"), params.get("b")].filter(Boolean).join(","))
     .split(",").map(id => id.trim()).filter(Boolean);
-  const first = (view.rankings[state.effort] || []).find(model => model.id === state.models[0]);
-  state.klass = params.get("class") || (first ? classOf(first) : start.klass);
   state.mode = params.get("show") || (params.get("m") ? (state.models.length === 1 ? "one"
     : state.models.length === 2 ? "two" : "many") : "two");
 }
 
 function writeHash() {
   history.replaceState(null, "", "#" + new URLSearchParams({
-    effort: state.effort || "", class: state.klass || "", show: state.mode,
+    effort: state.effort || "", show: state.mode,
     m: state.models.join(","),
   }).toString());
 }
 
 const HINTS = {
-  one: "One model, question by question, and what it cost the device that ran it.",
+  one: "One model, question by question, and what it cost the card.",
   two: "A difference smaller than the two 95% intervals allow is drawn in grey and marked \"tied\" — this run can't "
     + "tell those two apart. <code>blackwall compare</code> answers the same question question by question, which is a "
     + "sharper test.",
@@ -581,10 +501,9 @@ function onChange(id, apply) {
 }
 
 onChange("effort", value => { state.effort = value; });
-onChange("where", value => { state.klass = value; });
 onChange("show", value => { state.mode = value; });
 onChange("count", value => {
-  if (value !== "custom") state.models = pool().slice(0, Number(value)).map(model => model.id);
+  if (value !== "custom") state.models = ranking().slice(0, Number(value)).map(model => model.id);
 });
 onChange("only", value => { state.models = [value]; });
 onChange("left", value => { state.models = [value, state.models.find(id => id !== value)].filter(Boolean); });
