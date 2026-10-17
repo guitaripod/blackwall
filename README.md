@@ -39,7 +39,9 @@ _6 models on 2 setups, suite full/v1, max effort, newest run 17 Oct 2026._
 _tok/s, Peak and Wh/correct come from 2 drivers on one NVIDIA RTX PRO 6000 Blackwell Workstation Edition: 615.71.09 (3 models), 610.57.04 (3 models). They only compare within one_
 <!--/LEADERBOARD-->
 
-Quality is the index; then one column per task, single-request decode speed, peak throughput across all requests, first-token wait on a 32k prompt, and board watt-hours per correct answer. The [live page](https://guitaripod.github.io/blackwall/) adds 95% intervals, per-length breakdowns and every server setting behind each run. Those are one card's numbers; a different card, quantization or server setting will move them.
+Quality is the index; then one column per task, single-request decode speed, peak throughput across all requests, first-token wait on a 32k prompt, and board watt-hours per correct answer. The [live page](https://guitaripod.github.io/blackwall/) adds 95% intervals, per-length breakdowns and every server setting behind each run.
+
+The page reads at three depths. A sentence and three cards say who leads, who is fastest and who is leanest. *The wall* plots quality against speed (or first token, or energy) with the frontier drawn through it, and *The board* ranks every model with a rank range such as `#1–2`, because two scores inside each other's intervals are a tie. *Weigh it your way* re-ranks the board and moves the chart as you change the weight of each group, with the default rank shown beside yours. Open a row for what the model is strong and weak at, the scores inside each task, how it behaves, and the data checks and command behind its run; pin up to four models for a head-to-head that calls a difference only when its interval clears zero. A run still in progress sits at the foot of the table with the span its index can still land in. `Ctrl K` searches everything, and the address follows the page, so a link shares the exact view. Those are one card's numbers; a different card, quantization or server setting will move them.
 
 ## Following the board
 
@@ -49,7 +51,7 @@ The site is republished whenever new results land, and the same results come thr
 - **Data.** [`board.json`](https://guitaripod.github.io/blackwall/board.json) holds every number on the page plus a `history` of all finished runs, under a `schema` number whose keys are only ever added. [docs/data.md](docs/data.md) describes it.
 - **The software.** [Releases](https://github.com/guitaripod/blackwall/releases) list what changed in Blackwall itself, and the [changelog](CHANGELOG.md) keeps the same notes. A change to how scores are computed bumps the suite version, so old and new results are never ranked together.
 
-On the page, *The wall over time* charts the best quality index so far against the date each run finished, and *Recent results* says what each new run changed. `index.html#gpt-oss-120b` opens the page on a model.
+On the page, *The wall over time* charts the best quality index so far against the date each run finished, and *Recent results* says what each new run changed. `index.html#gpt-oss-120b` opens the page on a model, and the address carries the rest of the view once you change it.
 
 To publish a board of your own, `blackwall export --out site --site-url https://you.example/bench/` writes the page, the data and the feed.
 

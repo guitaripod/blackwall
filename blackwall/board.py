@@ -1,3 +1,4 @@
+import html
 import json
 import statistics
 import time
@@ -16,6 +17,7 @@ DEFAULT_EFFORT = "medium"
 TEMPLATE = paths.PACKAGE / "templates" / "leaderboard.html"
 CARD = paths.PACKAGE / "templates" / "card.html"
 PART_PREFIXES = (".bin.", ".part.")
+LIVE_STATUSES = ("running", "scheduled")
 
 
 def kind_of(run):
@@ -175,6 +177,46 @@ def history_entry(db, run):
             "gpu": where["gpu"], "driver": where["driver"], "build": where["build"]}
 
 
+def progress_of(run, definition):
+    """Where a run in progress is: the quality tasks it will run, which are scored, which one it is answering and how far
+    along that one is, read off the progress lines the worker keeps."""
+    flags = run.get("flags") or {}
+    plan = [task for task in ("speed", *suite.QUALITY_TASKS) if task in (flags.get("tasks") or ["speed", *suite.QUALITY_TASKS])]
+    current = None
+    try:
+        lines = (paths.RUNS / run["id"] / "events.jsonl").read_text().splitlines()
+    except OSError:
+        lines = []
+    for line in reversed(lines):
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if "done" in event and event.get("phase") in plan:
+            current = {"task": event["phase"], "done": event["done"], "total": event.get("total")}
+            break
+    return {"plan": plan, "current": current, "parked": flags.get("parked"), "yielded": flags.get("yielded", 0)}
+
+
+def live_entry(db, run, definition):
+    """A run still being measured, as the same entry a finished one gets plus how far it has got. Tasks that finished are
+    scored; the index waits for the last one, so a reader sees what is known and what is still to come."""
+    entry = model_entry(db, run, [run], definition)
+    entry["index"] = None
+    entry["progress"] = progress_of(run, definition)
+    entry["run"]["started"] = run.get("started")
+    entry["run"]["finished"] = None
+    entry["history"] = []
+    return entry
+
+
+def live_runs(db, classes=None):
+    found = [run for run in store.list_runs(db) if run["status"] in LIVE_STATUSES and kind_of(run) in ("full", "quick")
+             and suite.version_of(run["suite"]) == suite.VERSION and (not classes or units.device_class(run) in classes)]
+    definition = suite.DEFINITIONS[suite.VERSION]
+    return [live_entry(db, run, definition) for run in sorted(found, key=lambda run: run.get("started") or run["created"])]
+
+
 def hosts(models):
     """Every card and driver a ranking's speed numbers come from, the one with most models first."""
     counts = {}
@@ -231,6 +273,7 @@ def collect(db, classes=None):
         "suites": suites,
         **{key: suites[suite.VERSION][key] for key in ("indexTasks", "taskLabels", "efforts", "rankings")},
         "history": timeline.annotate([history_entry(db, run) for run in finished]),
+        "live": live_runs(db, classes),
     }
 
 
@@ -241,9 +284,30 @@ def publishable(data, indent=None):
     return text.replace(home, "~") if len(home) > 1 else text
 
 
+def plain_table(data):
+    """The ranking as a plain table inside <noscript>, so the board reads with scripts off and to anything that does not
+    run them: the effort with the most timed models, best quality first."""
+    view = (data.get("suites") or {}).get(data.get("current")) or {}
+    rankings = view.get("rankings") or {}
+    if not rankings:
+        return ""
+    timed = lambda effort: sum(1 for model in rankings[effort] if "decode" in (model.get("speed") or {}))
+    effort = max(rankings, key=lambda name: (timed(name), len(rankings[name])))
+    rows = []
+    for model in sorted(rankings[effort], key=lambda entry: -((entry.get("index") or {}).get("value") or -1)):
+        index = (model.get("index") or {}).get("value")
+        decode = ((model.get("speed") or {}).get("decode") or {}).get("value")
+        rows.append(f"<tr><td>{html.escape(model['name'].split(' · ')[0])}</td>"
+                    f"<td>{'' if index is None else f'{index:.1f}'}</td><td>{'' if decode is None else f'{decode:.0f}'}</td></tr>")
+    return (f"<noscript><p>The interactive board needs JavaScript. Ranked by quality index at {html.escape(effort)} effort:</p>"
+            "<table><thead><tr><th>Model</th><th>Quality index</th><th>Decode, tok/s</th></tr></thead>"
+            f"<tbody>{''.join(rows)}</tbody></table></noscript>")
+
+
 def page(data, template=None):
     """The whole leaderboard as one self-contained file: the template with the run data baked in."""
-    return (template or TEMPLATE).read_text().replace("/*__DATA__*/null", publishable(data))
+    text = (template or TEMPLATE).read_text().replace("/*__DATA__*/null", publishable(data))
+    return text.replace("/*__NOSCRIPT__*/", plain_table(data))
 
 
 def build():

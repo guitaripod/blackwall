@@ -2,6 +2,26 @@
 
 All notable changes to Blackwall are listed here, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the versions follow [Semantic Versioning](https://semver.org/). The published `board.json` carries its own `schema` number, described in [docs/data.md](docs/data.md).
 
+## [2.1.0] - 2026-10-17
+
+The leaderboard page is rebuilt. What is measured, the scores and the `board.json` schema (only keys were added) are unchanged.
+
+### Added
+- **A verdict first.** A sentence generated from the data says who leads, or that two models are tied when their intervals overlap, with cards for the smartest, the fastest and the leanest.
+- **Rank ranges.** Each model carries a range such as `#1–2` and its chance of being first, from 1,600 simulated reruns of the quality index (fixed seed), so a tie looks like a tie.
+- **Weigh it your way.** Sliders and presets (equal, coding agent, chat and knowledge, long documents, math and reasoning) re-rank the table and move the chart live. The default rank stays beside yours, with an arrow for who moved and a sentence saying so.
+- **The wall is interactive.** It plots against speed, peak throughput, first token or energy; drag across it to focus a group; an optional mode shows each dot's possible reruns; hovering a dot or a row lights the other.
+- **A profile for every row.** Strengths and gaps against the whole board, the scores inside each task with the weakest one open, how the model behaves, its provenance and the command that reproduces the run. The charts and every number are one click further.
+- **Compare.** Pin up to four models (shift-click, `c` or the plus button) for a head-to-head that calls a difference only when its 95% interval clears zero.
+- **Runs in progress.** `board.json` gains `live`, and the table shows a running model with the tasks scored so far and the span its index can still land in. The local page now rebuilds after every scored task, not only when a run ends.
+- **Keyboard and search.** `Ctrl K` or `/` opens a command palette; `j`, `k`, `Enter`, `c` and `w` move through the board. Dotted terms explain themselves in place.
+- **A fuller address.** The page writes the effort, open model, axis, weights, compared models, sort and tab into the address and reads them back. The old `#model~effort` links still work.
+- **Light theme** that follows the system setting, a phone layout that turns the table into cards, and a plain table inside `<noscript>`.
+
+### Changed
+- The page keeps every number the old one showed: suite tabs, setup notices, health notes, quick-run and repeat chips, the cost columns, the per-prompt-length charts, run history, localmaxxing ids and the share cards.
+- The page tests drive a real browser when Chromium is installed (`uv run --with playwright pytest`) and skip otherwise.
+
 ## [2.0.3] - 2026-10-17
 
 The RAM safety stop no longer fires on a dip of a few seconds. What is measured and the `board.json` schema are unchanged.

@@ -16,6 +16,7 @@ The published site carries every number on the page as `board.json`, so a script
 | `hardware` | object | The newest run's `gpu`, `driver` and `vram_mib`. |
 | `suites` | object | One entry per suite version, holding that version's rankings. Rankings of different versions measure different tasks and are never mixed. |
 | `history` | array | Every finished full or quick run, oldest first, with what each one changed. |
+| `live` | array | The runs still being measured: each is a model entry (below) with no `index`, only the tasks scored so far, and a `progress` block. Empty when nothing is running. |
 | `published` | object | Present when the folder was exported for publishing: `json` (this file's name) and `feed` (`feed.xml`, or `null`). |
 | `indexTasks`, `taskLabels`, `efforts`, `rankings` | | Copies of the current suite's keys of the same name, kept so a reader of the first schema needs only the top level. |
 
@@ -52,6 +53,20 @@ The published site carries every number on the page as `board.json`, so a script
 | `history` | The model's runs at any effort in this suite version, newest first and including the one behind the row: `id`, `suite`, `effort`, `finished`, `index`, `decode`. |
 | `server` | The server settings recorded with the run. Paths on the measuring machine appear as recorded, with its home directory written `~`. |
 
+## An entry in `live`
+
+The same keys as a model in `rankings`, plus what a finished run does not need. `index` is `null` and `run.finished` is `null`: a run joins the ranking when its last task is scored. `tasks` holds only the tasks scored so far, and `speed` is there once the speed task has finished.
+
+| Key | Meaning |
+|---|---|
+| `run.started` | Unix time the run first started. |
+| `progress.plan` | The tasks the run will do, in order: `speed`, then the quality tasks. |
+| `progress.current` | `task`, `done` and `total` for the task being answered now, or `null` before the first answer. |
+| `progress.parked` | Why the run is paused (it gave the GPU away, or its window closed), or `null`. |
+| `progress.yielded` | How many times it has given the GPU away. |
+
+A reader can bound a live run's index honestly: the groups already scored are known, and each group still open can land anywhere from 0 to 100.
+
 ## An entry in `history`
 
 One per finished run, oldest first. Quality indexes are only comparable inside one `version` and one `effort`, and the marks below respect that boundary.
@@ -71,5 +86,6 @@ One per finished run, oldest first. Quality indexes are only comparable inside o
 ## Following along
 
 - **Atom feed.** `feed.xml` has one entry per finished run, newest first, titled with the model and its quality index and marked `(new best)` or `(debut)`. Entry ids are `tag:` URIs built from the run id, so a reader shows each result once.
-- **Deep links.** `index.html#<model id>` opens the page on that model, and `#<model id>~<effort>` on that model at that effort. The feed links use the second form.
+- **Deep links.** `index.html#<model id>` opens the page on that model, and `#<model id>~<effort>` on that model at that effort. The feed links use the second form. Once a reader changes more than the open model, the page writes a fuller form, `#effort=max&m=<model id>&axis=ttft.32000&w=1,1,3,1,3&pin=a,b&cols=cost`, and reads it back: the effort, the open model, the wall's axis, the group weights in the order of `groups`, the compared models, the sort and the table's tab.
+- **Rank ranges.** The page simulates 1,600 reruns of the quality index from each score's 95% interval, with a fixed seed (11), so every reader sees the same ranges for the same data.
 - **Your own copy.** `blackwall export --out DIR --site-url URL` writes all of this for a database of your own, and `site_url` in `config.toml` sets the address once.

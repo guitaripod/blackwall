@@ -358,6 +358,15 @@ def stalled(db, run_id, run_dir):
     return count
 
 
+def refresh_board(events):
+    """The local page shows a run as it goes: each scored task is on it when the next one starts, not only once the run
+    has ended."""
+    try:
+        board.build()
+    except Exception as error:
+        events.log(f"leaderboard rebuild failed: {error!r}")
+
+
 def finished_note(db, run_id, model):
     entry = store.metrics_of(db, run_id).get("index.quality")
     return f"{model}: quality index {entry['value']:.1f}" if entry and entry.get("value") is not None else f"{model}: done"
@@ -485,6 +494,7 @@ def execute(run_id):
                 events.emit("grading", task="lcb")
                 graded = grader.grade(run_dir)
             store.set_metrics(db, run_id, metrics.task_metrics(task, metrics.load(run_dir, task), graded))
+            refresh_board(events)
         if halt.is_set():
             fault = halt_fault(halt, host, card)
             if fault:
