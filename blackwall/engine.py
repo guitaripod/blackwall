@@ -269,6 +269,15 @@ class ServerGone(RuntimeError):
     rather than scoring a dead server's silence."""
 
 
+SERVER_ERROR = re.compile(r"Error code: 5\d\d")
+
+
+def server_error(text):
+    """Whether a message says the server answered with a 5xx: llama-swap's 502 when the model under it died, its 500
+    when the model would not start."""
+    return bool(SERVER_ERROR.search(text))
+
+
 class QualityRunner:
     """Runs one task's items as many at a time as the server takes, appending each answer so an interrupted run resumes
     where it stopped. It stops dispatching when an item couldn't finish before the deadline, and stops outright when

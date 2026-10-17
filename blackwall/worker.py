@@ -4,6 +4,7 @@ import statistics
 import threading
 import time
 import traceback
+import urllib.error
 from datetime import datetime
 
 from . import board, datasets, doctor, engine, gpu, grader, hosts, lmx, metrics, notify, paths, schedule, speed, stack, store, suite, swap, units
@@ -19,6 +20,7 @@ GPU_CHECK_S = 30
 YIELD_STRIKES = 2
 YIELD_RETRY_S = 600
 STALL_LIMIT = 3
+LOAD_RETRY_PAUSE_S = 5
 MIN_WINDOW_S = 900
 SPEED_WINDOW_S = 1800
 
@@ -337,6 +339,25 @@ def finished_note(db, run_id, model):
     return f"{model}: quality index {entry['value']:.1f}" if entry and entry.get("value") is not None else f"{model}: done"
 
 
+def loading(host, events):
+    """Loads the model. A 5xx from llama-swap means the model did not start, usually because small models a client
+    keeps loading held the VRAM; they are unloaded and the load tried once more, and a second refusal is the server
+    going missing, which gives way and tries again later instead of failing a run that has hours of answers saved."""
+    for attempt in (1, 2):
+        try:
+            return host.ensure_loaded()
+        except urllib.error.HTTPError as error:
+            if error.code < 500:
+                raise
+        except urllib.error.URLError:
+            pass
+        if attempt == 1:
+            events.emit("load refused", retry="after unloading everything else")
+            host.unload()
+            time.sleep(LOAD_RETRY_PAUSE_S)
+    raise engine.ServerGone("the server would not load, twice")
+
+
 def execute(run_id):
     db = store.connect()
     run = store.get_run(db, run_id)
@@ -380,7 +401,7 @@ def execute(run_id):
         if host.kind == "gpu" and not wait_for_memory(events, halt):
             give_way(db, run, events, [{"name": f"a box with only {gpu.mem_available_gb():.1f} GB free"}], host)
             return
-        seconds = host.ensure_loaded()
+        seconds = loading(host, events)
         info = host.server_info()
         (run_dir / "server_info.json").write_text(json.dumps(info, indent=1))
         capacity = swap.capacity(info, unified=host.kv_unified())
@@ -404,7 +425,8 @@ def execute(run_id):
             if check["status"] != "ok":
                 events.emit("doctor", check=check["check"], status=check["status"], detail=check["detail"])
         if doctor.failures(checks):
-            raise RuntimeError("doctor: " + "; ".join(f"{check['check']}: {check['detail']}" for check in doctor.failures(checks)))
+            detail = "; ".join(f"{check['check']}: {check['detail']}" for check in doctor.failures(checks))
+            raise (engine.ServerGone if engine.server_error(detail) else RuntimeError)("doctor: " + detail)
         if schedule.gives_way(flags) and host.kind == "gpu":
             watch = GpuWatch(halt, events)
             watch.start()
