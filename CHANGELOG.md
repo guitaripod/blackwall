@@ -2,6 +2,17 @@
 
 All notable changes to Blackwall are listed here, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the versions follow [Semantic Versioning](https://semver.org/). The published `board.json` carries its own `schema` number, described in [docs/data.md](docs/data.md).
 
+## [2.0.2] - 2026-10-17
+
+A run no longer fails for good when its server goes missing while loading. What is measured and the `board.json` schema are unchanged.
+
+### Fixed
+- **A refused load is tried again, then waited out.** When llama-swap answers a load with a 5xx, because the model did not start (small models a client keeps loading held the VRAM), Blackwall unloads everything else and loads once more. A second refusal counts as the server going missing: the run gives way and tries again later, and fails only after the same stall limit as a server that dies mid-task.
+- **A 5xx in the preflight check is a missing server, not a bad model.** The tool-call check of a model whose server vanished under it used to fail the run for good, with hours of answers saved.
+
+### Board
+- Nemotron 3.5 Super VL 120B (vLLM, NVFP4, MTP) joins the max-effort board.
+
 ## [2.0.1] - 2026-10-17
 
 A cleanup release. What is measured, the scores and the `board.json` schema are unchanged.
