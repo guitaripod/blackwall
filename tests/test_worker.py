@@ -2,7 +2,7 @@ import urllib.error
 
 import pytest
 
-from blackwall import engine, paths, store, worker
+from blackwall import engine, gpu, paths, store, worker
 
 
 def test_sessions_that_fail_without_gaining_an_answer_are_counted_in_a_row(monkeypatch, tmp_path):
@@ -74,3 +74,46 @@ def test_a_client_error_on_load_is_a_real_failure(monkeypatch):
 def test_a_doctor_failure_that_is_a_5xx_is_a_missing_server_not_a_bad_model():
     assert engine.server_error("tool call: a request with tools failed: InternalServerError('Error code: 502')")
     assert not engine.server_error("tool call: calls come back as text")
+
+
+class RecordingEvents(FakeEvents):
+    def __init__(self):
+        super().__init__()
+        self.fields = []
+
+    def emit(self, name, **fields):
+        super().emit(name, **fields)
+        self.fields.append(fields)
+
+
+def test_a_dip_in_free_ram_is_ridden_out_and_written_down_once(monkeypatch):
+    monkeypatch.setattr(gpu, "top_memory_users", lambda count=5: [("swift-frontend", 9.4), ("rust-analyzer", 5.0)])
+    events = RecordingEvents()
+    guard = worker.MemoryGuard(worker.Halt(), events)
+    assert not guard.check(7.0, 100.0)
+    assert not guard.check(6.5, 120.0)
+    assert events.seen == ["memory low"]
+    assert events.fields[0]["biggest"] == "swift-frontend 9.4 GB, rust-analyzer 5.0 GB"
+    assert not guard.check(21.0, 130.0)
+    assert not guard.check(7.5, 140.0)
+    assert events.seen == ["memory low", "memory low"]
+
+
+def test_free_ram_that_stays_under_the_floor_stops_the_run(monkeypatch):
+    monkeypatch.setattr(gpu, "top_memory_users", lambda count=5: [])
+    guard = worker.MemoryGuard(worker.Halt(), RecordingEvents())
+    assert not guard.check(7.0, 100.0)
+    assert not guard.check(7.2, 100.0 + worker.RAM_SUSTAIN_S - 1)
+    assert guard.check(7.4, 100.0 + worker.RAM_SUSTAIN_S)
+
+
+def test_a_memory_stop_is_retried_sooner_than_one_for_another_program():
+    assert worker.retry_delay("memory") == worker.MEMORY_RETRY_S < worker.YIELD_RETRY_S
+    assert worker.retry_delay("gpu") == worker.YIELD_RETRY_S
+
+
+def test_the_biggest_memory_users_are_named_by_program_and_sorted():
+    users = gpu.top_memory_users(3)
+    assert 0 < len(users) <= 3
+    sizes = [size for _, size in users]
+    assert sizes == sorted(sizes, reverse=True)

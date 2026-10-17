@@ -214,6 +214,23 @@ def describe():
     return {"gpu": name, "driver": driver, "vram_mib": int(memory)}
 
 
+def top_memory_users(count=5):
+    """The programs holding the most resident memory right now, processes of one name summed (a compile is thirty `cc1plus`
+    and a browser is forty), as (name, GB) pairs largest first. What a run records when RAM runs short, so the next
+    stop names its cause."""
+    totals = {}
+    for status in Path("/proc").glob("[0-9]*/status"):
+        try:
+            fields = dict(line.split(":", 1) for line in status.read_text().splitlines() if ":" in line)
+            kib = int(fields.get("VmRSS", "0 kB").split()[0])
+        except (OSError, ValueError):
+            continue
+        name = fields.get("Name", "?").strip()
+        totals[name] = totals.get(name, 0) + kib
+    ranked = sorted(totals.items(), key=lambda item: item[1], reverse=True)[:count]
+    return [(name, round(kib / 1048576, 1)) for name, kib in ranked]
+
+
 def mem_available_gb():
     with open("/proc/meminfo") as handle:
         for line in handle:

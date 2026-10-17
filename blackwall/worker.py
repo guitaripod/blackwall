@@ -19,6 +19,9 @@ CARD_CHECK_S = 15
 GPU_CHECK_S = 30
 YIELD_STRIKES = 2
 YIELD_RETRY_S = 600
+MEMORY_RETRY_S = 120
+RAM_SUSTAIN_S = 45
+MEMORY_CHECK_S = 5
 STALL_LIMIT = 3
 LOAD_RETRY_PAUSE_S = 5
 MIN_WINDOW_S = 900
@@ -102,9 +105,11 @@ def wait_for_memory(events, halt):
 
 
 class MemoryGuard(threading.Thread):
-    """Stops a run if free RAM drops under 4 GB, so a benchmark can never take the desktop down. When several runs
-    share the box only the youngest gives way: each one deciding for itself means they all stop at once, which costs
-    every run instead of the one that was least far along."""
+    """Stops a run if free RAM stays under the floor, so a benchmark can never take the desktop down. A dip of a few
+    seconds (a compile, a browser tab) is written down with the programs that caused it and ridden out; unloading the
+    model for one costs every request in flight and a reload. When several runs share the box only the youngest gives
+    way: each one deciding for itself means they all stop at once, which costs every run instead of the one that was
+    least far along."""
 
     def __init__(self, halt, events, run_id=None):
         super().__init__(daemon=True)
@@ -112,6 +117,19 @@ class MemoryGuard(threading.Thread):
         self.events = events
         self.run_id = run_id
         self.stopped = threading.Event()
+        self.low_since = None
+
+    def check(self, available, now):
+        """Takes one reading of free RAM and says whether the run has to stop: only once it has been under the floor
+        for RAM_SUSTAIN_S without recovering. The first reading of a dip records who held the memory."""
+        if available >= RAM_FLOOR_GB:
+            self.low_since = None
+            return False
+        if self.low_since is None:
+            self.low_since = now
+            users = ", ".join(f"{name} {size} GB" for name, size in gpu.top_memory_users())
+            self.events.emit("memory low", available=round(available, 1), biggest=users)
+        return now - self.low_since >= RAM_SUSTAIN_S
 
     def answered_bytes(self, run_id):
         """How much of its work a run has already written down, which is what it stands to lose."""
@@ -130,13 +148,13 @@ class MemoryGuard(threading.Thread):
         return min(peers, key=lambda peer: (self.answered_bytes(peer), peer)) == self.run_id
 
     def run(self):
-        while not self.stopped.wait(5):
+        while not self.stopped.wait(MEMORY_CHECK_S):
             available = gpu.mem_available_gb()
-            if available < RAM_FLOOR_GB and self.gives_way():
-                self.events.emit("abort", reason=f"free RAM {available:.1f} GB; this run has the least to lose "
-                                                 "and gives way")
-                swap.unload()
+            if self.check(available, time.monotonic()) and self.gives_way():
+                self.events.emit("abort", reason=f"free RAM {available:.1f} GB for {RAM_SUSTAIN_S} s; this run has the "
+                                                 "least to lose and gives way")
                 self.halt.set("memory")
+                swap.unload()
                 return
 
     def stop(self):
@@ -300,9 +318,15 @@ def halt_fault(halt, host, card):
     return None
 
 
-def give_way(db, run, events, found, host):
-    """Frees the GPU for whatever else wants it and tries again in ten minutes, from the saved answers."""
-    resumes = time.time() + YIELD_RETRY_S
+def retry_delay(reason):
+    """How long a run stays parked: ten minutes for a program that wants the GPU, two for a memory dip, which is over
+    long before that and which the start of the next session waits out anyway."""
+    return MEMORY_RETRY_S if reason == "memory" else YIELD_RETRY_S
+
+
+def give_way(db, run, events, found, host, retry_s=YIELD_RETRY_S):
+    """Frees the GPU for whatever else wants it and tries again later, from the saved answers."""
+    resumes = time.time() + retry_s
     names = ", ".join(process["name"] for process in found) or "another program"
     host.unload()
     count = schedule.park(db, run["id"], resumes, f"gave the GPU to {names}", "yielded")
@@ -466,7 +490,8 @@ def execute(run_id):
             if fault:
                 raise RuntimeError(fault)
             if halt.reason == "memory":
-                give_way(db, run, events, [{"name": f"a box with under {RAM_FLOOR_GB:.0f} GB free"}], host)
+                give_way(db, run, events, [{"name": f"a box with under {RAM_FLOOR_GB:.0f} GB free"}], host,
+                         retry_delay("memory"))
                 return
             give_way(db, run, events, watch.found if watch else [], host)
             return
@@ -486,6 +511,10 @@ def execute(run_id):
         notify.send("Blackwall finished", finished_note(db, run_id, profile.id), run=run_id, status="complete")
     except engine.ServerGone as error:
         events.emit("server gone", reason=str(error)[:200])
+        if halt.reason == "memory":
+            give_way(db, run, events, [{"name": f"a box with under {RAM_FLOOR_GB:.0f} GB free"}], host,
+                     retry_delay("memory"))
+            return
         if stalled(db, run_id, run_dir) < STALL_LIMIT:
             give_way(db, run, events, [{"name": "a server that stopped answering"}], host)
             return
