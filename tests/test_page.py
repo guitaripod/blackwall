@@ -120,6 +120,13 @@ def page_file(database, tmp_path):
     return path.as_uri()
 
 
+@pytest.fixture
+def card_file(database, tmp_path):
+    path = tmp_path / "card.html"
+    path.write_text(board.page(board.collect(database), board.CARD))
+    return path.as_uri()
+
+
 def open_page(browser, url, width=1400, height=900, scheme="dark", suffix=""):
     context = browser.new_context(viewport={"width": width, "height": height}, color_scheme=scheme, reduced_motion="reduce",
                                   is_mobile=width < 500, has_touch=width < 500)
@@ -280,4 +287,38 @@ def test_a_model_scored_without_timing_is_listed_but_not_plotted(browser, databa
     assert page.locator('#plot .pt[data-id="echo"]').count() == 0
     assert "not plotted" in page.locator("#legend").text_content()
     assert errors == []
+    context.close()
+
+
+def lit_pixels(page, x, y, width, height):
+    return page.evaluate(
+        """([x, y, width, height]) => {
+            const data = document.getElementById("card").getContext("2d").getImageData(x, y, width, height).data;
+            let lit = 0;
+            for (let i = 0; i < data.length; i += 4) if (data[i] + data[i + 1] + data[i + 2] > 600) lit += 1;
+            return lit;
+        }""",
+        [x, y, width, height],
+    )
+
+
+def test_the_share_card_opens_on_the_wall_and_draws_the_wordmark(browser, card_file):
+    context = browser.new_context(viewport={"width": 1200, "height": 675})
+    errors = []
+    page = context.new_page()
+    page.on("pageerror", lambda error: errors.append(str(error)))
+    page.goto(card_file + "?bare=1")
+    page.wait_for_function("document.getElementById('show').value === 'wall'")
+    assert "show=wall" in page.evaluate("location.hash")
+    assert lit_pixels(page, 112, 150, 2176, 260) > 20000
+    assert errors == []
+    context.close()
+
+
+def test_a_share_link_that_names_its_models_keeps_its_own_card(browser, card_file):
+    context = browser.new_context(viewport={"width": 1200, "height": 675})
+    page = context.new_page()
+    page.goto(card_file + "?bare=1#show=two")
+    page.wait_for_function("document.getElementById('show').value === 'two'")
+    assert lit_pixels(page, 112, 150, 2176, 260) < 20000
     context.close()

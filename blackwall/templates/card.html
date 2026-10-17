@@ -57,6 +57,7 @@ body.bare canvas { width: 1200px; border: 0; border-radius: 0; }
   <div class="controls">
     <label>Effort<select id="effort"></select></label>
     <label>Show<select id="show">
+      <option value="wall">The wall</option>
       <option value="many">A ranking</option>
       <option value="two">Head to head</option>
       <option value="one">One model</option>
@@ -81,9 +82,9 @@ const CURRENT = DATA.current || Object.keys(SUITES)[0];
 const view = SUITES[CURRENT] || { efforts: [], rankings: {}, indexTasks: [], taskShort: {} };
 const canvas = document.getElementById("card");
 const context = canvas.getContext("2d");
-const MODES = ["many", "two", "one"];
-const NEEDS = { many: 3, two: 2, one: 1 };
-const state = { effort: null, mode: "two", models: [] };
+const MODES = ["wall", "many", "two", "one"];
+const NEEDS = { wall: 2, many: 3, two: 2, one: 1 };
+const state = { effort: null, mode: "wall", models: [] };
 
 function ranking() {
   return (view.rankings[state.effort] || []).slice()
@@ -245,6 +246,7 @@ function chosen() {
   const list = ranking();
   const named = state.models.map(id => list.find(model => model.id === id)).filter(Boolean);
   const rest = list.filter(model => !named.includes(model));
+  if (state.mode === "wall") return list;
   const want = state.mode === "many" ? Math.max(NEEDS.many, named.length) : NEEDS[state.mode];
   return [...named, ...rest].slice(0, Math.min(want, list.length));
 }
@@ -343,6 +345,163 @@ function drawOne(model) {
   text(when, W - 56, H - 28, { size: 13, family: "mono", color: "muted", align: "right" });
 }
 
+function ticks(low, high, count) {
+  const raw = (high - low) / count, magnitude = 10 ** Math.floor(Math.log10(raw));
+  const step = [1, 2, 2.5, 5, 10].map(factor => factor * magnitude).find(value => value >= raw) || magnitude * 10;
+  const marks = [];
+  for (let value = Math.ceil(low / step) * step; value <= high + 1e-9; value += step) marks.push(+value.toFixed(6));
+  return marks;
+}
+
+function wordmark(baseline) {
+  /* BLACKWALL across the card as the page draws it: a cyan and a red slice slipped sideways, a gap for the scan line. */
+  const word = "BLACKWALL", width = W - 112;
+  let size = 150;
+  while (size > 40) {
+    context.font = `expanded 900 ${size * S}px "Archivo", sans-serif`;
+    context.letterSpacing = `${-0.025 * size * S}px`;
+    if (context.measureText(word).width / S <= width) break;
+    size -= 1;
+  }
+  const spacing = -0.025 * size, cap = size * 0.686, top = baseline - cap;
+  const slice = (from, to, shift, color) => {
+    context.save();
+    context.beginPath();
+    context.rect(0, (top + cap * from) * S, canvas.width, cap * (to - from) * S);
+    context.clip();
+    text(word, 56 + shift, baseline, { size, weight: 900, family: "display", stretch: "expanded", spacing, color });
+    context.restore();
+  };
+  slice(0.18, 0.34, -size * 0.06, "cyan");
+  slice(0.7, 0.86, size * 0.07, "red");
+  const gap = [top + cap * 0.48, top + cap * 0.545];
+  for (const [from, to] of [[top - 4, gap[0]], [gap[1], baseline + 4]]) {
+    context.save();
+    context.beginPath();
+    context.rect(0, from * S, canvas.width, (to - from) * S);
+    context.clip();
+    text(word, 56, baseline, { size, weight: 900, family: "display", stretch: "expanded", spacing, color: "ink" });
+    context.restore();
+  }
+  wallLine((gap[0] + gap[1]) / 2);
+}
+
+function wallChart(list, frame) {
+  /* Quality against decode speed, with the frontier drawn as a staircase through the models nothing else beats on both. */
+  const points = list.filter(model => ((model.speed || {}).decode || {}).value != null && (model.index || {}).value != null)
+    .map(model => ({ model, x: model.speed.decode.value, y: model.index.value,
+                     lo: model.index.lo ?? model.index.value, hi: model.index.hi ?? model.index.value }));
+  if (points.length < 2) return;
+  const { x: left, y: top, w: width, h: height } = frame;
+  const xMin = Math.floor((Math.min(...points.map(p => p.x)) - 12) / 10) * 10;
+  const xMax = Math.ceil((Math.max(...points.map(p => p.x)) + 12) / 10) * 10;
+  const yMin = Math.floor((Math.min(...points.map(p => p.lo)) - 4) / 10) * 10;
+  const yMax = Math.min(100, Math.ceil((Math.max(...points.map(p => p.hi)) + 2) / 5) * 5);
+  const gx = value => left + 36 + ((value - xMin) / (xMax - xMin)) * (width - 36 - 12);
+  const gy = value => top + height - 26 - ((value - yMin) / (yMax - yMin)) * (height - 26 - 12);
+  for (const value of ticks(yMin, yMax, 4)) {
+    box(left + 36, gy(value), width - 48, 1, "grid");
+    text(String(value), left + 28, gy(value) + 4, { size: 12, family: "mono", color: "muted", align: "right" });
+  }
+  for (const value of ticks(xMin, xMax, 4)) {
+    box(gx(value), top + 12, 1, height - 38, "grid");
+    text(String(value), gx(value), top + height - 6, { size: 12, family: "mono", color: "muted", align: "center" });
+  }
+  const front = points.filter(p => !points.some(q => q !== p && q.x >= p.x && q.y >= p.y && (q.x > p.x || q.y > p.y)))
+    .sort((one, two) => one.x - two.x);
+  const floor = top + height - 26, edge = left + 36;
+  const stair = () => {
+    context.beginPath();
+    context.moveTo(edge * S, gy(front[0].y) * S);
+    front.forEach((p, index) => {
+      context.lineTo(gx(p.x) * S, gy(p.y) * S);
+      context.lineTo(gx(p.x) * S, (front[index + 1] ? gy(front[index + 1].y) : floor) * S);
+    });
+  };
+  stair();
+  context.lineTo(edge * S, floor * S);
+  context.closePath();
+  context.fillStyle = "rgba(118, 185, 0, 0.13)";
+  context.fill();
+  context.save();
+  stair();
+  context.strokeStyle = PALETTE.wall;
+  context.lineWidth = 3 * S;
+  context.lineJoin = "round";
+  context.shadowColor = "rgba(118, 185, 0, 0.75)";
+  context.shadowBlur = 12 * S;
+  context.stroke();
+  context.restore();
+  const best = points.reduce((a, b) => (b.y > a.y ? b : a));
+  for (const p of points) {
+    box(gx(p.x) - 0.75, gy(p.hi), 1.5, gy(p.lo) - gy(p.hi), "#8c8c8c");
+    const onWall = front.includes(p), half = p === best ? 7 : 6;
+    box(gx(p.x) - half, gy(p.y) - half, half * 2, half * 2, onWall ? "wall" : "page");
+    if (!onWall) {
+      context.strokeStyle = "#8c8c8c";
+      context.lineWidth = 1.5 * S;
+      context.strokeRect((gx(p.x) - half) * S, (gy(p.y) - half) * S, half * 2 * S, half * 2 * S);
+    }
+  }
+  const taken = [];
+  for (const p of front) {
+    let label = shortName(p.model).split(" ");
+    while (label.length > 1 && label.join(" ").length > 20) label.pop();
+    label = label.join(" ");
+    context.font = `600 ${13 * S}px "Atkinson Hyperlegible Mono", monospace`;
+    const wide = context.measureText(label).width / S;
+    const flip = gx(p.x) + 12 + wide > left + width;
+    const at = flip ? gx(p.x) - 12 : gx(p.x) + 12;
+    let y = gy(p.y) - 11;
+    while (taken.some(([a, b, c]) => Math.abs(c - y) < 15 && a < (flip ? at : at + wide) && (flip ? at - wide : at) < b)) y += 17;
+    taken.push([flip ? at - wide : at, flip ? at : at + wide, y]);
+    text(label, at, y, { size: 13, weight: 600, family: "mono", align: flip ? "right" : "left" });
+  }
+  text("better ↗", left + width - 12, top + 26, { size: 13, family: "mono", color: "wall", align: "right" });
+  text("quality ↑   decode speed (tok/s) →", left, top - 6, { size: 13, family: "mono", color: "muted" });
+}
+
+function drawWall(list) {
+  /* The share card with nothing asked of it: the name, who leads and the wall, drawn from the board itself. */
+  const first = list[0], second = list[1];
+  const where = first.stack && first.stack.gpu ? cardName(first.stack.gpu) : "RTX PRO 6000 Blackwell";
+  box(0, 0, W, 3, "wall");
+  text(`suite ${DATA.suite || "full"} · ${state.effort} effort`, 56, 44, { size: 14, family: "mono", color: "muted" });
+  wordmark(176);
+  text("Open models, ranked on one", 56, 268, { size: 30, weight: 600, family: "display" });
+  text(`${where}.`, 56, 306, { size: 30, weight: 600, family: "display" });
+  text("Speed and answer quality, measured", 56, 346, { size: 15, family: "mono", color: "muted" });
+  text("the same way every time.", 56, 368, { size: 15, family: "mono", color: "muted" });
+  const score = first.index.value.toFixed(1);
+  const width = text(score, 56, 480, { size: 96, weight: 700, family: "display", color: "#a3e635" });
+  const tied = second && second.index.hi != null && first.index.lo != null && second.index.hi >= first.index.lo;
+  const name = shortName(first);
+  text(name, 56 + width + 22, 440, { size: fit(name, 340, 28, 700, "display"), weight: 700, family: "display" });
+  text(tied ? "ahead, within the margin" : "leads the board", 56 + width + 22, 466,
+    { size: 14, family: "mono", color: "muted" });
+  const timed = list.filter(model => ((model.speed || {}).decode || {}).value != null);
+  const lean = list.filter(model => ((model.energy || {}).perCorrect || {}).value != null);
+  const facts = [
+    ["Fastest", timed.length ? timed.reduce((a, b) => (b.speed.decode.value > a.speed.decode.value ? b : a)) : null,
+      model => Math.round(model.speed.decode.value) + " tok/s"],
+    ["Leanest", lean.length ? lean.reduce((a, b) => (b.energy.perCorrect.value < a.energy.perCorrect.value ? b : a)) : null,
+      model => model.energy.perCorrect.value.toFixed(2) + " Wh per correct answer"],
+  ];
+  facts.forEach(([label, model, format], index) => {
+    if (!model) return;
+    const x = 56 + index * 280;
+    text(label, x, 540, { size: 13, family: "mono", color: "muted" });
+    const title = shortName(model);
+    text(title, x, 566, { size: fit(title, 260, 20, 600, "display"), weight: 600, family: "display" });
+    text(format(model), x, 586, { size: 13, family: "mono", color: "ink2" });
+  });
+  wallChart(list, { x: 640, y: 236, w: W - 56 - 640, h: 320 });
+  const newest = Math.max(...list.map(model => (model.run || {}).finished || 0));
+  const when = newest > 0 ? new Date(newest * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "";
+  text("guitaripod.github.io/blackwall", 56, H - 28, { size: 13, family: "mono", color: "muted" });
+  text(`${list.length} models${when ? " · " + when : ""}`, W - 56, H - 28, { size: 13, family: "mono", color: "muted", align: "right" });
+}
+
 function draw() {
   const list = chosen();
   context.fillStyle = PALETTE.page;
@@ -352,6 +511,7 @@ function draw() {
     return;
   }
   if (list.length === 1) return drawOne(list[0]);
+  if (state.mode === "wall") return drawWall(list);
   if (list.length > 2) return drawMany(list);
   const left = list[0], right = list[1];
   const stack = left.stack && left.stack.gpu ? cardName(left.stack.gpu) : "RTX PRO 6000 Blackwell";
@@ -390,7 +550,7 @@ function settle() {
   const efforts = view.efforts || [];
   if (!efforts.includes(state.effort)) state.effort = efforts[0];
   const list = ranking();
-  if (!MODES.includes(state.mode)) state.mode = "two";
+  if (!MODES.includes(state.mode)) state.mode = "wall";
   while (list.length < NEEDS[state.mode]) state.mode = MODES[MODES.indexOf(state.mode) + 1] || "one";
   state.models = chosen().map(model => model.id);
 }
@@ -464,24 +624,26 @@ function readHash() {
   state.models = (params.get("m") || [params.get("a"), params.get("b")].filter(Boolean).join(","))
     .split(",").map(id => id.trim()).filter(Boolean);
   state.mode = params.get("show") || (params.get("m") ? (state.models.length === 1 ? "one"
-    : state.models.length === 2 ? "two" : "many") : "two");
+    : state.models.length === 2 ? "two" : "many") : "wall");
 }
 
 function writeHash() {
   history.replaceState(null, "", "#" + new URLSearchParams({
     effort: state.effort || "", show: state.mode,
-    m: state.models.join(","),
+    m: state.mode === "wall" ? "" : state.models.join(","),
   }).toString());
 }
 
 const HINTS = {
+  wall: "The whole ranking on one card: who leads, and the wall, the line through the models nothing else beats on both "
+    + "quality and speed. This is the card the page's link previews show.",
   one: "One model, question by question, and what it cost the card.",
   two: "A difference smaller than the two 95% intervals allow is drawn in grey and marked \"tied\" — this run can't "
     + "tell those two apart. <code>blackwall compare</code> answers the same question question by question, which is a "
     + "sharper test.",
   many: "The ranking at these settings, with what each model settles at beside it.",
 };
-const TITLES = { one: "Model card", two: "Comparison card", many: "Ranked card" };
+const TITLES = { wall: "Wall card", one: "Model card", two: "Comparison card", many: "Ranked card" };
 
 function render() {
   settle();
@@ -514,7 +676,7 @@ document.getElementById("download").addEventListener("click", () => {
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     const list = chosen();
-    link.download = "blackwall-" + (list.length === 1 ? list[0].id
+    link.download = "blackwall-" + (state.mode === "wall" ? `${state.effort}-wall` : list.length === 1 ? list[0].id
       : list.length === 2 ? `${list[0].id}-vs-${list[1].id}` : `${state.effort}-top${list.length}`) + ".png";
     link.click();
     setTimeout(() => URL.revokeObjectURL(link.href), 5000);

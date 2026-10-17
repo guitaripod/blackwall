@@ -2,6 +2,14 @@
 
 All notable changes to Blackwall are listed here, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the versions follow [Semantic Versioning](https://semver.org/). The published `board.json` carries its own `schema` number, described in [docs/data.md](docs/data.md).
 
+## [2.2.0] - 2026-10-17
+
+### Added
+- **A wall card, and it is the page's link preview.** With nothing asked of it the share card now shows BLACKWALL across the top (with the page's cyan and red slip and the scan line through it), who leads and by how much, the fastest and the leanest model, and the wall drawn from the board: quality against decode speed with the frontier as a green staircase and a whisker on every dot. It is the first choice in the card's *Show* menu, so *The wall* sits beside *A ranking*, *Head to head* and *One model*. Links that name models or a mode keep their own card.
+
+### Changed
+- `docs/card.png`, and so the `card.png` an exported page names in its link preview, is the wall card instead of the top-two comparison.
+
 ## [2.1.0] - 2026-10-17
 
 The leaderboard page is rebuilt. What is measured, the scores and the `board.json` schema (only keys were added) are unchanged.
