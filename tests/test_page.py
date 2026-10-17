@@ -226,11 +226,21 @@ def test_the_command_palette_jumps_and_switches(browser, page_file):
     context.close()
 
 
-def test_the_light_theme_has_no_dark_surfaces_left(browser, page_file):
-    context, page, errors = open_page(browser, page_file, scheme="light")
+def body_channels(page):
     background = page.evaluate("getComputedStyle(document.body).backgroundColor")
-    red, green, blue = [int(part) for part in background.removeprefix("rgb(").removesuffix(")").split(",")[:3]]
-    assert min(red, green, blue) > 200
+    return [int(part) for part in background.removeprefix("rgb(").removesuffix(")").split(",")[:3]]
+
+
+def test_the_page_stays_dark_until_the_toggle_picks_light_and_remembers_it(browser, page_file):
+    context, page, errors = open_page(browser, page_file, scheme="light")
+    assert max(body_channels(page)) < 40
+    page.click("#theme")
+    assert min(body_channels(page)) > 200
+    page.reload()
+    page.wait_for_selector(".row-wrap")
+    assert min(body_channels(page)) > 200
+    page.click("#theme")
+    assert max(body_channels(page)) < 40
     assert errors == []
     context.close()
 

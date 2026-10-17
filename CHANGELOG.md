@@ -16,7 +16,7 @@ The leaderboard page is rebuilt. What is measured, the scores and the `board.jso
 - **Runs in progress.** `board.json` gains `live`, and the table shows a running model with the tasks scored so far and the span its index can still land in. The local page now rebuilds after every scored task, not only when a run ends.
 - **Keyboard and search.** `Ctrl K` or `/` opens a command palette; `j`, `k`, `Enter`, `c` and `w` move through the board. Dotted terms explain themselves in place.
 - **A fuller address.** The page writes the effort, open model, axis, weights, compared models, sort and tab into the address and reads them back. The old `#model~effort` links still work.
-- **Light theme** that follows the system setting, a phone layout that turns the table into cards, and a plain table inside `<noscript>`.
+- **Light theme** behind a toggle (the page stays dark until you pick it, and remembers the choice), a phone layout that turns the table into cards, and a plain table inside `<noscript>`.
 
 ### Changed
 - The page keeps every number the old one showed: suite tabs, setup notices, health notes, quick-run and repeat chips, the cost columns, the per-prompt-length charts, run history, localmaxxing ids and the share cards.

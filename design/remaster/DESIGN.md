@@ -36,7 +36,7 @@ Support figures are the numbers the research pass read from caniuse on 2026-10-1
 - **The weights panel is the main new idea.** The index is an equal-weight average of five groups (the page now says so). Letting people change that, with the default always shown next to their ranking, turns a verdict into a tool. Drop long-context weight and Super passes Qwen; weight code and tools and GPT-OSS climbs.
 - **Plain words over jargon.** "First token", "cut off", "per correct answer", with the technical term one tap away.
 - **Colour carries meaning, not decoration.** Green is the wall and positive; amber means unfinished; the A to D pin colours are the only categorical colours; cyan and red are kept for the wordmark and for gaps.
-- **Brand kept.** The glitch wordmark, black ground, `#76b900`, Archivo for display, Atkinson Hyperlegible for text and numerals. A light theme was added; it follows the system setting.
+- **Brand kept.** The glitch wordmark, black ground, `#76b900`, Archivo for display, Atkinson Hyperlegible for text and numerals. The page stays dark by default; a light theme sits behind the toggle and is remembered.
 
 ## Accessibility
 

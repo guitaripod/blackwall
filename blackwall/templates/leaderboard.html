@@ -45,33 +45,6 @@
   --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
   --cut: 14px;
 }
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    color-scheme: light;
-    --page: #eff3ea;
-    --surface: #ffffff;
-    --surface-2: #f6f9f2;
-    --raise: #e9eee3;
-    --line: #d3dccb;
-    --grid: #e3e9dd;
-    --axis: #b2bfa6;
-    --ink: #0c1109;
-    --ink-2: #2f3a29;
-    --muted: #5d6955;
-    --green: #5d9300;
-    --green-ink: #3f6b00;
-    --green-wash: rgba(93, 147, 0, 0.12);
-    --cyan: #006f9b;
-    --red: #c4153c;
-    --amber: #a86500;
-    --violet: #6b46c1;
-    --pin-a: #006f9b;
-    --pin-b: #c4153c;
-    --pin-c: #a86500;
-    --pin-d: #6b46c1;
-    --shadow: 0 18px 50px rgba(30, 50, 20, 0.18);
-  }
-}
 :root[data-theme="light"] {
   color-scheme: light;
   --page: #eff3ea;
@@ -1872,7 +1845,7 @@ function openMethod() { $("#method-body").innerHTML = methodHtml(); $("#method")
 const THEME_KEY = "blackwall-theme";
 function toggleTheme() {
   const root = document.documentElement;
-  const dark = root.dataset.theme ? root.dataset.theme === "dark" : !matchMedia("(prefers-color-scheme: light)").matches;
+  const dark = root.dataset.theme !== "light";
   root.dataset.theme = dark ? "light" : "dark";
   try { localStorage.setItem(THEME_KEY, root.dataset.theme); } catch (error) {}
   renderAll(false);
