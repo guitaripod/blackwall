@@ -3,11 +3,18 @@
   <id>https://guitaripod.github.io/blackwall/</id>
   <title>Blackwall</title>
   <subtitle>New results on one NVIDIA RTX PRO 6000 Blackwell, in the order they finished.</subtitle>
-  <updated>2026-10-17T04:50:18Z</updated>
+  <updated>2026-10-17T18:47:51Z</updated>
   <author><name>Blackwall</name></author>
   <generator version="2.2.0">blackwall</generator>
   <link rel="self" type="application/atom+xml" href="https://guitaripod.github.io/blackwall/feed.xml"/>
   <link rel="alternate" type="text/html" href="https://guitaripod.github.io/blackwall/"/>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-10-17:run/20261016-015458-nemotron-3.5-bolt-74b-a9b-24gb-gguf</id>
+    <title>Nemotron 3.5 Bolt 74B-A9B: 71.4 quality (debut)</title>
+    <updated>2026-10-17T18:47:51Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#nemotron-3.5-bolt-74b-a9b-24gb-gguf~max"/>
+    <summary>Max effort, suite full/v1. Quality index 71.4 (95% interval 68.5 to 74.2). 267 tok/s decoding one request, 363 tok/s at peak, 6.54 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 615.71.09, llama.cpp b1-b76b133.</summary>
+  </entry>
   <entry>
     <id>tag:guitaripod.github.io,2026-10-17:run/20261016-005434-nemotron-3.5-super-vl-120b-nvfp4</id>
     <title>Nemotron 3.5 Super VL 120B: 79.2 quality (debut)</title>
