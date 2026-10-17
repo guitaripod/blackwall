@@ -1,0 +1,1381 @@
+<title>Blackwall Leaderboard</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,100..900&family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root {
+  color-scheme: dark;
+  --page: #040504;
+  --surface: #0a0d09;
+  --surface-2: #10140e;
+  --raise: #171c14;
+  --line: #232b1f;
+  --grid: #181e15;
+  --axis: #3a4531;
+  --ink: #f3f7ee;
+  --ink-2: #c3cabc;
+  --muted: #8f9988;
+  --green: #76b900;
+  --green-ink: #a3e635;
+  --green-wash: rgba(118, 185, 0, 0.11);
+  --cyan: #19d3ff;
+  --red: #ff2d55;
+  --amber: #ffb000;
+  --violet: #b690ff;
+  --pin-a: #19d3ff;
+  --pin-b: #ff5b7a;
+  --pin-c: #ffb000;
+  --pin-d: #b690ff;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  --ui: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Atkinson Hyperlegible Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --cut: 14px;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --page: #eff3ea;
+    --surface: #ffffff;
+    --surface-2: #f6f9f2;
+    --raise: #e9eee3;
+    --line: #d3dccb;
+    --grid: #e3e9dd;
+    --axis: #b2bfa6;
+    --ink: #0c1109;
+    --ink-2: #2f3a29;
+    --muted: #5d6955;
+    --green: #5d9300;
+    --green-ink: #3f6b00;
+    --green-wash: rgba(93, 147, 0, 0.12);
+    --cyan: #006f9b;
+    --red: #c4153c;
+    --amber: #a86500;
+    --violet: #6b46c1;
+    --pin-a: #006f9b;
+    --pin-b: #c4153c;
+    --pin-c: #a86500;
+    --pin-d: #6b46c1;
+    --shadow: 0 18px 50px rgba(30, 50, 20, 0.18);
+  }
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --page: #eff3ea;
+  --surface: #ffffff;
+  --surface-2: #f6f9f2;
+  --raise: #e9eee3;
+  --line: #d3dccb;
+  --grid: #e3e9dd;
+  --axis: #b2bfa6;
+  --ink: #0c1109;
+  --ink-2: #2f3a29;
+  --muted: #5d6955;
+  --green: #5d9300;
+  --green-ink: #3f6b00;
+  --green-wash: rgba(93, 147, 0, 0.12);
+  --cyan: #006f9b;
+  --red: #c4153c;
+  --amber: #a86500;
+  --violet: #6b46c1;
+  --pin-a: #006f9b;
+  --pin-b: #c4153c;
+  --pin-c: #a86500;
+  --pin-d: #6b46c1;
+  --shadow: 0 18px 50px rgba(30, 50, 20, 0.18);
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
+body {
+  margin: 0;
+  overflow-x: clip;
+  background: var(--page);
+  color: var(--ink);
+  font: 400 15px/1.5 var(--ui);
+  padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 6rem;
+  -webkit-font-smoothing: antialiased;
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+button:focus-visible, [tabindex]:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: 3px; }
+h1, h2, h3, p { margin: 0; }
+h2 { font: 800 1.5rem/1.1 var(--display); font-stretch: 112%; letter-spacing: -0.01em; text-wrap: balance; }
+h3 { font: 600 0.78rem/1.2 var(--ui); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.mono, .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.wrap { max-width: 1240px; margin-inline: auto; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.chamfer { clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%); }
+
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding-inline: max(16px, env(safe-area-inset-left, 0px)); background: color-mix(in srgb, var(--page) 86%, transparent); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 31; background: var(--page); }
+.topbar .wrap { display: flex; align-items: center; gap: 0.9rem; min-height: 3.3rem; flex-wrap: wrap; padding-block: 0.4rem; }
+.brand { font: 900 1.05rem/1 var(--display); font-stretch: 125%; letter-spacing: -0.02em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.5rem; }
+.brand i { width: 1.6rem; height: 3px; background: var(--green); box-shadow: 0 0 10px var(--green); display: inline-block; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; background: var(--surface); }
+.seg button { padding: 0.28rem 0.8rem; border-radius: 999px; font-size: 0.86rem; color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--green); color: #061000; font-weight: 600; }
+.spacer { flex: 1; }
+.short { display: none; }
+@media (max-width: 640px) {
+  .long { display: none; }
+  .short { display: inline; }
+  .topbar .wrap { gap: 0.5rem; }
+  .seg button { padding: 0.28rem 0.6rem; }
+  .chip-btn { padding: 0.3rem 0.55rem; }
+  .chip-btn kbd { display: none; }
+  .brand i { display: none; }
+}
+.chip-btn { display: inline-flex; align-items: center; gap: 0.45rem; border: 1px solid var(--line); background: var(--surface); padding: 0.3rem 0.7rem; border-radius: 8px; font-size: 0.85rem; color: var(--ink-2); }
+.chip-btn:hover { border-color: var(--green); color: var(--ink); }
+kbd { font: 600 0.72rem var(--mono); border: 1px solid var(--axis); border-bottom-width: 2px; border-radius: 4px; padding: 0 0.32rem; color: var(--ink-2); background: var(--surface-2); }
+
+.hero { padding-block: 2.2rem 1.2rem; }
+.wordmark-row { position: relative; padding: 0.12em 0; font-size: min(9rem, calc((100vw - 32px) / 8.15)); }
+.wordmark-row::after { content: ""; position: absolute; top: -0.5rem; bottom: -0.5rem; left: 50%; width: 100vw; transform: translateX(-50%); pointer-events: none; background: repeating-linear-gradient(0deg, color-mix(in srgb, var(--ink) 5%, transparent) 0 1px, transparent 1px 4px); -webkit-mask-image: linear-gradient(#000 40%, transparent); mask-image: linear-gradient(#000 40%, transparent); }
+.wordmark { font-family: var(--display); font-stretch: 125%; font-weight: 900; line-height: 0.82; letter-spacing: -0.025em; text-transform: uppercase; }
+.wordmark span { display: block; position: relative; width: max-content; max-width: 100%; --cut-top: 48%; --cut-bottom: 54.5%; -webkit-mask-image: linear-gradient(#000 var(--cut-top), transparent var(--cut-top), transparent var(--cut-bottom), #000 var(--cut-bottom)); mask-image: linear-gradient(#000 var(--cut-top), transparent var(--cut-top), transparent var(--cut-bottom), #000 var(--cut-bottom)); }
+.wordmark span::before, .wordmark span::after { content: attr(data-text); position: absolute; left: 0; top: 0; mix-blend-mode: screen; }
+.wordmark span::before { color: var(--cyan); clip-path: inset(18% 0 66% 0); transform: translateX(-0.03em); }
+.wordmark span::after { color: var(--red); clip-path: inset(70% 0 14% 0); transform: translateX(0.035em); }
+:root[data-theme="light"] .wordmark span::before, :root[data-theme="light"] .wordmark span::after { mix-blend-mode: multiply; }
+.wall-line { position: absolute; left: 50%; width: 100vw; top: calc(0.12em + 0.82em * 0.5125); height: 3px; transform: translate(-50%, -50%); background: var(--green); box-shadow: 0 0 10px color-mix(in srgb, var(--green) 55%, transparent); pointer-events: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .wordmark span::before { animation: slip-a 0.7s steps(1, end) 1; }
+  .wordmark span::after { animation: slip-b 0.7s steps(1, end) 1; }
+  .wall-line { animation: strike 0.5s ease-out 1; }
+}
+@keyframes slip-a { 0% { transform: translateX(-0.2em); } 20% { transform: translateX(0.12em); } 40% { transform: translateX(-0.1em); } 60% { transform: translateX(-0.07em); } 100% { transform: translateX(-0.03em); } }
+@keyframes slip-b { 0% { transform: translateX(0.2em); } 25% { transform: translateX(-0.1em); } 50% { transform: translateX(0.14em); } 75% { transform: translateX(0.07em); } 100% { transform: translateX(0.035em); } }
+@keyframes strike { from { transform: translate(-50%, -50%) scaleX(0); } to { transform: translate(-50%, -50%) scaleX(1); } }
+
+.verdict { margin-top: 1.6rem; display: grid; gap: 0.5rem; max-width: 62rem; }
+.verdict h1 { font: 800 clamp(1.5rem, 3.4vw, 2.3rem)/1.12 var(--display); font-stretch: 108%; letter-spacing: -0.015em; text-wrap: balance; }
+.verdict h1 em { font-style: normal; color: var(--green-ink); }
+.verdict p { color: var(--ink-2); font-size: 1.02rem; max-width: 58ch; }
+.term { border-bottom: 1px dotted var(--muted); cursor: help; color: inherit; }
+.term:hover { color: var(--green-ink); border-color: var(--green-ink); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr)); gap: 0.8rem; margin-top: 1.4rem; }
+.card { position: relative; text-align: left; background: var(--surface); border: 1px solid var(--line); padding: 0.95rem 1rem 1rem; display: grid; gap: 0.25rem; transition: border-color 0.15s, transform 0.15s; }
+.card:hover { border-color: var(--green); }
+.card .k { font: 600 0.72rem var(--ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.card .v { font: 600 2rem/1.05 var(--mono); font-variant-numeric: tabular-nums; }
+.card .v small { font-size: 0.9rem; color: var(--muted); font-weight: 400; margin-left: 0.2rem; }
+.card .n { font: 800 1.02rem/1.2 var(--display); font-stretch: 108%; }
+.card .s { color: var(--ink-2); font-size: 0.86rem; }
+.card.bench { border-style: dashed; background: repeating-linear-gradient(135deg, transparent 0 9px, color-mix(in srgb, var(--amber) 7%, transparent) 9px 18px), var(--surface); }
+.card.bench .v { color: var(--amber); }
+.steps { display: flex; gap: 3px; margin-top: 0.3rem; }
+.steps i { flex: 1; height: 6px; background: var(--raise); position: relative; }
+.steps i b { position: absolute; inset: 0; background: var(--amber); transform-origin: left; }
+.steps i.done b { background: var(--green); }
+
+section.block { margin-top: 2.6rem; }
+.block-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem 2rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
+.block-head p { color: var(--ink-2); max-width: 56ch; font-size: 0.93rem; margin-top: 0.35rem; }
+.tools { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+.pill { border: 1px solid var(--line); background: var(--surface); padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.84rem; color: var(--ink-2); }
+.pill:hover { border-color: var(--green); color: var(--ink); }
+.pill[aria-pressed="true"], .pill.on { background: var(--green-wash); border-color: var(--green); color: var(--green-ink); font-weight: 600; }
+
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) 19rem; gap: 1rem; align-items: start; }
+.plot { position: relative; background: var(--surface); border: 1px solid var(--line); padding: 0.4rem; min-width: 0; touch-action: pan-y; }
+.plot svg { display: block; width: 100%; height: auto; user-select: none; -webkit-user-select: none; }
+.plot text { font-family: var(--mono); fill: var(--muted); font-size: 11px; }
+.plot .lbl { font-family: var(--ui); font-size: 12.5px; fill: var(--ink-2); paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+.plot .lbl.on { fill: var(--ink); font-weight: 600; }
+.plot .axis-title { font-family: var(--ui); fill: var(--ink-2); font-size: 12px; }
+.plot .pt { cursor: pointer; }
+.plot .pt circle.dot { fill: var(--raise); stroke: var(--muted); stroke-width: 1.5; transition: r 0.15s; }
+.plot .pt.wall circle.dot { fill: var(--green); stroke: var(--green-ink); }
+.plot .pt.dim { opacity: 0.2; }
+.plot .pt:hover circle.dot, .plot .pt.hot circle.dot { r: 9; stroke: var(--ink); stroke-width: 2; }
+.plot .pt.open circle.ring { stroke: var(--ink); }
+.plot circle.ring { fill: none; stroke: transparent; stroke-width: 2; }
+.plot .whisk { stroke: var(--muted); stroke-width: 1.5; opacity: 0.45; }
+.plot .pt:hover .whisk, .plot .pt.hot .whisk, .plot .pt.open .whisk { opacity: 1; stroke: var(--ink); }
+.plot .pin-badge { font: 700 10px var(--mono); fill: #04120a; text-anchor: middle; dominant-baseline: central; }
+.plot .wallpath { fill: none; stroke: var(--green); stroke-width: 2.5; filter: drop-shadow(0 0 5px color-mix(in srgb, var(--green) 70%, transparent)); }
+.plot .wallfill { fill: url(#wallgrad); }
+.plot .gridline { stroke: var(--grid); stroke-width: 1; }
+.plot .axisline { stroke: var(--axis); stroke-width: 1; }
+.plot .ghost { fill: var(--green-ink); opacity: 0.55; transition: cy 0.55s ease-in-out; }
+.plot .hint { font-family: var(--ui); font-size: 11px; fill: var(--green-ink); letter-spacing: 0.08em; text-transform: uppercase; }
+.plot .brush { fill: var(--green-wash); stroke: var(--green); stroke-dasharray: 4 3; }
+.plot .bench-range { stroke: var(--amber); stroke-width: 2; stroke-dasharray: 3 4; }
+.plot .bench-cap { stroke: var(--amber); stroke-width: 2; }
+.tip { position: absolute; z-index: 5; pointer-events: none; background: var(--raise); border: 1px solid var(--axis); padding: 0.6rem 0.75rem; box-shadow: var(--shadow); font-size: 0.84rem; min-width: 13rem; max-width: 17rem; display: grid; gap: 0.15rem; }
+.tip b { font: 800 0.95rem/1.2 var(--display); font-stretch: 108%; }
+.tip .trow { display: flex; justify-content: space-between; gap: 1rem; color: var(--ink-2); }
+.tip .trow span:last-child { font-family: var(--mono); color: var(--ink); }
+.tip .act { color: var(--muted); font-size: 0.76rem; margin-top: 0.2rem; }
+.side { display: grid; gap: 0.8rem; align-content: start; }
+.panel { background: var(--surface); border: 1px solid var(--line); padding: 0.9rem 1rem; display: grid; gap: 0.55rem; }
+.legend-item { display: grid; grid-template-columns: auto 1fr auto; gap: 0.15rem 0.6rem; align-items: baseline; text-align: left; padding: 0.35rem 0.4rem; margin-inline: -0.4rem; border-radius: 6px; width: calc(100% + 0.8rem); }
+.legend-item:hover, .legend-item.hot { background: var(--green-wash); }
+.legend-item .nm { font-weight: 600; font-size: 0.92rem; }
+.legend-item .meta { grid-column: 2 / 4; color: var(--muted); font-size: 0.78rem; font-family: var(--mono); }
+.legend-item .dotk { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); align-self: center; }
+.note { color: var(--muted); font-size: 0.82rem; }
+
+.lab { margin-bottom: 0.9rem; }
+.lab[hidden] { display: none; }
+.lab-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.8rem 1.4rem; }
+.slider { display: grid; gap: 0.2rem; }
+.slider label { display: flex; justify-content: space-between; font-size: 0.86rem; color: var(--ink-2); }
+.slider label b { font-family: var(--mono); color: var(--ink); font-weight: 600; }
+input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: transparent; margin: 0; }
+input[type="range"]::-webkit-slider-runnable-track { height: 4px; background: linear-gradient(90deg, var(--green) var(--fill, 33%), var(--raise) var(--fill, 33%)); border-radius: 4px; }
+input[type="range"]::-moz-range-track { height: 4px; background: var(--raise); border-radius: 4px; }
+input[type="range"]::-moz-range-progress { height: 4px; background: var(--green); border-radius: 4px; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--ink); border: 3px solid var(--green); margin-top: -6px; }
+input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--ink); border: 3px solid var(--green); }
+.lab-foot { display: flex; gap: 0.6rem 1rem; flex-wrap: wrap; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 0.6rem; }
+.lab-foot .msg { color: var(--ink-2); font-size: 0.9rem; max-width: 60ch; }
+
+.board { container-type: inline-size; container-name: board; }
+.grid-table { --cols: 2.6rem minmax(15rem, 2fr) minmax(12rem, 1.5fr) repeat(5, minmax(4.4rem, 0.62fr)) 4.8rem 4.4rem 4.6rem; }
+.hrow, .row { display: grid; grid-template-columns: var(--cols); align-items: center; column-gap: 0.7rem; padding-inline: 0.8rem; }
+.hrow { position: sticky; top: calc(3.3rem + env(safe-area-inset-top, 0px)); z-index: 4; background: color-mix(in srgb, var(--page) 94%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--axis); min-height: 2.6rem; }
+.hrow [role="columnheader"] { font: 600 0.7rem/1.15 var(--ui); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); text-align: right; }
+.hrow [role="columnheader"].l { text-align: left; }
+.hrow button { text-transform: inherit; letter-spacing: inherit; font: inherit; color: inherit; display: inline-flex; gap: 0.25rem; align-items: center; padding: 0.35rem 0; }
+.hrow button:hover { color: var(--ink); }
+.hrow [aria-sort="ascending"] button, .hrow [aria-sort="descending"] button { color: var(--green-ink); }
+.hrow [aria-sort="ascending"] button::after { content: "▲"; font-size: 0.6rem; }
+.hrow [aria-sort="descending"] button::after { content: "▼"; font-size: 0.6rem; }
+.wbadge { display: block; width: max-content; margin-left: auto; font: 600 0.62rem var(--mono); background: var(--green-wash); color: var(--green-ink); border-radius: 4px; padding: 0 0.28rem; letter-spacing: 0; }
+.hrow button { flex-direction: column; align-items: flex-end; gap: 0.1rem; }
+.rows { position: relative; }
+.row-wrap { border-bottom: 1px solid var(--line); background: var(--surface); }
+.row-wrap + .row-wrap { border-top: 0; }
+.row { min-height: 4.6rem; padding-block: 0.65rem; cursor: pointer; position: relative; }
+.row:hover, .row.hot { background: var(--green-wash); }
+.row-wrap.open { background: var(--surface-2); }
+.row-wrap.dim { opacity: 0.28; }
+.row-wrap.lead::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--green); box-shadow: 0 0 10px var(--green); }
+.row-wrap { position: relative; }
+.row-wrap.ghost-row { background: repeating-linear-gradient(135deg, transparent 0 10px, color-mix(in srgb, var(--amber) 6%, transparent) 10px 20px), var(--surface); border-style: dashed; }
+.c-rank { font: 600 1.05rem var(--mono); color: var(--ink-2); display: grid; justify-items: start; }
+.c-rank .delta { font-size: 0.68rem; color: var(--muted); }
+.c-rank .delta.up { color: var(--green-ink); }
+.c-rank .delta.down { color: var(--red); }
+.c-model { min-width: 0; display: grid; gap: 0.12rem; }
+.c-model .name { text-align: left; font: 800 1.02rem/1.15 var(--display); font-stretch: 108%; letter-spacing: -0.005em; }
+.c-model .meta { color: var(--muted); font: 400 0.76rem var(--mono); overflow-wrap: anywhere; }
+.tags { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 0.1rem; }
+.tag { font: 600 0.66rem var(--ui); letter-spacing: 0.04em; text-transform: uppercase; border: 1px solid var(--axis); border-radius: 4px; padding: 0 0.35rem; color: var(--ink-2); }
+.tag.wall { border-color: var(--green); color: var(--green-ink); }
+.tag.warn { border-color: var(--amber); color: var(--amber); }
+.tag.live { border-color: var(--amber); color: var(--amber); }
+.c-quality { display: grid; gap: 0.3rem; }
+.q-top { display: flex; align-items: baseline; gap: 0.45rem; flex-wrap: wrap; }
+.q-val { font: 600 1.3rem/1 var(--mono); font-variant-numeric: tabular-nums; }
+.q-pm { font: 400 0.76rem var(--mono); color: var(--muted); }
+.rank-chip { font: 600 0.7rem var(--mono); border: 1px solid var(--axis); border-radius: 999px; padding: 0 0.45rem; color: var(--ink-2); cursor: help; }
+.rank-chip.sure { border-color: var(--green); color: var(--green-ink); }
+.track { position: relative; height: 10px; background: var(--raise); border-radius: 2px; }
+.track .fill { position: absolute; left: 0; top: 3px; bottom: 3px; background: color-mix(in srgb, var(--green) 55%, transparent); border-radius: 2px; }
+.track .ci { position: absolute; top: 1px; bottom: 1px; background: color-mix(in srgb, var(--green-ink) 35%, transparent); border-left: 2px solid var(--green-ink); border-right: 2px solid var(--green-ink); }
+.track .tick { position: absolute; top: -2px; bottom: -2px; width: 3px; margin-left: -1.5px; background: var(--ink); border-radius: 1px; }
+.track .range { position: absolute; top: 2px; bottom: 2px; background: repeating-linear-gradient(90deg, var(--amber) 0 4px, transparent 4px 7px); opacity: 0.8; }
+.c-grp { text-align: right; display: grid; gap: 0.25rem; justify-items: end; }
+.c-grp .gv { font: 400 0.96rem var(--mono); font-variant-numeric: tabular-nums; }
+.c-grp .gb { width: 100%; height: 4px; background: var(--raise); border-radius: 2px; overflow: hidden; }
+.c-grp .gb i { display: block; height: 100%; background: var(--g, var(--green)); }
+.c-grp.best .gv { color: var(--green-ink); font-weight: 600; }
+.c-grp.pending .gv { color: var(--amber); }
+.c-num { text-align: right; font: 400 0.98rem var(--mono); font-variant-numeric: tabular-nums; }
+.c-num small { color: var(--muted); font-size: 0.7rem; margin-left: 0.15rem; }
+.c-num.best { color: var(--green-ink); font-weight: 600; }
+.c-act { display: flex; gap: 0.25rem; justify-content: flex-end; }
+.icon-btn { width: 1.95rem; height: 1.95rem; border: 1px solid var(--line); border-radius: 6px; display: grid; place-items: center; font: 600 0.95rem var(--mono); color: var(--ink-2); background: var(--surface); }
+.icon-btn:hover { border-color: var(--green); color: var(--ink); }
+.icon-btn[aria-pressed="true"] { background: var(--pin, var(--cyan)); border-color: transparent; color: #04120a; }
+.chev { transition: transform 0.2s; }
+.row-wrap.open .chev { transform: rotate(180deg); }
+
+.profile { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 0.9fr); gap: 1.2rem 1.6rem; padding: 0.4rem 0.8rem 1.3rem 3.4rem; border-top: 1px dashed var(--line); animation: reveal 0.25s ease-out; }
+@keyframes reveal { from { opacity: 0; transform: translateY(-6px); } }
+.profile > div { display: grid; gap: 0.6rem; align-content: start; min-width: 0; }
+.profile .lede { grid-column: 1 / -1; padding-top: 0.7rem; color: var(--ink-2); font-size: 1rem; max-width: 70ch; }
+.profile .lede strong { color: var(--ink); font-weight: 600; }
+.strip { display: grid; grid-template-columns: 5.2rem 1fr auto; gap: 0.2rem 0.6rem; align-items: center; font-size: 0.84rem; }
+.strip .nm { color: var(--ink-2); }
+.strip .val { font-family: var(--mono); text-align: right; white-space: nowrap; min-width: 2.6rem; }
+.dots { position: relative; height: 22px; }
+.dots .band { position: absolute; top: 8px; height: 6px; background: color-mix(in srgb, var(--axis) 55%, transparent); border-radius: 3px; }
+.dots .mid { position: absolute; top: 4px; height: 14px; width: 2px; background: var(--axis); }
+.dots .whisk { position: absolute; top: 10px; height: 2px; background: var(--c, var(--green-ink)); opacity: 0.75; }
+.dots .dot { position: absolute; top: 5px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--c, var(--green-ink)); box-shadow: 0 0 0 2px var(--surface-2); }
+.dots .dot.low { background: var(--red); }
+.legend-line { display: flex; gap: 0.9rem; flex-wrap: wrap; color: var(--muted); font-size: 0.76rem; }
+.legend-line i { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 50%; vertical-align: -1px; margin-right: 0.3rem; }
+.tabs { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+.bars { display: grid; gap: 0.32rem; }
+.bar { display: grid; grid-template-columns: 5.4rem 1fr 2.8rem; gap: 0.5rem; align-items: center; font-size: 0.8rem; }
+.bar .t { height: 9px; background: var(--raise); border-radius: 2px; position: relative; overflow: hidden; }
+.bar .t i { position: absolute; inset: 0 auto 0 0; background: var(--green); }
+.bar .t i.low { background: var(--red); }
+.bar span:first-child { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar span:last-child { font-family: var(--mono); text-align: right; }
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem 1rem; }
+.fact b { display: block; font: 600 1.15rem/1.1 var(--mono); }
+.fact span { color: var(--muted); font-size: 0.76rem; }
+.mini svg { width: 100%; height: auto; display: block; }
+.mini text { font: 10px var(--mono); fill: var(--muted); }
+.prov { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 0.8rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 0.6rem 1.4rem; font-size: 0.82rem; color: var(--ink-2); }
+.prov code { font: 400 0.76rem var(--mono); color: var(--ink); overflow-wrap: anywhere; }
+.prov .cmd { grid-column: 1 / -1; display: flex; gap: 0.6rem; align-items: center; background: var(--page); border: 1px solid var(--line); padding: 0.5rem 0.7rem; border-radius: 6px; }
+.prov .cmd code { flex: 1; }
+.rankdist { display: flex; align-items: flex-end; gap: 3px; height: 38px; }
+.rankdist i { flex: 1; background: var(--green); min-height: 2px; border-radius: 2px 2px 0 0; position: relative; }
+.rankdist i span { position: absolute; bottom: -1.1rem; left: 0; right: 0; text-align: center; font: 0.66rem var(--mono); color: var(--muted); }
+
+.dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 0 max(12px, env(safe-area-inset-left, 0px)) env(safe-area-inset-bottom, 0px); transform: translateY(105%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none; }
+.dock.show { transform: none; pointer-events: auto; }
+.dock-inner { max-width: 1240px; margin-inline: auto; background: var(--raise); border: 1px solid var(--axis); border-bottom: 0; box-shadow: var(--shadow); padding: 0.8rem 1rem 1rem; max-height: min(66vh, 34rem); overflow: auto; }
+.dock-head { display: flex; gap: 0.6rem 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.7rem; }
+.pinchip { display: inline-flex; align-items: center; gap: 0.45rem; border: 1px solid var(--c); border-radius: 999px; padding: 0.15rem 0.3rem 0.15rem 0.35rem; font-size: 0.86rem; }
+.pinchip b { width: 1.2rem; height: 1.2rem; border-radius: 50%; background: var(--c); color: #04120a; font: 700 0.7rem var(--mono); display: grid; place-items: center; }
+.pinchip button { width: 1.2rem; height: 1.2rem; color: var(--muted); line-height: 1; border-radius: 50%; }
+.pinchip button:hover { color: var(--ink); background: var(--surface); }
+.dock-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 1.2rem 2rem; }
+.h2h { display: grid; gap: 0.5rem; align-content: start; }
+.h2h .sent { color: var(--ink-2); font-size: 0.95rem; }
+.h2h .sent strong { color: var(--ink); }
+.delta-row { display: grid; grid-template-columns: 5.2rem 1fr 4.4rem; gap: 0.6rem; align-items: center; font-size: 0.82rem; }
+.delta-row .zero { position: relative; height: 18px; }
+.delta-row .zero::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--axis); }
+.delta-row .dbar { position: absolute; top: 5px; height: 8px; border-radius: 2px; }
+.delta-row .dci { position: absolute; top: 8px; height: 2px; background: var(--ink); opacity: 0.55; }
+.delta-row .dv { font-family: var(--mono); text-align: right; }
+.delta-row .dv.sig { font-weight: 600; }
+
+dialog#pal { margin-top: 12vh; }
+dialog { background: var(--raise); color: var(--ink); border: 1px solid var(--axis); padding: 0; box-shadow: var(--shadow); max-width: min(40rem, calc(100vw - 2rem)); width: 100%; }
+dialog::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px); }
+.pal { display: grid; }
+.pal input { background: transparent; border: 0; border-bottom: 1px solid var(--line); color: var(--ink); font: 400 1.05rem var(--ui); padding: 0.95rem 1.1rem; outline: none; width: 100%; }
+.pal ul { list-style: none; margin: 0; padding: 0.4rem; max-height: 22rem; overflow: auto; }
+.pal li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.5rem 0.7rem; border-radius: 6px; cursor: pointer; align-items: baseline; }
+.pal li[aria-selected="true"] { background: var(--green-wash); box-shadow: inset 2px 0 var(--green); }
+.pal li small { color: var(--muted); font-family: var(--mono); font-size: 0.74rem; }
+.pal .grp { padding: 0.5rem 0.7rem 0.15rem; font: 600 0.68rem var(--ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); cursor: default; }
+.method { padding: 1.4rem 1.5rem 1.6rem; display: grid; gap: 0.9rem; }
+.method p, .method li { color: var(--ink-2); font-size: 0.94rem; max-width: 62ch; }
+.method ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.35rem; }
+.method code { font: 400 0.84rem var(--mono); color: var(--ink); }
+.method .close { justify-self: end; }
+[popover] { background: var(--raise); color: var(--ink); border: 1px solid var(--axis); padding: 0.7rem 0.85rem; max-width: 19rem; font-size: 0.86rem; line-height: 1.45; box-shadow: var(--shadow); margin: 0; position: fixed; inset: auto; }
+[popover]:popover-open { display: block; }
+[popover] strong { display: block; margin-bottom: 0.2rem; }
+
+.time { display: grid; grid-template-columns: minmax(0, 1fr) 19rem; gap: 1rem; }
+.time .plot svg .wl { fill: none; stroke: var(--green); stroke-width: 2.5; }
+.recent { display: grid; gap: 0.6rem; }
+.recent li { list-style: none; display: grid; gap: 0.05rem; font-size: 0.86rem; color: var(--ink-2); }
+.recent ul { margin: 0; padding: 0; display: grid; gap: 0.7rem; }
+.recent b { color: var(--ink); font-weight: 600; font-size: 0.92rem; }
+.recent .tag.debut { border-color: var(--green); color: var(--green-ink); margin-left: 0.4rem; }
+
+footer { margin-top: 3rem; border-top: 1px solid var(--line); padding-top: 1.4rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1.4rem; color: var(--ink-2); font-size: 0.88rem; }
+footer h3 { margin-bottom: 0.4rem; }
+footer code { font: 400 0.8rem var(--mono); color: var(--ink); background: var(--surface); border: 1px solid var(--line); padding: 0.15rem 0.4rem; border-radius: 4px; display: inline-block; margin-top: 0.3rem; }
+footer a { color: var(--cyan); }
+.toast { opacity: 0; visibility: hidden; position: fixed; left: 50%; bottom: 1.2rem; transform: translate(-50%, 140%); background: var(--ink); color: var(--page); padding: 0.55rem 0.95rem; border-radius: 8px; font-size: 0.86rem; z-index: 60; transition: transform 0.25s; pointer-events: none; }
+.toast.show { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
+
+@container board (max-width: 1020px) {
+  .grid-table { --cols: 2.4rem minmax(11rem, 1.6fr) minmax(11rem, 1.4fr) 4.6rem 4.4rem; }
+  .c-grp, [role="columnheader"].grp, .c-wh, [role="columnheader"].wh { display: none; }
+  .profile { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding-left: 0.8rem; }
+}
+@container board (max-width: 640px) {
+  .grid-table { --cols: 1fr auto; }
+  .hrow { display: none; }
+  .row { grid-template-areas: "model act" "quality quality" "speed speed"; row-gap: 0.55rem; }
+  .c-rank { display: none; }
+  .c-model { grid-area: model; }
+  .c-quality { grid-area: quality; }
+  .c-spd { grid-area: speed; text-align: left; }
+  .c-act { grid-area: act; align-self: start; }
+  .profile { grid-template-columns: minmax(0, 1fr); padding-left: 0.8rem; }
+}
+@media (max-width: 900px) {
+  .stage, .time, .dock-grid { grid-template-columns: minmax(0, 1fr); }
+  .hero { padding-top: 1.4rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="topbar">
+  <div class="wrap">
+    <span class="brand"><i></i>Blackwall</span>
+    <div class="seg" role="group" aria-label="Reasoning effort" id="efforts"></div>
+    <span class="spacer"></span>
+    <button class="chip-btn" id="open-pal" aria-label="Open command palette"><span class="long">Search or jump</span><span class="short">Search</span> <kbd>Ctrl K</kbd></button>
+    <button class="chip-btn" id="open-method" aria-haspopup="dialog"><span class="long">How it is measured</span><span class="short">Method</span></button>
+    <button class="chip-btn" id="theme" aria-label="Switch theme">Theme</button>
+  </div>
+</div>
+
+<main class="wrap">
+  <header class="hero">
+    <div class="wordmark-row" aria-hidden="true"><div class="wordmark"><span data-text="Blackwall">Blackwall</span></div><div class="wall-line"></div></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="cards" id="cards"></div>
+  </header>
+
+  <section class="block" id="wall-block" aria-labelledby="wall-h">
+    <div class="block-head">
+      <div>
+        <h2 id="wall-h">The wall</h2>
+        <p>Up and to the right is better. The green line is <button class="term" popovertarget="g-wall">the wall</button>: nothing else here is both faster and smarter than a model on it. Drag across the chart to focus a group, click a dot to open it, shift-click to compare.</p>
+      </div>
+      <div class="tools" id="axis-chips" role="group" aria-label="Horizontal axis"></div>
+    </div>
+    <div class="stage">
+      <div class="plot" id="plot"></div>
+      <div class="side">
+        <div class="panel" id="legend"></div>
+        <div class="panel" id="plot-tools"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="board-block" aria-labelledby="board-h">
+    <div class="block-head">
+      <div>
+        <h2 id="board-h">The board</h2>
+        <p>Every score carries a <button class="term" popovertarget="g-ci">95% interval</button>. The rank badge is the range each model lands in when the benchmark is rerun, so a tie looks like a tie.</p>
+      </div>
+      <div class="tools">
+        <button class="pill" id="lab-toggle" aria-expanded="false" aria-controls="lab">Weigh it your way</button>
+        <button class="pill" id="clear-brush" hidden>Clear focus</button>
+      </div>
+    </div>
+    <div class="panel lab" id="lab" hidden>
+      <div class="tools" id="presets" role="group" aria-label="Weight presets"></div>
+      <div class="lab-grid" id="sliders"></div>
+      <div class="lab-foot"><p class="msg" id="lab-msg"></p><button class="pill" id="lab-reset">Reset to equal</button></div>
+    </div>
+    <div class="board">
+      <div class="grid-table" role="table" aria-label="Models ranked by quality index" id="table">
+        <div class="hrow" role="row" id="hrow"></div>
+        <div class="rows" id="rows"></div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:0.7rem">Press <kbd>/</kbd> to search, <kbd>j</kbd> <kbd>k</kbd> to move, <kbd>Enter</kbd> to open, <kbd>c</kbd> to compare, <kbd>w</kbd> for weights.</p>
+  </section>
+
+  <section class="block" id="time-block" aria-labelledby="time-h">
+    <div class="block-head">
+      <div>
+        <h2 id="time-h">The wall over time</h2>
+        <p>Each dot is a finished run. The green line is the best quality index so far; it steps up whenever a model beats everything before it.</p>
+      </div>
+    </div>
+    <div class="time">
+      <div class="plot" id="time-plot"></div>
+      <div class="panel recent" id="recent"></div>
+    </div>
+  </section>
+
+  <footer>
+    <div><h3>Benchmark another model</h3><p>Any model llama-swap serves. The run survives a closed terminal and resumes from its saved answers.</p><code>blackwall run &lt;id&gt; --effort max --submit</code></div>
+    <div><h3>Follow it</h3><p>Every number on this page is in <a href="#" onclick="return false">board.json</a>, and each finished run lands in the <a href="#" onclick="return false">Atom feed</a>.</p></div>
+    <div><h3>Check our work</h3><p>Answers, error counts and the exact launch command are kept per run. Open a model and read its data checks.</p></div>
+  </footer>
+</main>
+
+<div class="dock" id="dock" aria-live="polite"></div>
+<dialog id="pal" aria-label="Command palette"><div class="pal"><input id="pal-q" placeholder="Jump to a model, switch effort, change the axis…" autocomplete="off" aria-controls="pal-list"><ul id="pal-list" role="listbox"></ul></div></dialog>
+<dialog id="method"><div class="method" id="method-body"></div></dialog>
+<div popover id="g-wall"><strong>The wall</strong>The set of models that no other model beats on both axes at once. Moving toward it costs you either speed or quality; beyond it nothing exists on this card.</div>
+<div popover id="g-ci"><strong>95% interval</strong>The range the true score very likely sits in, given how many questions were asked. Overlapping intervals mean the order between two models is not settled.</div>
+<div popover id="g-wh"><strong>Watt-hours per correct answer</strong>Energy the card drew, measured at the board, divided by the number of questions answered correctly. Lower is better.</div>
+<div popover id="g-cut"><strong>Cut off</strong>The share of answers that hit the token limit before the model finished. A cut-off answer scores zero.</div>
+<div class="toast" id="toast" role="status"></div>
+<div class="sr" id="live" aria-live="polite"></div>
+
+<script>
+const D = /*DATA*/null;
+</script>
+<script>
+const $ = (selector, root = document) => root.querySelector(selector);
+const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+const sum = values => values.reduce((a, b) => a + b, 0);
+const mean = values => sum(values) / values.length;
+const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
+const escapeHtml = text => String(text).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const GROUPS = Object.keys(D.groups);
+const GROUP_SHORT = { "Knowledge": "Knowledge", "Math": "Math", "Code": "Code", "Long context": "Long ctx", "Tool use": "Tools" };
+const GROUP_HINT = { "Knowledge": "SuperGPQA", "Math": "AIME + HMMT", "Code": "LiveCodeBench", "Long context": "MRCR + Graphwalks", "Tool use": "Tool use" };
+const EFFORT_LABEL = { max: "Max effort", medium: "Medium effort", none: "No thinking" };
+const EFFORT_SHORT = { max: "Max", medium: "Medium", none: "None" };
+const PIN_COLORS = ["var(--pin-a)", "var(--pin-b)", "var(--pin-c)", "var(--pin-d)"];
+const PIN_LETTERS = ["A", "B", "C", "D"];
+const PRESETS = [
+  { id: "equal", label: "Equal", weights: { "Knowledge": 1, "Math": 1, "Code": 1, "Long context": 1, "Tool use": 1 } },
+  { id: "coding", label: "Coding agent", weights: { "Knowledge": 0.5, "Math": 0.5, "Code": 3, "Long context": 1, "Tool use": 3 } },
+  { id: "chat", label: "Chat and knowledge", weights: { "Knowledge": 3, "Math": 1, "Code": 0.5, "Long context": 1, "Tool use": 1 } },
+  { id: "docs", label: "Long documents", weights: { "Knowledge": 1, "Math": 0.5, "Code": 0.5, "Long context": 3, "Tool use": 1 } },
+  { id: "reason", label: "Math and reasoning", weights: { "Knowledge": 1, "Math": 3, "Code": 2, "Long context": 0.5, "Tool use": 0.5 } },
+];
+const AXES = {
+  decode: { label: "Decode speed, one request", short: "Speed", unit: "tok/s", good: 1, get: m => val(m.speed.decode), fmt: v => Math.round(v) },
+  "conc.4": { label: "Throughput, four requests at once", short: "Throughput", unit: "tok/s", good: 1, get: m => val(m.speed["conc.4"]), fmt: v => Math.round(v) },
+  "ttft.32000": { label: "First token after a 32k-token prompt", short: "First token", unit: "s", good: -1, get: m => val(m.speed["ttft.32000"]), fmt: v => v.toFixed(1) },
+  wh: { label: "Energy per correct answer", short: "Energy", unit: "Wh", good: -1, get: m => val(m.wh), fmt: v => v.toFixed(1) },
+};
+
+const state = {
+  effort: D.efforts.includes("max") ? "max" : D.efforts[0],
+  axis: "decode",
+  sort: "index",
+  dir: -1,
+  weights: { ...PRESETS[0].weights },
+  pinned: [],
+  open: null,
+  hover: null,
+  brush: null,
+  hop: false,
+  labOpen: false,
+  tab: {},
+};
+
+function val(entry) { return entry && entry.value != null ? entry.value : null; }
+function models() { return D.rankings[state.effort] || []; }
+function benchModels() { return state.effort === "max" ? (D.provisional || []) : []; }
+function allModels() { return [...models(), ...benchModels()]; }
+function byId(id) { return allModels().find(m => m.id === id); }
+function weightsAreEqual() { return GROUPS.every(g => state.weights[g] === state.weights[GROUPS[0]]); }
+function normalWeights(weights) { const total = sum(GROUPS.map(g => weights[g])) || 1; return Object.fromEntries(GROUPS.map(g => [g, weights[g] / total])); }
+
+function taskSe(task) { return task.lo != null && task.hi != null ? (task.hi - task.lo) / (2 * 1.96) : 0; }
+function groupStat(model, group) {
+  const tasks = D.groups[group].map(key => model.tasks[key]);
+  if (tasks.some(t => !t || t.value == null)) return null;
+  return { v: mean(tasks.map(t => t.value)), s: Math.sqrt(sum(tasks.map(t => taskSe(t) ** 2))) / tasks.length };
+}
+function indexStat(model, weights = state.weights) {
+  const w = normalWeights(weights);
+  let v = 0, variance = 0;
+  for (const group of GROUPS) {
+    const g = groupStat(model, group);
+    if (!g) return model.index ? { v: model.index.value, s: (model.index.hi - model.index.lo) / 3.92 } : null;
+    v += w[group] * g.v;
+    variance += (w[group] * g.s) ** 2;
+  }
+  return { v, s: Math.sqrt(variance) };
+}
+function benchBounds(model, weights = state.weights) {
+  const w = normalWeights(weights);
+  let known = 0, open = 0;
+  for (const group of GROUPS) {
+    const g = groupStat(model, group);
+    if (g) known += w[group] * g.v; else open += w[group];
+  }
+  return { low: known, high: known + open * 100 };
+}
+
+function mulberry32(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function gauss(rng) { let u = 0; while (u === 0) u = rng(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rng()); }
+function normalCdf(z) { const t = 1 / (1 + 0.2316419 * Math.abs(z)); const d = 0.3989423 * Math.exp(-z * z / 2); const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return z > 0 ? 1 - p : p; }
+
+let rankCache = { key: "", data: null };
+function rankSimulation() {
+  const list = models();
+  const key = state.effort + JSON.stringify(state.weights);
+  if (rankCache.key === key) return rankCache.data;
+  const rng = mulberry32(11);
+  const stats = list.map(m => indexStat(m));
+  const draws = 1600;
+  const counts = list.map(() => new Array(list.length).fill(0));
+  for (let d = 0; d < draws; d++) {
+    const sample = stats.map((s, i) => ({ i, v: s.v + s.s * gauss(rng) }));
+    sample.sort((a, b) => b.v - a.v);
+    sample.forEach((entry, rank) => counts[entry.i][rank]++);
+  }
+  const out = {};
+  list.forEach((m, i) => {
+    const probs = counts[i].map(c => c / draws);
+    let acc = 0, low = 0, high = list.length - 1;
+    for (let r = 0; r < probs.length; r++) { acc += probs[r]; if (acc >= 0.025) { low = r; break; } }
+    acc = 0;
+    for (let r = probs.length - 1; r >= 0; r--) { acc += probs[r]; if (acc >= 0.025) { high = r; break; } }
+    out[m.id] = { probs, best: low + 1, worst: high + 1, p1: probs[0] };
+  });
+  rankCache = { key, data: out };
+  return out;
+}
+function beatProbability(a, b) {
+  const sa = indexStat(a), sb = indexStat(b);
+  return normalCdf((sa.v - sb.v) / Math.sqrt(sa.s ** 2 + sb.s ** 2 || 1));
+}
+function ordered(list = models()) {
+  const key = state.sort;
+  const value = m => {
+    if (key === "index") return indexStat(m).v;
+    if (GROUPS.includes(key)) { const g = groupStat(m, key); return g ? g.v : -1; }
+    if (key === "decode") return val(m.speed.decode) ?? -1;
+    if (key === "wh") return val(m.wh) ?? 1e9;
+    return 0;
+  };
+  return [...list].sort((a, b) => (value(a) - value(b)) * state.dir || a.name.localeCompare(b.name));
+}
+function defaultOrderIndex() {
+  const base = [...models()].sort((a, b) => indexStat(a, PRESETS[0].weights).v - indexStat(b, PRESETS[0].weights).v).reverse();
+  return Object.fromEntries(base.map((m, i) => [m.id, i + 1]));
+}
+function frontier(points) {
+  return points.filter(p => !points.some(q => q !== p && q.gx >= p.gx && q.y >= p.y && (q.gx > p.gx || q.y > p.y)));
+}
+function joinList(items) { return items.length < 2 ? items.join("") : items.slice(0, -1).join(", ") + " and " + items[items.length - 1]; }
+function shortName(model) { return model.name.split(" · ")[0]; }
+function metaLine(model) {
+  const ctx = model.context ? `${Math.round(model.context / 1024)}k ctx` : "";
+  return [model.engine, model.quant, model.spec, ctx].filter(Boolean).join(" · ");
+}
+function dateLabel(seconds) { return new Date(seconds * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }); }
+function fmt1(value) { return value == null ? "n/a" : value.toFixed(1); }
+function sign(value) { return (value > 0 ? "+" : value < 0 ? "−" : "") + Math.abs(value).toFixed(1); }
+
+function announce(text) { $("#live").textContent = text; }
+let toastTimer = 0;
+function toast(text) { const node = $("#toast"); node.textContent = text; node.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => node.classList.remove("show"), 1800); }
+function saveState() {
+  try { localStorage.setItem("blackwall-proto", JSON.stringify({ effort: state.effort, axis: state.axis, weights: state.weights, theme: document.documentElement.dataset.theme || "" })); } catch (error) {}
+}
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("blackwall-proto") || "null");
+    if (!saved) return;
+    if (D.efforts.includes(saved.effort)) state.effort = saved.effort;
+    if (AXES[saved.axis]) state.axis = saved.axis;
+    if (saved.weights && GROUPS.every(g => typeof saved.weights[g] === "number")) state.weights = saved.weights;
+    if (saved.theme) document.documentElement.dataset.theme = saved.theme;
+  } catch (error) {}
+}
+
+function renderEfforts() {
+  const holder = $("#efforts");
+  holder.innerHTML = D.efforts.map(e => `<button aria-pressed="${e === state.effort}" data-effort="${e}"><span class="long">${EFFORT_LABEL[e] || e}</span><span class="short">${EFFORT_SHORT[e] || e}</span></button>`).join("");
+}
+
+function verdictSentence() {
+  const list = models();
+  if (list.length < 2) return { head: `<em>${escapeHtml(shortName(list[0]))}</em> is the only model measured at this effort.`, body: "More will appear as they finish." };
+  const sim = rankSimulation();
+  const top = ordered(list.map(m => m)).sort((a, b) => indexStat(b).v - indexStat(a).v);
+  const first = top[0], second = top[1];
+  const tied = sim[first.id].p1 < 0.8;
+  const speed = [...list].filter(m => val(m.speed.decode)).sort((a, b) => val(b.speed.decode) - val(a.speed.decode))[0];
+  const onWall = frontier(list.map(m => ({ m, gx: val(m.speed.decode) ?? -1, y: indexStat(m).v }))).length;
+  const head = tied
+    ? `<em>${escapeHtml(shortName(first))}</em> and <em>${escapeHtml(shortName(second))}</em> are tied for the lead.`
+    : `<em>${escapeHtml(shortName(first))}</em> leads the board.`;
+  const body = tied
+    ? `${fmt1(indexStat(first).v)} against ${fmt1(indexStat(second).v)}, inside each other's <button class="term" popovertarget="g-ci">error margin</button>. ${escapeHtml(shortName(speed))} is the fastest at ${Math.round(val(speed.speed.decode))} tok/s. ${onWall} of ${list.length} models sit on the wall.`
+    : `${fmt1(indexStat(first).v)} quality, ${Math.round(sim[first.id].p1 * 100)}% likely to hold first place on a rerun. ${escapeHtml(shortName(speed))} is the fastest at ${Math.round(val(speed.speed.decode))} tok/s. ${onWall} of ${list.length} models sit on the wall.`;
+  return { head, body };
+}
+function renderVerdict() {
+  const v = verdictSentence();
+  $("#verdict").innerHTML = `<h1>${v.head}</h1><p>${v.body}</p>`;
+}
+function renderCards() {
+  const list = models();
+  if (!list.length) { $("#cards").innerHTML = ""; return; }
+  const sim = rankSimulation();
+  const smartest = [...list].sort((a, b) => indexStat(b).v - indexStat(a).v)[0];
+  const fast = [...list].filter(m => val(m.speed.decode)).sort((a, b) => val(b.speed.decode) - val(a.speed.decode))[0];
+  const lean = [...list].filter(m => val(m.wh)).sort((a, b) => val(a.wh) - val(b.wh))[0];
+  const si = indexStat(smartest);
+  const cards = [];
+  cards.push(`<button class="card chamfer" data-open="${smartest.id}"><span class="k">Smartest</span><span class="v">${si.v.toFixed(1)}<small>±${(si.s * 1.96).toFixed(1)}</small></span><span class="n">${escapeHtml(shortName(smartest))}</span><span class="s">${Math.round(sim[smartest.id].p1 * 100)}% chance it is truly first</span></button>`);
+  if (fast) cards.push(`<button class="card chamfer" data-open="${fast.id}"><span class="k">Fastest</span><span class="v">${Math.round(val(fast.speed.decode))}<small>tok/s</small></span><span class="n">${escapeHtml(shortName(fast))}</span><span class="s">One request. ${fmt1(indexStat(fast).v)} quality.</span></button>`);
+  if (lean) cards.push(`<button class="card chamfer" data-open="${lean.id}"><span class="k">Leanest</span><span class="v">${val(lean.wh).toFixed(1)}<small>Wh per correct</small></span><span class="n">${escapeHtml(shortName(lean))}</span><span class="s">Least energy for each right answer.</span></button>`);
+  benchModels().forEach(b => {
+    const taskKeys = D.indexTasks;
+    const steps = taskKeys.map(k => { const t = b.tasks[k]; const frac = t ? t.n / t.total : 0; return `<i class="${frac >= 1 ? "done" : ""}" title="${D.taskShort[k]} ${t ? t.n : 0}/${t ? t.total : "?"}"><b style="transform:scaleX(${frac})"></b></i>`; }).join("");
+    const pending = taskKeys.filter(k => !b.tasks[k] || b.tasks[k].value == null || b.tasks[k].n < b.tasks[k].total).map(k => D.taskShort[k]);
+    cards.push(`<button class="card bench chamfer" data-open="${b.id}"><span class="k">On the bench now</span><span class="v">${b.groupsDone}/5<small>groups scored</small></span><span class="n">${escapeHtml(shortName(b))}</span><div class="steps" aria-hidden="true">${steps}</div><span class="s">Waiting on ${pending.join(", ") || "grading"}. Provisional until it finishes.</span></button>`);
+  });
+  $("#cards").innerHTML = cards.join("");
+}
+
+function niceTicks(low, high, count) {
+  const span = high - low, step0 = span / count, mag = 10 ** Math.floor(Math.log10(step0));
+  const step = [1, 2, 2.5, 5, 10].map(f => f * mag).find(s => s >= step0) || mag * 10;
+  const ticks = [];
+  for (let t = Math.ceil(low / step) * step; t <= high + 1e-9; t += step) ticks.push(+t.toFixed(6));
+  return ticks;
+}
+function plotPoints() {
+  const axis = AXES[state.axis];
+  return models().map(m => ({ m, x: axis.get(m), y: indexStat(m).v, s: indexStat(m).s })).filter(p => p.x != null).map(p => ({ ...p, gx: p.x * axis.good }));
+}
+
+let hopTimer = 0;
+function renderPlot() {
+  const holder = $("#plot");
+  const width = Math.max(300, holder.clientWidth - 8);
+  const compact = width < 560;
+  const height = compact ? 340 : Math.round(clamp(width * 0.5, 360, 470));
+  const pad = { l: 52, r: compact ? 14 : 28, t: 30, b: 50 };
+  const axis = AXES[state.axis];
+  const pts = plotPoints();
+  const benches = benchModels().filter(b => axis.get(b) != null);
+  if (!pts.length) { holder.innerHTML = `<p class="note" style="padding:2rem">No model has this measurement at this effort.</p>`; return; }
+  const xs = [...pts.map(p => p.x), ...benches.map(b => axis.get(b))];
+  const xmin = Math.min(...xs), xmax = Math.max(...xs);
+  const xlo = axis.good > 0 ? Math.max(0, xmin * 0.78) : Math.max(0, xmin * 0.7);
+  const xhi = xmax * (axis.good > 0 ? 1.1 : 1.15);
+  const ys = pts.flatMap(p => [p.y - p.s * 1.96, p.y + p.s * 1.96]);
+  const ylo = Math.max(0, Math.floor((Math.min(...ys) - 6) / 10) * 10), yhi = Math.min(100, Math.ceil((Math.max(...ys) + 4) / 10) * 10);
+  const W = width - pad.l - pad.r, H = height - pad.t - pad.b;
+  const sx = v => pad.l + (axis.good > 0 ? (v - xlo) / (xhi - xlo) : (xhi - v) / (xhi - xlo)) * W;
+  const sy = v => pad.t + (1 - (v - ylo) / (yhi - ylo)) * H;
+  const front = frontier(pts);
+  const frontSet = new Set(front.map(p => p.m.id));
+  const sorted = [...front].sort((a, b) => sx(a.x) - sx(b.x));
+  let wall = "";
+  if (sorted.length) {
+    const top = sy(sorted[0].y);
+    wall = `M${pad.l},${top}`;
+    sorted.forEach((p, i) => { wall += ` H${sx(p.x)}`; const next = sorted[i + 1]; if (next) wall += ` V${sy(next.y)}`; });
+    wall += ` V${pad.t + H}`;
+  }
+  const area = wall ? `${wall} L${pad.l},${pad.t + H} Z` : "";
+  const xticks = niceTicks(xlo, xhi, compact ? 4 : 6), yticks = niceTicks(ylo, yhi, 5);
+  const grid = xticks.map(t => `<line class="gridline" x1="${sx(t)}" x2="${sx(t)}" y1="${pad.t}" y2="${pad.t + H}"/><text x="${sx(t)}" y="${pad.t + H + 16}" text-anchor="middle">${axis.fmt(t)}</text>`).join("")
+    + yticks.map(t => `<line class="gridline" x1="${pad.l}" x2="${pad.l + W}" y1="${sy(t)}" y2="${sy(t)}"/><text x="${pad.l - 8}" y="${sy(t) + 4}" text-anchor="end">${t}</text>`).join("");
+  const inBrush = p => !state.brush || (p.x >= state.brush.x0 && p.x <= state.brush.x1 && p.y >= state.brush.y0 && p.y <= state.brush.y1);
+
+  const labelBoxes = [];
+  const place = (px, py, text) => {
+    const w = text.length * 6.6 + 6, h = 15;
+    const options = [[12, -9, "start"], [-12, -9, "end"], [12, 15, "start"], [-12, 15, "end"], [0, -16, "middle"], [0, 24, "middle"]];
+    for (const [dx, dy, anchor] of options) {
+      const x0 = px + dx - (anchor === "end" ? w : anchor === "middle" ? w / 2 : 0), y0 = py + dy - 11;
+      const box = { x0, y0, x1: x0 + w, y1: y0 + h };
+      const inside = box.x0 >= pad.l - 4 && box.x1 <= width - 2 && box.y0 >= 2 && box.y1 <= pad.t + H + 4;
+      const clash = labelBoxes.some(o => !(box.x1 < o.x0 || box.x0 > o.x1 || box.y1 < o.y0 || box.y0 > o.y1));
+      if (inside && !clash) { labelBoxes.push(box); return { x: px + dx, y: py + dy, anchor }; }
+    }
+    return null;
+  };
+  const wantLabel = p => frontSet.has(p.m.id) || state.open === p.m.id || state.hover === p.m.id || state.pinned.includes(p.m.id);
+  const drawOrder = [...pts].sort((a, b) => (wantLabel(a) ? 1 : 0) - (wantLabel(b) ? 1 : 0));
+  const labelFirst = [...pts].filter(wantLabel).sort((a, b) => (state.hover === b.m.id) - (state.hover === a.m.id));
+  const labels = new Map();
+  labelFirst.forEach(p => { const spot = place(sx(p.x), sy(p.y), shortName(p.m)); if (spot) labels.set(p.m.id, spot); });
+
+  const pointSvg = drawOrder.map(p => {
+    const px = sx(p.x), py = sy(p.y), lo = sy(p.y - p.s * 1.96), hi = sy(p.y + p.s * 1.96);
+    const pin = state.pinned.indexOf(p.m.id);
+    const cls = ["pt", frontSet.has(p.m.id) ? "wall" : "", state.open === p.m.id ? "open" : "", state.hover === p.m.id ? "hot" : "", inBrush(p) ? "" : "dim"].join(" ");
+    const lab = labels.get(p.m.id);
+    return `<g class="${cls}" data-id="${p.m.id}" tabindex="0" role="button" aria-label="${escapeHtml(shortName(p.m))}, quality ${p.y.toFixed(1)}, ${axis.fmt(p.x)} ${axis.unit}">
+      <line class="whisk" x1="${px}" x2="${px}" y1="${hi}" y2="${lo}"/><line class="whisk" x1="${px - 4}" x2="${px + 4}" y1="${hi}" y2="${hi}"/><line class="whisk" x1="${px - 4}" x2="${px + 4}" y1="${lo}" y2="${lo}"/>
+      <circle class="ring" cx="${px}" cy="${py}" r="12"/><circle class="dot" cx="${px}" cy="${py}" r="7"/>
+      ${pin >= 0 ? `<circle cx="${px}" cy="${py}" r="9" fill="${PIN_COLORS[pin]}"/><text class="pin-badge" x="${px}" y="${py + 0.5}">${PIN_LETTERS[pin]}</text>` : ""}
+      ${lab ? `<text class="lbl ${state.hover === p.m.id || state.open === p.m.id ? "on" : ""}" x="${lab.x}" y="${lab.y}" text-anchor="${lab.anchor}">${escapeHtml(shortName(p.m))}</text>` : ""}
+      <circle cx="${px}" cy="${py}" r="16" fill="transparent"/>
+    </g>`;
+  }).join("");
+
+  const benchSvg = benches.map(b => {
+    const bx = sx(axis.get(b)), bounds = benchBounds(b), top = sy(Math.min(bounds.high, yhi)), bottom = sy(Math.max(bounds.low, ylo));
+    const lab = place(bx, sy(Math.min(bounds.high, yhi)) + 14, `${shortName(b)} (running)`);
+    return `<g class="pt bench" data-id="${b.id}" tabindex="0" role="button" aria-label="${escapeHtml(shortName(b))}, still running">
+      <rect x="${bx - 14}" y="${top}" width="28" height="${Math.max(10, bottom - top)}" fill="transparent"/><line class="bench-range" x1="${bx}" x2="${bx}" y1="${top}" y2="${bottom}"/><line class="bench-cap" x1="${bx - 6}" x2="${bx + 6}" y1="${top}" y2="${top}"/><line class="bench-cap" x1="${bx - 6}" x2="${bx + 6}" y1="${bottom}" y2="${bottom}"/>
+      ${lab ? `<text class="lbl" x="${lab.x}" y="${lab.y}" text-anchor="${lab.anchor}" style="fill:var(--amber)">${escapeHtml(shortName(b))} (running)</text>` : ""}
+      <circle cx="${bx}" cy="${(top + bottom) / 2}" r="16" fill="transparent"/>
+    </g>`;
+  }).join("");
+
+  const ghosts = state.hop ? pts.flatMap(p => [0, 1, 2].map(k => `<circle class="ghost" data-ghost="${p.m.id}" cx="${sx(p.x)}" cy="${sy(p.y)}" style="cy:${sy(p.y)}px" r="5"/>`)).join("") : "";
+  const hintX = axis.good > 0 ? "faster →" : "← better";
+
+  holder.innerHTML = `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="group" aria-label="Quality against ${axis.label}">
+    <defs><linearGradient id="wallgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--green)" stop-opacity="0.16"/><stop offset="1" stop-color="var(--green)" stop-opacity="0.02"/></linearGradient></defs>
+    <rect id="plot-bg" x="${pad.l}" y="${pad.t}" width="${W}" height="${H}" fill="transparent"/>
+    ${grid}<line class="axisline" x1="${pad.l}" x2="${pad.l + W}" y1="${pad.t + H}" y2="${pad.t + H}"/><line class="axisline" x1="${pad.l}" x2="${pad.l}" y1="${pad.t}" y2="${pad.t + H}"/>
+    ${area ? `<path class="wallfill" d="${area}"/>` : ""}${wall ? `<path class="wallpath" d="${wall}"/>` : ""}
+    <text class="hint" x="${pad.l + W}" y="${pad.t - 12}" text-anchor="end">${hintX}</text><text class="hint" x="${pad.l}" y="${pad.t - 12}">↑ smarter</text>
+    <text class="axis-title" x="${pad.l + W / 2}" y="${height - 8}" text-anchor="middle">${axis.label} (${axis.unit}${axis.good < 0 ? ", lower is better" : ""})</text>
+    <text class="axis-title" transform="translate(13 ${pad.t + H / 2}) rotate(-90)" text-anchor="middle">Quality index${weightsAreEqual() ? "" : " (your weights)"}</text>
+    ${ghosts}${benchSvg}${pointSvg}
+    ${state.brush ? `<rect class="brush" x="${Math.min(sx(state.brush.x0), sx(state.brush.x1))}" y="${sy(state.brush.y1)}" width="${Math.abs(sx(state.brush.x1) - sx(state.brush.x0))}" height="${Math.abs(sy(state.brush.y0) - sy(state.brush.y1))}"/>` : ""}
+  </svg><div class="tip" id="tip" hidden></div>`;
+  holder._geom = { sx, sy, pad, W, H, xlo, xhi, ylo, yhi, axis, pts, width, height };
+  wirePlot(holder);
+  if (state.hop) startHop(holder);
+}
+
+function startHop(holder) {
+  clearInterval(hopTimer);
+  const g = holder._geom, rng = mulberry32(Date.now() & 0xffff);
+  const move = () => { $$("[data-ghost]", holder).forEach(c => { const p = g.pts.find(q => q.m.id === c.dataset.ghost); if (p) c.style.cy = g.sy(clamp(p.y + p.s * gauss(rng), g.ylo, g.yhi)) + "px"; }); };
+  if (reduced) { for (let i = 0; i < 1; i++) move(); return; }
+  move();
+  hopTimer = setInterval(move, 650);
+}
+
+function wirePlot(holder) {
+  const g = holder._geom, svg = $("svg", holder);
+  const tip = $("#tip", holder);
+  const showTip = (id, event) => {
+    const m = byId(id); if (!m) return;
+    const tipBox = holder.getBoundingClientRect();
+    let html;
+    if (m.groupsDone != null) {
+      const b = benchBounds(m);
+      html = `<b>${escapeHtml(shortName(m))}</b><div class="trow"><span>Status</span><span>running</span></div><div class="trow"><span>Index would land</span><span>${b.low.toFixed(0)} to ${b.high.toFixed(0)}</span></div><div class="act">Click for progress</div>`;
+    } else {
+      const s = indexStat(m), r = rankSimulation()[m.id];
+      html = `<b>${escapeHtml(shortName(m))}</b><div class="trow"><span>Quality</span><span>${s.v.toFixed(1)} ±${(s.s * 1.96).toFixed(1)}</span></div><div class="trow"><span>${g.axis.short}</span><span>${g.axis.fmt(g.axis.get(m))} ${g.axis.unit}</span></div><div class="trow"><span>Rank range</span><span>${r.best === r.worst ? "#" + r.best : `#${r.best} to #${r.worst}`}</span></div><div class="act">Click to open · shift-click to compare</div>`;
+    }
+    tip.innerHTML = html; tip.hidden = false;
+    const cx = event.clientX - tipBox.left, cy = event.clientY - tipBox.top;
+    tip.style.left = clamp(cx + 16, 4, tipBox.width - tip.offsetWidth - 4) + "px";
+    tip.style.top = clamp(cy - tip.offsetHeight - 14 < 4 ? cy + 18 : cy - tip.offsetHeight - 14, 4, tipBox.height - tip.offsetHeight - 4) + "px";
+  };
+  $$(".pt", holder).forEach(node => {
+    const id = node.dataset.id;
+    node.addEventListener("pointerenter", event => { setHover(id, true); showTip(id, event); });
+    node.addEventListener("pointermove", event => showTip(id, event));
+    node.addEventListener("pointerleave", () => { setHover(null, true); tip.hidden = true; });
+    node.addEventListener("focus", () => setHover(id, true));
+    node.addEventListener("blur", () => setHover(null, true));
+    node.addEventListener("click", event => { event.stopPropagation(); if (event.shiftKey) togglePin(id); else openModel(id, true); });
+    node.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openModel(id, true); } if (event.key === "c") togglePin(id); });
+  });
+  let drag = null;
+  const toData = event => { const box = svg.getBoundingClientRect(); const px = (event.clientX - box.left) * (g.width / box.width), py = (event.clientY - box.top) * (g.height / box.height); return { px, py }; };
+  const invertX = px => g.axis.good > 0 ? g.xlo + (px - g.pad.l) / g.W * (g.xhi - g.xlo) : g.xhi - (px - g.pad.l) / g.W * (g.xhi - g.xlo);
+  const invertY = py => g.ylo + (1 - (py - g.pad.t) / g.H) * (g.yhi - g.ylo);
+  svg.addEventListener("pointerdown", event => {
+    if (event.target.closest(".pt") || event.pointerType === "touch") return;
+    const p = toData(event);
+    if (p.px < g.pad.l || p.px > g.pad.l + g.W || p.py < g.pad.t || p.py > g.pad.t + g.H) return;
+    drag = { start: p, moved: false }; svg.setPointerCapture(event.pointerId);
+  });
+  const paintBrush = () => {
+    const b = state.brush; if (!b) return;
+    let rect = $(".brush", svg);
+    if (!rect) { rect = document.createElementNS("http://www.w3.org/2000/svg", "rect"); rect.setAttribute("class", "brush"); svg.appendChild(rect); }
+    const xa = g.sx(b.x0), xb = g.sx(b.x1), ya = g.sy(b.y0), yb = g.sy(b.y1);
+    rect.setAttribute("x", Math.min(xa, xb)); rect.setAttribute("width", Math.abs(xb - xa));
+    rect.setAttribute("y", Math.min(ya, yb)); rect.setAttribute("height", Math.abs(yb - ya));
+    const inside = new Set(brushedModels().map(m => m.id));
+    $$(".pt", svg).forEach(node => node.classList.toggle("dim", !node.classList.contains("bench") && !inside.has(node.dataset.id)));
+  };
+  svg.addEventListener("pointermove", event => {
+    if (!drag) return;
+    const p = toData(event);
+    if (Math.abs(p.px - drag.start.px) + Math.abs(p.py - drag.start.py) < 8 && !drag.moved) return;
+    drag.moved = true;
+    const xa = invertX(drag.start.px), xb = invertX(p.px), ya = invertY(drag.start.py), yb = invertY(p.py);
+    state.brush = { x0: Math.min(xa, xb), x1: Math.max(xa, xb), y0: Math.min(ya, yb), y1: Math.max(ya, yb) };
+    paintBrush();
+  });
+  const finish = event => {
+    if (!drag) return;
+    const moved = drag.moved; drag = null;
+    try { svg.releasePointerCapture(event.pointerId); } catch (error) {}
+    if (!moved && state.brush) { state.brush = null; renderAll(false); }
+    else if (moved) { renderAll(false); announce(`${brushedModels().length} models in focus`); }
+  };
+  svg.addEventListener("pointerup", finish); svg.addEventListener("pointercancel", finish);
+}
+function brushedModels() {
+  if (!state.brush) return models();
+  const axis = AXES[state.axis], b = state.brush;
+  return models().filter(m => { const x = axis.get(m), y = indexStat(m).v; return x != null && x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1; });
+}
+function renderBrushUi() { $("#clear-brush").hidden = !state.brush; }
+
+function renderAxisChips() {
+  $("#axis-chips").innerHTML = Object.entries(AXES).map(([key, a]) => `<button class="pill" aria-pressed="${key === state.axis}" data-axis="${key}">${a.short}</button>`).join("");
+}
+function renderLegend() {
+  const pts = plotPoints();
+  const front = new Set(frontier(pts).map(p => p.m.id));
+  const list = [...pts].sort((a, b) => b.y - a.y);
+  const walls = list.filter(p => front.has(p.m.id));
+  $("#legend").innerHTML = `<h3>On the wall</h3>` + (walls.map(p => `<button class="legend-item" data-open="${p.m.id}" data-hover="${p.m.id}"><span class="dotk"></span><span class="nm">${escapeHtml(shortName(p.m))}</span><span class="num">${p.y.toFixed(1)}</span><span class="meta">${AXES[state.axis].fmt(p.x)} ${AXES[state.axis].unit}</span></button>`).join("") || `<p class="note">Nothing to show.</p>`)
+    + `<p class="note">${list.length - walls.length} more are beaten on both axes by someone on the wall.</p>`;
+  $("#plot-tools").innerHTML = `<h3>Plot options</h3><button class="pill ${state.hop ? "on" : ""}" id="hop-toggle" aria-pressed="${state.hop}">${state.hop ? "Hide reruns" : "Show what a rerun could look like"}</button><p class="note">${state.hop ? (reduced ? "One random rerun, shown static because motion is off." : "Each green ghost is one possible rerun, drawn from the score's own error margin. Dots that jump a lot are not settled.") : "Replays the benchmark in your head: dots jitter inside their error margin."}</p><button class="pill" id="brush-hint-clear" ${state.brush ? "" : "hidden"}>Clear focus (${brushedModels().length} of ${models().length})</button>`;
+}
+
+function renderLab() {
+  const norm = normalWeights(state.weights);
+  $("#sliders").innerHTML = GROUPS.map(g => `<div class="slider"><label for="w-${g.replace(/\W/g, "")}"><span>${GROUP_SHORT[g]} <small class="note">${GROUP_HINT[g]}</small></span><b>${Math.round(norm[g] * 100)}%</b></label><input type="range" id="w-${g.replace(/\W/g, "")}" min="0" max="3" step="0.25" value="${state.weights[g]}" data-group="${g}" style="--fill:${state.weights[g] / 3 * 100}%"></div>`).join("");
+  $("#presets").innerHTML = PRESETS.map(p => `<button class="pill ${GROUPS.every(g => p.weights[g] === state.weights[g]) ? "on" : ""}" data-preset="${p.id}">${p.label}</button>`).join("");
+  const base = defaultOrderIndex();
+  const now = ordered(models()).sort((a, b) => indexStat(b).v - indexStat(a).v);
+  const moves = now.map((m, i) => ({ m, now: i + 1, was: base[m.id] })).filter(r => r.now !== r.was);
+  let msg;
+  if (weightsAreEqual()) msg = "Equal weights, the default. Slide any group up to see who gains.";
+  else if (!moves.length) msg = "Your weights keep the same order as the default.";
+  else { const best = moves.sort((a, b) => (b.was - b.now) - (a.was - a.now))[0]; msg = `${shortName(best.m)} moves from #${best.was} to #${best.now}. ${moves.length} of ${now.length} models change place.`; }
+  $("#lab-msg").textContent = msg;
+  $("#lab").hidden = !state.labOpen;
+  $("#lab-toggle").setAttribute("aria-expanded", String(state.labOpen));
+  $("#lab-toggle").classList.toggle("on", state.labOpen || !weightsAreEqual());
+  $("#lab-toggle").textContent = weightsAreEqual() ? "Weigh it your way" : "Weights: custom";
+}
+
+function renderHead() {
+  const cols = [
+    { key: "rank", label: "#", cls: "" },
+    { key: "model", label: "Model", cls: "l" },
+    { key: "index", label: "Quality index", cls: "l", sortable: true },
+    ...GROUPS.map(g => ({ key: g, label: GROUP_SHORT[g], cls: "grp", sortable: true, weight: state.weights[g] })),
+    { key: "decode", label: "Tok/s", cls: "spd", sortable: true },
+    { key: "wh", label: "Wh / correct", cls: "wh", sortable: true },
+    { key: "act", label: "", cls: "" },
+  ];
+  $("#hrow").innerHTML = cols.map(c => {
+    const sorted = state.sort === c.key ? (state.dir < 0 ? "descending" : "ascending") : "none";
+    const badge = c.weight != null && c.weight !== 1 ? `<span class="wbadge">×${c.weight}</span>` : "";
+    return `<div role="columnheader" class="${c.cls}" ${c.sortable ? `aria-sort="${sorted}"` : ""}>${c.sortable ? `<button data-sort="${c.key}">${c.label}${badge}</button>` : c.label}</div>`;
+  }).join("");
+}
+
+function groupColumnStats() {
+  const stats = {};
+  GROUPS.forEach(g => { const vals = models().map(m => groupStat(m, g)?.v).filter(v => v != null); stats[g] = { max: Math.max(...vals), min: Math.min(...vals) }; });
+  return stats;
+}
+function rankChip(model, rank) {
+  const sim = rankSimulation()[model.id]; if (!sim || models().length < 2) return "";
+  const text = sim.best === sim.worst ? `#${sim.best}` : `#${sim.best}–${sim.worst}`;
+  const tip = `Across 1,600 simulated reruns this model finishes ${sim.best === sim.worst ? "in place " + sim.best : "between place " + sim.best + " and " + sim.worst}. Chance of first: ${Math.round(sim.p1 * 100)}%.`;
+  return `<span class="rank-chip ${sim.best === sim.worst ? "sure" : ""}" title="${tip}">${text}</span>`;
+}
+function modelTags(model, onWall) {
+  const tags = [];
+  if (onWall) tags.push(`<span class="tag wall">On the wall</span>`);
+  (model.warnings || []).forEach(w => tags.push(`<span class="tag warn" title="${escapeHtml(w)}">${/Capped/.test(w) ? "Context capped" : "Check note"}</span>`));
+  if ((model.run?.contended || []).length) tags.push(`<span class="tag warn" title="Another program used the GPU during this run: ${escapeHtml(model.run.contended.join(", "))}">GPU shared</span>`);
+  return tags.join("");
+}
+function rowHtml(model, position, ctx) {
+  const idx = indexStat(model), isOpen = state.open === model.id;
+  const pinIndex = state.pinned.indexOf(model.id);
+  const onWall = ctx.front.has(model.id);
+  const lo = clamp(idx.v - idx.s * 1.96, 0, 100), hi = clamp(idx.v + idx.s * 1.96, 0, 100);
+  const baseRank = ctx.base[model.id], liveRank = ctx.live[model.id];
+  const delta = !weightsAreEqual() && baseRank !== liveRank ? `<span class="delta ${liveRank < baseRank ? "up" : "down"}">${liveRank < baseRank ? "▲" : "▼"}${Math.abs(baseRank - liveRank)}</span>` : "";
+  const dim = state.brush && !brushedModels().includes(model) ? " dim" : "";
+  const groupCells = GROUPS.map(g => {
+    const s = groupStat(model, g), st = ctx.cols[g];
+    if (!s) return `<div role="cell" class="c-grp pending"><span class="gv">…</span></div>`;
+    const best = s.v === st.max && models().length > 1;
+    return `<div role="cell" class="c-grp ${best ? "best" : ""}" title="${GROUP_HINT[g]}: ${s.v.toFixed(1)} ±${(s.s * 1.96).toFixed(1)}"><span class="gv">${s.v.toFixed(1)}</span><span class="gb"><i style="width:${s.v}%"></i></span></div>`;
+  }).join("");
+  const fastest = ctx.fastest === model.id, leanest = ctx.leanest === model.id;
+  return `<div class="row-wrap${isOpen ? " open" : ""}${dim}${position === 0 && state.sort === "index" && state.dir < 0 ? " lead" : ""}" data-id="${model.id}">
+    <div class="row" role="row" tabindex="0" data-id="${model.id}" aria-expanded="${isOpen}">
+      <div role="cell" class="c-rank"><span>${liveRank}</span>${delta}</div>
+      <div role="cell" class="c-model"><button class="name" data-open="${model.id}" aria-label="Open ${escapeHtml(shortName(model))}">${escapeHtml(shortName(model))}</button><span class="meta">${escapeHtml(metaLine(model))}</span><span class="tags">${modelTags(model, onWall)}</span></div>
+      <div role="cell" class="c-quality"><div class="q-top"><span class="q-val">${idx.v.toFixed(1)}</span><span class="q-pm">±${(idx.s * 1.96).toFixed(1)}</span>${rankChip(model, liveRank)}</div><div class="track" aria-hidden="true"><span class="fill" style="width:${idx.v}%"></span><span class="ci" style="left:${lo}%;width:${Math.max(0.6, hi - lo)}%"></span><span class="tick" style="left:${idx.v}%"></span></div></div>
+      ${groupCells}
+      <div role="cell" class="c-num c-spd ${fastest ? "best" : ""}">${val(model.speed.decode) ? Math.round(val(model.speed.decode)) : "n/a"}<small>tok/s</small></div>
+      <div role="cell" class="c-num c-wh ${leanest ? "best" : ""}">${val(model.wh) ? val(model.wh).toFixed(1) : "n/a"}<small>Wh</small></div>
+      <div role="cell" class="c-act"><button class="icon-btn" data-pin="${model.id}" aria-pressed="${pinIndex >= 0}" aria-label="Compare ${escapeHtml(shortName(model))}" title="Compare (c)" ${pinIndex >= 0 ? `style="--pin:${PIN_COLORS[pinIndex]}"` : ""}>${pinIndex >= 0 ? PIN_LETTERS[pinIndex] : "+"}</button><button class="icon-btn chev" data-open="${model.id}" aria-label="Details" tabindex="-1">▾</button></div>
+    </div>
+    ${isOpen ? profileHtml(model, ctx) : ""}
+  </div>`;
+}
+function benchRowHtml(model) {
+  const bounds = benchBounds(model);
+  const isOpen = state.open === model.id;
+  const cells = GROUPS.map(g => { const s = groupStat(model, g); return s ? `<div role="cell" class="c-grp"><span class="gv">${s.v.toFixed(1)}</span><span class="gb"><i style="width:${s.v}%"></i></span></div>` : `<div role="cell" class="c-grp pending"><span class="gv">running</span><span class="gb"></span></div>`; }).join("");
+  return `<div class="row-wrap ghost-row${isOpen ? " open" : ""}" data-id="${model.id}">
+    <div class="row" role="row" tabindex="0" data-id="${model.id}" aria-expanded="${isOpen}">
+      <div role="cell" class="c-rank"><span>·</span></div>
+      <div role="cell" class="c-model"><button class="name" data-open="${model.id}">${escapeHtml(shortName(model))}</button><span class="meta">${escapeHtml(metaLine(model))}</span><span class="tags"><span class="tag live">On the bench now</span></span></div>
+      <div role="cell" class="c-quality"><div class="q-top"><span class="q-val" style="color:var(--amber)">${bounds.low.toFixed(0)}–${bounds.high.toFixed(0)}</span><span class="q-pm">${model.groupsDone} of 5 groups scored</span></div><div class="track" aria-hidden="true"><span class="range" style="left:${bounds.low}%;width:${bounds.high - bounds.low}%"></span></div></div>
+      ${cells}
+      <div role="cell" class="c-num c-spd">${val(model.speed.decode) ? Math.round(val(model.speed.decode)) : "n/a"}<small>tok/s</small></div>
+      <div role="cell" class="c-num c-wh">n/a</div>
+      <div role="cell" class="c-act"><button class="icon-btn chev" data-open="${model.id}" aria-label="Details" tabindex="-1">▾</button></div>
+    </div>
+    ${isOpen ? benchProfileHtml(model) : ""}
+  </div>`;
+}
+
+function strongWeak(model) {
+  const keys = D.indexTasks.filter(k => model.tasks[k] && model.tasks[k].value != null);
+  const list = models();
+  const info = keys.map(k => {
+    const vals = list.map(m => m.tasks[k]?.value).filter(v => v != null).sort((a, b) => a - b);
+    const mid = vals[Math.floor(vals.length / 2)];
+    const v = model.tasks[k].value;
+    return { k, v, mid, min: vals[0], max: vals[vals.length - 1], rank: vals.filter(x => x > v).length + 1, n: vals.length, gap: v - mid };
+  });
+  return info;
+}
+function ledeFor(model) {
+  const info = strongWeak(model);
+  if (models().length < 2) return `Only model at this effort, so there is nothing to compare against yet.`;
+  const best = info.filter(i => i.rank === 1).map(i => D.taskShort[i.k]);
+  const worst = [...info].sort((a, b) => a.gap - b.gap)[0];
+  const parts = [];
+  if (best.length) parts.push(`Top of the board at <strong>${joinList(best)}</strong>.`);
+  if (worst && worst.gap < -8) parts.push(`Weakest spot is <strong>${D.taskShort[worst.k]}</strong> at ${worst.v.toFixed(1)}, ${Math.abs(worst.gap).toFixed(0)} points under the board's middle.`);
+  if (!parts.length) parts.push("No standout strengths or gaps against the others.");
+  const sim = rankSimulation()[model.id];
+  parts.push(sim.best === sim.worst ? `Its place (#${sim.best}) held in every simulated rerun.` : `On a rerun it could finish anywhere from #${sim.best} to #${sim.worst}.`);
+  return parts.join(" ");
+}
+function dotStrip(model) {
+  const info = strongWeak(model);
+  const rows = info.map(i => {
+    const t = model.tasks[i.k];
+    const sc = v => clamp(v, 0, 100);
+    const lo = t.lo ?? t.value, hi = t.hi ?? t.value;
+    return `<span class="nm">${D.taskShort[i.k]}</span><div class="dots" title="${D.taskNotes[i.k]}"><span class="band" style="left:${sc(i.min)}%;width:${Math.max(1, sc(i.max) - sc(i.min))}%"></span><span class="mid" style="left:${sc(i.mid)}%"></span><span class="whisk" style="left:${sc(lo)}%;width:${Math.max(0.5, sc(hi) - sc(lo))}%"></span><span class="dot ${i.gap < -8 ? "low" : ""}" style="left:${sc(t.value)}%"></span></div><span class="val">${t.value.toFixed(1)}</span>`;
+  }).join("");
+  return `<div class="strip">${rows}</div><div class="legend-line"><span><i style="background:var(--green-ink)"></i>this model, bar is its 95% interval</span><span><i style="background:var(--raise);border:1px solid var(--axis)"></i>range across the board</span><span>│ board middle</span></div>`;
+}
+function weakestTask(model) {
+  const info = strongWeak(model).filter(i => model.tasks[i.k].parts && Object.keys(model.tasks[i.k].parts).length);
+  return info.sort((a, b) => a.gap - b.gap)[0]?.k || info[0]?.k;
+}
+const PART_NAMES = { aime: "AIME 2026", hmmt: "HMMT Feb 2026", bfs: "BFS", parents: "Parents" };
+const PART_LABEL = k => PART_NAMES[k] || (/^\d+$/.test(k) ? (+k >= 1024 ? Math.round(+k / 1024) + "k tokens" : k) : k);
+function partsView(model) {
+  const withParts = D.indexTasks.filter(k => model.tasks[k]?.parts && Object.keys(model.tasks[k].parts).length);
+  if (!withParts.length) return `<p class="note">No per-part breakdown for this model.</p>`;
+  const current = withParts.includes(state.tab[model.id]) ? state.tab[model.id] : weakestTask(model) || withParts[0];
+  const parts = Object.entries(model.tasks[current].parts).sort((a, b) => (/^\d+$/.test(a[0]) && /^\d+$/.test(b[0])) ? +a[0] - +b[0] : a[0].localeCompare(b[0]));
+  const bars = parts.map(([k, v]) => `<div class="bar"><span title="${k}">${PART_LABEL(k)}</span><span class="t"><i class="${v < 50 ? "low" : ""}" style="width:${clamp(v, 0, 100)}%"></i></span><span>${v.toFixed(0)}</span></div>`).join("");
+  return `<div class="tabs" role="tablist">${withParts.map(k => `<button class="pill" role="tab" aria-pressed="${k === current}" data-tab="${k}" data-model="${model.id}">${D.taskShort[k]}</button>`).join("")}</div><div class="bars">${bars}</div><p class="note">${D.taskNotes[current]}</p>`;
+}
+function ttftMini(model) {
+  const pts = [[1000, "ttft.1000"], [8000, "ttft.8000"], [32000, "ttft.32000"], [64000, "ttft.64000"], [120000, "ttft.120000"]].map(([n, k]) => [n, val(model.speed[k])]).filter(p => p[1] != null);
+  if (pts.length < 2) return "";
+  const W = 260, H = 96, p = { l: 28, r: 20, t: 8, b: 20 };
+  const xmax = Math.log(pts[pts.length - 1][0]), xmin = Math.log(pts[0][0]), ymax = Math.max(...pts.map(q => q[1])) * 1.1;
+  const sx = n => p.l + (Math.log(n) - xmin) / (xmax - xmin) * (W - p.l - p.r), sy = v => p.t + (1 - v / ymax) * (H - p.t - p.b);
+  const path = pts.map((q, i) => `${i ? "L" : "M"}${sx(q[0])},${sy(q[1])}`).join(" ");
+  return `<div class="mini"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Seconds to first token by prompt length"><path d="${path}" fill="none" stroke="var(--green-ink)" stroke-width="2"/>${pts.map(q => `<circle cx="${sx(q[0])}" cy="${sy(q[1])}" r="3.2" fill="var(--green-ink)"/>${q[0] === 64000 ? "" : `<text x="${sx(q[0])}" y="${H - 6}" text-anchor="${q[0] === pts[pts.length - 1][0] ? "end" : "middle"}">${q[0] >= 1000 ? q[0] / 1000 + "k" : q[0]}</text>`}`).join("")}<text x="2" y="${p.t + 8}">${ymax.toFixed(0)}s</text></svg><span class="note">Seconds until the first token, by prompt length</span></div>`;
+}
+function rankDist(model) {
+  const sim = rankSimulation()[model.id]; if (!sim) return "";
+  const max = Math.max(...sim.probs);
+  return `<div><h3>If the benchmark were rerun</h3><div class="rankdist" role="img" aria-label="Chance of each finishing place">${sim.probs.map((p, i) => `<i style="height:${Math.max(4, p / max * 100)}%" title="#${i + 1}: ${Math.round(p * 100)}%"><span>${i + 1}</span></i>`).join("")}</div></div>`;
+}
+function profileHtml(model, ctx) {
+  const tasks = Object.values(model.tasks).filter(t => t.value != null);
+  const tokens = Math.round(mean(tasks.map(t => t.tokens || 0)));
+  const cut = mean(tasks.map(t => t.truncated || 0));
+  const lat = mean(tasks.map(t => t.latency || 0));
+  const conc = [1, 2, 4].map(c => val(model.speed["conc." + c])).filter(Boolean);
+  const subs = (model.subs || []).map(s => `${s.kind.replace("speed.", "")} ${s.value} tok/s`).join(", ");
+  const lmx = model.lmx && model.lmx.gsm8k ? `GSM8K ${val(model.lmx.gsm8k)?.toFixed(1)}, HellaSwag ${val(model.lmx.hellaswag)?.toFixed(1)} (${model.lmx.gsm8k?.n} shards each)` : "none";
+  const cmd = `blackwall run ${model.id} --effort ${state.effort}`;
+  return `<div class="profile">
+    <p class="lede">${ledeFor(model)}</p>
+    <div><h3>Where it is strong and weak</h3>${dotStrip(model)}</div>
+    <div><h3>Inside a task</h3>${partsView(model)}</div>
+    <div><h3>How it behaves</h3><div class="facts"><div class="fact"><b>${(tokens / 1000).toFixed(1)}k</b><span>tokens per answer</span></div><div class="fact"><b>${cut.toFixed(0)}%</b><span><button class="term" popovertarget="g-cut">cut off</button> at the limit</span></div><div class="fact"><b>${lat.toFixed(0)}s</b><span>per answer, in a batch</span></div><div class="fact"><b>${conc.length ? Math.round(conc[conc.length - 1]) : "n/a"}</b><span>tok/s with 4 at once</span></div></div>${ttftMini(model)}${rankDist(model)}</div>
+    <div class="prov">
+      <div><h3>Run</h3><code>${escapeHtml(model.run?.id || "")}</code><br>${model.run?.finished ? dateLabel(model.run.finished) : ""} · driver ${escapeHtml(model.driver || "")}</div>
+      <div><h3>Data checks</h3>${model.run?.failedItems === 0 ? "0 failed items" : escapeHtml(String(model.run?.failedItems ?? "n/a")) + " failed items"}${model.run?.contended?.length ? `<br>Shared with ${escapeHtml(model.run.contended.join(", "))}` : "<br>GPU to itself"}</div>
+      <div><h3>On localmaxxing</h3>${escapeHtml(subs || "not submitted")}<br>${escapeHtml(lmx)}</div>
+      <div><h3>Engine</h3>${escapeHtml(model.build || model.engine || "")}<br><code>${escapeHtml(model.fingerprint || "")}</code></div>
+      <div class="cmd"><span class="note">Reproduce</span><code>${escapeHtml(cmd)}</code><button class="pill" data-copy="${escapeHtml(cmd)}">Copy</button></div>
+    </div>
+  </div>`;
+}
+function benchProfileHtml(model) {
+  const rows = D.indexTasks.map(k => {
+    const t = model.tasks[k];
+    const frac = t ? t.n / t.total : 0;
+    return `<div class="bar"><span>${D.taskShort[k]}</span><span class="t"><i style="width:${frac * 100}%;background:${frac >= 1 ? "var(--green)" : "var(--amber)"}"></i></span><span>${t ? t.n : 0}/${t ? t.total : "?"}</span></div>`;
+  }).join("");
+  const b = benchBounds(model);
+  return `<div class="profile"><p class="lede">This run has not finished, so it is not ranked. With ${model.groupsDone} of 5 groups scored, its index can still land anywhere from <strong>${b.low.toFixed(0)} to ${b.high.toFixed(0)}</strong>; the dashed bar shows that span. It will take its place on the board when the last task is graded.</p><div><h3>Progress</h3><div class="bars">${rows}</div></div><div><h3>Scored so far</h3>${GROUPS.map(g => { const s = groupStat(model, g); return `<div class="bar"><span>${GROUP_SHORT[g]}</span><span class="t"><i style="width:${s ? s.v : 0}%"></i></span><span>${s ? s.v.toFixed(0) : "…"}</span></div>`; }).join("")}</div><div>${ttftMini(model)}</div></div>`;
+}
+
+function renderBoard(animate = true) {
+  const list = ordered(models().filter(() => true));
+  const ctx = { front: new Set(frontier(plotPoints()).map(p => p.m.id)), base: defaultOrderIndex(), cols: groupColumnStats(), live: {} };
+  [...models()].sort((a, b) => indexStat(b).v - indexStat(a).v).forEach((m, i) => { ctx.live[m.id] = i + 1; });
+  const speeds = models().filter(m => val(m.speed.decode)).sort((a, b) => val(b.speed.decode) - val(a.speed.decode));
+  ctx.fastest = speeds[0]?.id;
+  ctx.leanest = models().filter(m => val(m.wh)).sort((a, b) => val(a.wh) - val(b.wh))[0]?.id;
+  const holder = $("#rows");
+  const before = new Map($$(".row-wrap", holder).map(node => [node.dataset.id, node.getBoundingClientRect().top]));
+  holder.innerHTML = list.map((m, i) => rowHtml(m, i, ctx)).join("") + benchModels().map(benchRowHtml).join("");
+  if (animate && !reduced && before.size) {
+    $$(".row-wrap", holder).forEach(node => {
+      const old = before.get(node.dataset.id); if (old == null) return;
+      const delta = old - node.getBoundingClientRect().top;
+      if (Math.abs(delta) > 2) node.animate([{ transform: `translateY(${delta}px)` }, { transform: "none" }], { duration: 420, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" });
+    });
+  }
+  renderHead();
+}
+
+function renderDock() {
+  const dock = $("#dock");
+  const picks = state.pinned.map(byId).filter(Boolean);
+  if (!picks.length) { dock.classList.remove("show"); dock.innerHTML = ""; return; }
+  dock.classList.add("show");
+  const chips = picks.map((m, i) => `<span class="pinchip" style="--c:${PIN_COLORS[i]}"><b>${PIN_LETTERS[i]}</b>${escapeHtml(shortName(m))}<button data-unpin="${m.id}" aria-label="Remove ${escapeHtml(shortName(m))}">×</button></span>`).join("");
+  let body = `<p class="note">Pick one more model to compare head to head.</p>`;
+  if (picks.length >= 2) {
+    const a = picks[0];
+    const strips = D.indexTasks.map(k => {
+      const dots = picks.map((m, i) => { const t = m.tasks[k]; if (!t || t.value == null) return ""; const lo = clamp(t.lo ?? t.value, 0, 100), hi = clamp(t.hi ?? t.value, 0, 100); return `<span class="whisk" style="--c:${PIN_COLORS[i]};left:${lo}%;width:${Math.max(0.4, hi - lo)}%"></span><span class="dot" style="--c:${PIN_COLORS[i]};left:${clamp(t.value, 0, 100)}%"></span>`; }).join("");
+      return `<span class="nm">${D.taskShort[k]}</span><div class="dots">${dots}</div><span class="val">${picks.map(m => m.tasks[k]?.value != null ? m.tasks[k].value.toFixed(0) : "…").join(" · ")}</span>`;
+    }).join("");
+    const rows = picks.slice(1).map((b, j) => {
+      const diffs = D.indexTasks.map(k => {
+        const ta = a.tasks[k], tb = b.tasks[k];
+        if (!ta || !tb || ta.value == null || tb.value == null) return null;
+        const d = ta.value - tb.value, s = Math.sqrt(taskSe(ta) ** 2 + taskSe(tb) ** 2);
+        return { k, d, s, sig: Math.abs(d) > 1.96 * s };
+      }).filter(Boolean);
+      const lead = diffs.filter(x => x.sig && x.d > 0).map(x => `${D.taskShort[x.k]} (${sign(x.d)})`);
+      const trail = diffs.filter(x => x.sig && x.d < 0).map(x => `${D.taskShort[x.k]} (${sign(x.d)})`);
+      const tie = diffs.filter(x => !x.sig).map(x => D.taskShort[x.k]);
+      const p = beatProbability(a, b);
+      const sentence = `<strong>${escapeHtml(shortName(a))}</strong> ${lead.length ? "clearly leads on " + lead.join(", ") : "leads nowhere clearly"}${trail.length ? ", and clearly trails on " + trail.join(", ") : ""}. ${tie.length ? "Too close to call: " + tie.join(", ") + ". " : ""}Overall it is ahead in ${Math.round(p * 100)}% of simulated reruns.`;
+      const bars = diffs.map(x => { const span = 60, w = clamp(Math.abs(x.d), 0, span) / span * 50; const left = x.d >= 0 ? 50 : 50 - w; const ciL = 50 + clamp(x.d - 1.96 * x.s, -span, span) / span * 50, ciH = 50 + clamp(x.d + 1.96 * x.s, -span, span) / span * 50; return `<div class="delta-row"><span>${D.taskShort[x.k]}</span><div class="zero"><span class="dbar" style="left:${left}%;width:${w}%;background:${x.sig ? (x.d > 0 ? PIN_COLORS[0] : PIN_COLORS[j + 1]) : "var(--axis)"}"></span><span class="dci" style="left:${Math.min(ciL, ciH)}%;width:${Math.abs(ciH - ciL)}%"></span></div><span class="dv ${x.sig ? "sig" : ""}">${sign(x.d)}</span></div>`; }).join("");
+      return `<div class="h2h"><h3>${PIN_LETTERS[0]} against ${PIN_LETTERS[j + 1]}</h3><p class="sent">${sentence}</p>${bars}<p class="note">Bars to the right favour ${PIN_LETTERS[0]}. The line is the 95% interval of the difference; a bar is coloured only when the interval clears zero.</p></div>`;
+    }).join("");
+    body = `<div class="dock-grid"><div><h3>Profiles</h3><div class="strip" style="margin-top:0.6rem">${strips}</div></div><div style="display:grid;gap:1rem">${rows}</div></div>`;
+  }
+  dock.innerHTML = `<div class="dock-inner"><div class="dock-head"><h3>Compare</h3>${chips}<span class="spacer"></span><button class="pill" id="clear-pins">Clear all</button></div>${body}</div>`;
+}
+
+function timeData() {
+  const runs = D.history.filter(h => h.effort === state.effort && h.index != null).sort((a, b) => a.finished - b.finished);
+  return runs;
+}
+function renderTime() {
+  const holder = $("#time-plot");
+  const runs = timeData();
+  if (runs.length < 1) { holder.innerHTML = `<p class="note" style="padding:2rem">No finished runs at this effort yet.</p>`; $("#recent").innerHTML = ""; return; }
+  const width = Math.max(300, holder.clientWidth - 8), height = width < 560 ? 260 : 300;
+  const pad = { l: 46, r: 18, t: 18, b: 34 };
+  const t0 = Math.min(...runs.map(r => r.finished)) - 86400 * 1.2, t1 = Math.max(...runs.map(r => r.finished)) + 86400 * 1.2;
+  const ylo = Math.max(0, Math.floor((Math.min(...runs.map(r => r.lo ?? r.index)) - 5) / 10) * 10), yhi = Math.min(100, Math.ceil((Math.max(...runs.map(r => r.hi ?? r.index)) + 3) / 10) * 10);
+  const W = width - pad.l - pad.r, H = height - pad.t - pad.b;
+  const sx = t => pad.l + (t - t0) / (t1 - t0) * W, sy = v => pad.t + (1 - (v - ylo) / (yhi - ylo)) * H;
+  let best = -1, path = "", prev = null;
+  const marks = [];
+  runs.forEach(r => { if (r.index > best) { best = r.index; marks.push(r); } });
+  marks.forEach((r, i) => { const x = sx(r.finished), y = sy(r.index); path += i === 0 ? `M${x},${y}` : ` H${x} V${y}`; prev = { x, y }; });
+  if (prev) path += ` H${pad.l + W}`;
+  const grid = niceTicks(ylo, yhi, 4).map(t => `<line class="gridline" x1="${pad.l}" x2="${pad.l + W}" y1="${sy(t)}" y2="${sy(t)}"/><text x="${pad.l - 8}" y="${sy(t) + 4}" text-anchor="end">${t}</text>`).join("");
+  const days = []; for (let t = Math.ceil(t0 / 86400 / 3) * 86400 * 3; t < t1; t += 86400 * 3) days.push(t);
+  const xt = days.map(t => `<text x="${sx(t)}" y="${pad.t + H + 18}" text-anchor="middle">${new Date(t * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</text>`).join("");
+  const dots = runs.map(r => { const isBest = marks.includes(r); return `<g><line x1="${sx(r.finished)}" x2="${sx(r.finished)}" y1="${sy(r.hi ?? r.index)}" y2="${sy(r.lo ?? r.index)}" stroke="var(--muted)" opacity="0.35"/><circle cx="${sx(r.finished)}" cy="${sy(r.index)}" r="${isBest ? 6 : 4.5}" fill="${isBest ? "var(--green)" : "var(--raise)"}" stroke="${isBest ? "var(--green-ink)" : "var(--muted)"}" stroke-width="1.5"><title>${escapeHtml(r.name.split(" · ")[0])}: ${r.index.toFixed(1)} on ${dateLabel(r.finished)}</title></circle></g>`; }).join("");
+  const labels = marks.map(r => `<text class="lbl on" x="${sx(r.finished) + 9}" y="${sy(r.index) - 9}">${escapeHtml(r.name.split(" · ")[0])}</text>`).join("");
+  holder.innerHTML = `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-label="Best quality index over time">${grid}${xt}<line class="axisline" x1="${pad.l}" x2="${pad.l + W}" y1="${pad.t + H}" y2="${pad.t + H}"/><path class="wl" d="${path}" style="filter:drop-shadow(0 0 5px color-mix(in srgb, var(--green) 70%, transparent))"/>${dots}${labels}</svg>`;
+  const recent = [...runs].reverse().slice(0, 6);
+  const firstSeen = new Set(); [...runs].forEach(r => firstSeen.add(r.model));
+  const seen = new Set();
+  const debut = {}; runs.forEach(r => { if (!seen.has(r.model)) { debut[r.run] = true; seen.add(r.model); } });
+  $("#recent").innerHTML = `<h3>Recent results</h3><ul>${recent.map(r => `<li><b>${escapeHtml(r.name.split(" · ")[0])}${debut[r.run] ? '<span class="tag debut">debut</span>' : ""}</b><span class="mono">${dateLabel(r.finished)} · ${r.index.toFixed(1)} quality${r.decode ? " · " + Math.round(r.decode) + " tok/s" : ""}</span></li>`).join("")}</ul>`;
+}
+
+function setHover(id, fromChart) {
+  state.hover = id;
+  $$(".row, .legend-item, .pt").forEach(node => node.classList.toggle("hot", !!id && (node.dataset.id === id || node.dataset.hover === id)));
+  if (!fromChart || true) {
+    const chart = $("#plot");
+    if (chart._geom && !fromChart) renderPlotLight();
+  }
+}
+function renderPlotLight() { renderPlot(); }
+
+function openModel(id, scroll) {
+  state.open = state.open === id ? null : id;
+  if (state.open && !byId(id)) state.open = null;
+  renderBoard(false); renderPlot();
+  announce(state.open ? `Opened ${shortName(byId(id))}` : "Closed details");
+  if (state.open && scroll) { const node = $(`.row-wrap[data-id="${id}"]`); if (node) node.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" }); }
+}
+function togglePin(id) {
+  if (!models().some(m => m.id === id)) return;
+  const at = state.pinned.indexOf(id);
+  if (at >= 0) state.pinned.splice(at, 1);
+  else if (state.pinned.length >= 4) { toast("Compare holds four models. Remove one first."); return; }
+  else state.pinned.push(id);
+  renderBoard(false); renderPlot(); renderDock();
+}
+function setEffort(effort) {
+  if (!D.efforts.includes(effort)) return;
+  state.effort = effort; state.open = null; state.brush = null; state.pinned = state.pinned.filter(id => models().some(m => m.id === id));
+  saveState(); renderAll(false);
+}
+function setAxis(axis) { state.axis = axis; state.brush = null; saveState(); renderAll(false); }
+function setWeights(weights) {
+  const before = ordered(models()).sort((a, b) => indexStat(b).v - indexStat(a).v).map(m => m.id).join();
+  state.weights = { ...weights }; rankCache = { key: "", data: null }; saveState();
+  renderAll(true);
+  const after = ordered(models()).sort((a, b) => indexStat(b).v - indexStat(a).v);
+  if (before !== after.map(m => m.id).join()) announce(`Ranking updated. ${shortName(after[0])} is first.`);
+}
+
+function renderAll(animate = true) {
+  renderEfforts(); renderVerdict(); renderCards(); renderAxisChips(); renderPlot(); renderLegend(); renderLab(); renderBoard(animate); renderDock(); renderTime(); renderBrushUi();
+}
+
+function methodHtml() {
+  return `<h2>How it is measured</h2>
+  <p>Every model runs the same fixed suite on one RTX PRO 6000 Blackwell, served through llama-swap. Datasets are pinned by checksum and subsets use a fixed seed, so a rerun asks the same questions.</p>
+  <ul>
+    <li><strong>The index</strong> is the plain average of five groups: knowledge, math, code, long context and tool use. The weights panel changes that average; the default is equal.</li>
+    <li><strong>The ± and the rank range</strong> come from how many questions were asked. A rank range such as #1–2 means the order held in 1,600 simulated reruns only within that span.</li>
+    <li><strong>Cut off</strong> means the answer hit the token limit and scored zero. Budgets are the same for every model, so rambling is part of the result.</li>
+    <li><strong>Speed</strong> is one greedy request unless a column says otherwise. Energy is measured at the card and divided by correct answers.</li>
+    <li><strong>Provenance.</strong> Each run keeps its answers, error counts, the launch command and the engine build. Open any model to read them and copy the command that reproduces it.</li>
+  </ul>
+  <p>Effort is ranked separately: max is the highest level each model offers, so models are never compared at different thinking budgets.</p>
+  <button class="pill close" id="close-method">Close</button>`;
+}
+
+function paletteItems() {
+  const items = [];
+  models().forEach(m => items.push({ g: "Models", label: shortName(m), hint: metaLine(m), run: () => { openModel(m.id, true); } }));
+  benchModels().forEach(m => items.push({ g: "Models", label: `${shortName(m)} (running)`, hint: "on the bench", run: () => openModel(m.id, true) }));
+  D.efforts.forEach(e => items.push({ g: "Effort", label: `Show ${EFFORT_LABEL[e] || e}`, hint: e === state.effort ? "current" : "", run: () => setEffort(e) }));
+  Object.entries(AXES).forEach(([k, a]) => items.push({ g: "Wall axis", label: `Plot against ${a.label.toLowerCase()}`, hint: k === state.axis ? "current" : "", run: () => setAxis(k) }));
+  PRESETS.forEach(p => items.push({ g: "Weights", label: `Rank for: ${p.label}`, hint: "", run: () => { state.labOpen = true; setWeights(p.weights); } }));
+  items.push({ g: "Actions", label: "Open weights panel", hint: "w", run: () => { state.labOpen = true; renderLab(); $("#board-block").scrollIntoView(); } });
+  items.push({ g: "Actions", label: "How it is measured", hint: "", run: () => openMethod() });
+  items.push({ g: "Actions", label: "Toggle light and dark", hint: "", run: () => toggleTheme() });
+  items.push({ g: "Actions", label: "Clear compare", hint: "", run: () => { state.pinned = []; renderAll(false); } });
+  return items;
+}
+let palIndex = 0, palShown = [];
+function renderPalette() {
+  const q = $("#pal-q").value.trim().toLowerCase();
+  const items = paletteItems().filter(i => !q || (i.label + " " + i.hint + " " + i.g).toLowerCase().includes(q));
+  palShown = items; palIndex = clamp(palIndex, 0, Math.max(0, items.length - 1));
+  let last = "", html = "";
+  items.forEach((item, i) => { if (item.g !== last) { html += `<li class="grp" role="presentation">${item.g}</li>`; last = item.g; } html += `<li role="option" data-i="${i}" aria-selected="${i === palIndex}"><span>${escapeHtml(item.label)}</span><small>${escapeHtml(item.hint)}</small></li>`; });
+  $("#pal-list").innerHTML = html || `<li class="grp">Nothing matches</li>`;
+}
+function openPalette() { const d = $("#pal"); if (d.open) return; $("#pal-q").value = ""; palIndex = 0; renderPalette(); d.showModal(); $("#pal-q").focus(); }
+function runPalette() { const item = palShown[palIndex]; if (!item) return; $("#pal").close(); item.run(); }
+function openMethod() { $("#method-body").innerHTML = methodHtml(); $("#method").showModal(); }
+function toggleTheme() {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : !matchMedia("(prefers-color-scheme: light)").matches;
+  root.dataset.theme = dark ? "light" : "dark"; saveState(); renderAll(false);
+}
+
+function wireEvents() {
+  document.addEventListener("click", event => {
+    const t = event.target;
+    const effort = t.closest("[data-effort]"); if (effort) return setEffort(effort.dataset.effort);
+    const axis = t.closest("[data-axis]"); if (axis) return setAxis(axis.dataset.axis);
+    const sort = t.closest("[data-sort]");
+    if (sort) { const key = sort.dataset.sort; if (state.sort === key) state.dir *= -1; else { state.sort = key; state.dir = key === "wh" ? 1 : -1; } renderBoard(true); return; }
+    const pin = t.closest("[data-pin]"); if (pin) { event.stopPropagation(); return togglePin(pin.dataset.pin); }
+    const unpin = t.closest("[data-unpin]"); if (unpin) return togglePin(unpin.dataset.unpin);
+    const tab = t.closest("[data-tab]"); if (tab) { state.tab[tab.dataset.model] = tab.dataset.tab; return renderBoard(false); }
+    const copy = t.closest("[data-copy]"); if (copy) { const text = copy.dataset.copy; (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => toast("Command copied"), () => toast("Select and copy the command")); return; }
+    const opener = t.closest("[data-open]"); if (opener) return openModel(opener.dataset.open, true);
+    const row = t.closest(".row"); if (row && !t.closest("button")) return openModel(row.dataset.id, false);
+    if (t.closest("#hop-toggle")) { state.hop = !state.hop; if (!state.hop) clearInterval(hopTimer); renderLegend(); renderPlot(); return; }
+    if (t.closest("#clear-pins")) { state.pinned = []; return renderAll(false); }
+    if (t.closest("#clear-brush") || t.closest("#brush-hint-clear")) { state.brush = null; return renderAll(false); }
+    if (t.closest("#lab-toggle")) { state.labOpen = !state.labOpen; return renderLab(); }
+    if (t.closest("#lab-reset")) return setWeights(PRESETS[0].weights);
+    const preset = t.closest("[data-preset]"); if (preset) return setWeights(PRESETS.find(p => p.id === preset.dataset.preset).weights);
+    if (t.closest("#open-pal")) return openPalette();
+    if (t.closest("#open-method")) return openMethod();
+    if (t.closest("#close-method")) return $("#method").close();
+    if (t.closest("#theme")) return toggleTheme();
+    const item = t.closest("#pal-list li[data-i]"); if (item) { palIndex = +item.dataset.i; return runPalette(); }
+  });
+  document.addEventListener("input", event => {
+    const slider = event.target.closest("input[data-group]");
+    if (slider) { const next = { ...state.weights, [slider.dataset.group]: +slider.value }; state.weights = next; rankCache = { key: "", data: null }; saveState(); renderVerdict(); renderCards(); renderPlot(); renderLegend(); renderBoard(true); renderLabMessageOnly(slider); }
+    if (event.target.id === "pal-q") { palIndex = 0; renderPalette(); }
+  });
+  const hoverTarget = event => event.target.closest(".row-wrap[data-id], .legend-item[data-hover]");
+  const hoverId = node => node ? (node.dataset.id || node.dataset.hover) : null;
+  const paintHover = () => {
+    $$(".pt").forEach(p => p.classList.toggle("hot", !!state.hover && p.dataset.id === state.hover));
+    $$(".row").forEach(r => r.classList.toggle("hot", !!state.hover && r.dataset.id === state.hover));
+    $$(".legend-item").forEach(r => r.classList.toggle("hot", !!state.hover && r.dataset.hover === state.hover));
+  };
+  document.addEventListener("pointerover", event => {
+    const node = hoverTarget(event);
+    if (!node || event.target.closest(".profile")) return;
+    const id = hoverId(node);
+    if (state.hover !== id && !event.target.closest(".plot")) { state.hover = id; paintHover(); }
+  });
+  document.addEventListener("pointerout", event => {
+    if (hoverTarget(event) && !event.relatedTarget?.closest?.(".row-wrap, .legend-item")) { state.hover = null; paintHover(); }
+  });
+  let lastTerm = null;
+  document.addEventListener("pointerdown", event => { lastTerm = event.target.closest("[popovertarget]"); });
+  $$("[popover]").forEach(pop => pop.addEventListener("toggle", event => {
+    if (event.newState !== "open" || !lastTerm) return;
+    const r = lastTerm.getBoundingClientRect();
+    pop.style.left = clamp(r.left, 8, innerWidth - pop.offsetWidth - 8) + "px";
+    pop.style.top = (r.bottom + 8 + pop.offsetHeight > innerHeight ? Math.max(8, r.top - pop.offsetHeight - 8) : r.bottom + 8) + "px";
+  }));
+  document.addEventListener("keydown", event => {
+    const typing = /INPUT|TEXTAREA|SELECT/.test(event.target.tagName);
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") { event.preventDefault(); return openPalette(); }
+    if ($("#pal").open) {
+      if (event.key === "ArrowDown") { event.preventDefault(); palIndex = Math.min(palShown.length - 1, palIndex + 1); renderPalette(); $("#pal-list [aria-selected=true]")?.scrollIntoView({ block: "nearest" }); }
+      if (event.key === "ArrowUp") { event.preventDefault(); palIndex = Math.max(0, palIndex - 1); renderPalette(); $("#pal-list [aria-selected=true]")?.scrollIntoView({ block: "nearest" }); }
+      if (event.key === "Enter") { event.preventDefault(); runPalette(); }
+      return;
+    }
+    if (typing) return;
+    if (event.key === "/") { event.preventDefault(); return openPalette(); }
+    if (event.key === "w") { state.labOpen = !state.labOpen; return renderLab(); }
+    if (event.key === "j" || event.key === "k") { const rows = $$(".row"); const at = rows.indexOf(document.activeElement); const next = rows[clamp(at + (event.key === "j" ? 1 : -1), 0, rows.length - 1)]; if (next) next.focus(); }
+    if (event.key === "Enter" && document.activeElement?.classList.contains("row")) openModel(document.activeElement.dataset.id, false);
+    if (event.key === "c" && document.activeElement?.classList.contains("row")) togglePin(document.activeElement.dataset.id);
+    if (event.key === "Escape") { if (state.open) { state.open = null; renderBoard(false); renderPlot(); } else if (state.brush) { state.brush = null; renderAll(false); } }
+  });
+  $("#pal").addEventListener("click", event => { if (event.target === $("#pal")) $("#pal").close(); });
+  $("#method").addEventListener("click", event => { if (event.target === $("#method")) $("#method").close(); });
+  let resizeTimer = 0;
+  new ResizeObserver(() => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { renderPlot(); renderTime(); }, 80); }).observe($("#plot"));
+}
+function renderLabMessageOnly(slider) {
+  const norm = normalWeights(state.weights);
+  $$("#sliders .slider").forEach(node => { const input = $("input", node); const g = input.dataset.group; $("label b", node).textContent = Math.round(norm[g] * 100) + "%"; input.style.setProperty("--fill", state.weights[g] / 3 * 100 + "%"); });
+  const base = defaultOrderIndex();
+  const now = ordered(models()).sort((a, b) => indexStat(b).v - indexStat(a).v);
+  const moves = now.map((m, i) => ({ m, now: i + 1, was: base[m.id] })).filter(r => r.now !== r.was);
+  let msg;
+  if (weightsAreEqual()) msg = "Equal weights, the default. Slide any group up to see who gains.";
+  else if (!moves.length) msg = "Your weights keep the same order as the default.";
+  else { const best = moves.sort((a, b) => (b.was - b.now) - (a.was - a.now))[0]; msg = `${shortName(best.m)} moves from #${best.was} to #${best.now}. ${moves.length} of ${now.length} models change place.`; }
+  $("#lab-msg").textContent = msg;
+  $$("#presets .pill").forEach(p => p.classList.toggle("on", GROUPS.every(g => PRESETS.find(x => x.id === p.dataset.preset).weights[g] === state.weights[g])));
+  $("#lab-toggle").textContent = weightsAreEqual() ? "Weigh it your way" : "Weights: custom";
+  $("#lab-toggle").classList.toggle("on", state.labOpen || !weightsAreEqual());
+}
+
+loadState();
+wireEvents();
+renderAll(false);
+</script>
