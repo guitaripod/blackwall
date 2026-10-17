@@ -84,7 +84,7 @@ def test_the_plain_table_names_every_ranked_model_best_first(database):
 def test_the_page_keeps_what_export_needs(database):
     html = board.page(board.collect(database))
     assert html.count('<meta property="og:image" content="card.png">') == 1
-    assert "/*__DATA__*/null" not in html and "/*__NOSCRIPT__*/" not in html
+    assert "/*__DATA__*/null" not in html and "<!--__NOSCRIPT__-->" not in html
     assert '"live"' in html and "<noscript>" in html
 
 

@@ -307,7 +307,7 @@ def plain_table(data):
 def page(data, template=None):
     """The whole leaderboard as one self-contained file: the template with the run data baked in."""
     text = (template or TEMPLATE).read_text().replace("/*__DATA__*/null", publishable(data))
-    return text.replace("/*__NOSCRIPT__*/", plain_table(data))
+    return text.replace("<!--__NOSCRIPT__-->", plain_table(data))
 
 
 def build():
