@@ -2,6 +2,17 @@
 
 All notable changes to Blackwall are listed here, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the versions follow [Semantic Versioning](https://semver.org/). The published `board.json` carries its own `schema` number, described in [docs/data.md](docs/data.md).
 
+## [2.0.3] - 2026-10-17
+
+The RAM safety stop no longer fires on a dip of a few seconds. What is measured and the `board.json` schema are unchanged.
+
+### Fixed
+- **A short dip in free RAM no longer unloads the model.** The guard checked once every five seconds and unloaded the model the first time free RAM was under 8 GB. A run on a busy desktop was stopped seven times in a day by dips that were over in seconds (a compile, a browser), each one costing every request in flight and a reload. Free RAM now has to stay under the floor for 45 seconds before the run stops.
+- **A memory stop is retried within minutes, not after ten.** The cause is over long before that, and the next session waits for room anyway. A run that stopped for memory no longer counts toward the same-questions-failed limit either.
+
+### Added
+- **Dips are written down with their cause.** The first reading of every dip records the programs holding the most memory (processes of one name summed) as a `memory low` event in the run's log, so the next stop names what caused it.
+
 ## [2.0.2] - 2026-10-17
 
 A run no longer fails for good when its server goes missing while loading. What is measured and the `board.json` schema are unchanged.

@@ -961,7 +961,7 @@ to 250k-token prompts, board power), then quality at the chosen effort (SuperGPQ
 and HMMT 2026, agentic tool use, MRCR and Graphwalks long context, LiveCodeBench graded
 in a sandbox), and rebuilds the leaderboard. Answers are saved as they arrive, so
 `blackwall resume` continues a stopped run. It stops itself and unloads the model if free
-RAM drops under 4 GB.
+RAM stays under 8 GB for 45 seconds, and the event log names the programs that held it.
 """
 
 RUN_EPILOG = """\
