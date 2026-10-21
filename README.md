@@ -27,13 +27,13 @@ One command per model: Blackwall loads it through llama-swap, checks the server,
 <!--LEADERBOARD-->
 | Model | Quality | SuperGPQA | Math | LCB | MRCR | Graphwalks | Tools | tok/s | Peak | TTFT 32k | Wh/correct | Run |
 |---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
-| Qwen 3.8 27B · SGLang · DFlash2 · 524K | 81.0 | 61.2 | 81.0 | 76.2 | 78.4 | 94.5 | 100.0 | 157 | 400 | 5.0 | 2.67 | 12 Sep |
-| Nemotron 3.5 Super VL 120B · vLLM · NVFP4 · MTP | 79.2 | 61.2 | 88.9 | 83.2 | 32.8 | 98.1 | 97.4 | 187 | 414 | 2.4 | 3.18 | 17 Oct |
+| Qwen 3.8 27B · Uncensored · SGLang · FP8 · DFlash2 · 512K | 81.0 | 61.2 | 81.0 | 76.2 | 78.4 | 94.5 | 100.0 | 157 | 400 | 5.0 | 2.67 | 12 Sep |
+| Nemotron 3.5 Super VL 120B · vLLM · NVFP4 · MTP · 256K | 79.2 | 61.2 | 88.9 | 83.2 | 32.8 | 98.1 | 97.4 | 187 | 414 | 2.4 | 3.18 | 17 Oct |
 | Muse Glimmer 30B · SGLang · FP8 · DFlash2 · 128K | 71.6 | 57.8 | 84.1 | 62.4 | 33.9 | 78.8 | 97.4 | 143 | 680 | 4.0 | 2.73 | 13 Sep |
-| Nemotron 3.5 Bolt 74B-A9B · llama.cpp · IQ2 24GB · DFlash | 71.4 | 52.8 | 84.1 | 69.3 | 15.9 | 91.5 | 97.4 | 267 | 363 | 11.3 | 6.54 | 17 Oct |
+| Nemotron 3.5 Bolt 74B · llama.cpp · IQ2 · DFlash · 256K | 71.4 | 52.8 | 84.1 | 69.3 | 15.9 | 91.5 | 97.4 | 267 | 363 | 11.3 | 6.54 | 17 Oct |
 | GPT-OSS 120B · SGLang · MXFP4 · DFlash · 128K | 71.2 | 51.4 | 87.3 | 83.2 | 11.0 | 64.4 | 96.5 | 206 | 432 | 1.8 | 5.99 | 12 Sep |
-| Kolibri 1 78B-A3B · llama.cpp · Q5_K_M · 160k | 67.7 | 46.4 | 86.5 | 78.2 | 13.6 | 53.3 | 93.9 | 172 | 470 | 7.9 | 12.00 | 10 Oct |
-| MiMo-V2.6 Distill Qwen 9B · llama.cpp · Q5_K_M · 262k | 50.0 | 39.7 | 41.3 | 35.6 | 34.3 | 76.2 | 78.1 | 164 | 419 | 3.8 | 17.92 | 25 Sep |
+| Kolibri 1 78B-A3B · llama.cpp · Q5_K_M · 160K | 67.7 | 46.4 | 86.5 | 78.2 | 13.6 | 53.3 | 93.9 | 172 | 470 | 7.9 | 12.00 | 10 Oct |
+| MiMo-V2.6 Distill Qwen 9B · llama.cpp · Q5_K_M · 256K | 50.0 | 39.7 | 41.3 | 35.6 | 34.3 | 76.2 | 78.1 | 164 | 419 | 3.8 | 17.92 | 25 Sep |
 
 _7 models on 2 setups, suite full/v1, max effort, newest run 17 Oct 2026._
 

@@ -4,12 +4,12 @@
   "name": "blackwall",
   "version": "2.2.0"
  },
- "generated": 1792262878.6742098,
+ "generated": 1792620739.0943813,
  "suite": "full/v1",
  "current": "1",
  "hardware": {
   "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
-  "driver": "615.71.09",
+  "driver": "615.78.08",
   "vram_mib": 97887
  },
  "suites": {
@@ -72,8 +72,737 @@
    "rankings": {
     "medium": [
      {
+      "id": "nemotron-3.5-lightning-30b-a3b-darkstar-gguf",
+      "name": "Nemotron 3.5 Lightning 30B \u00b7 Uncensored \u00b7 llama.cpp \u00b7 Q8 \u00b7 DFlash \u00b7 256K",
+      "engine": "llama.cpp",
+      "quantization": "Q8_0",
+      "spec": "DFlash",
+      "context": 262144,
+      "fingerprint": "316c6d477475424b",
+      "stack": {
+       "host": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|615.78.08",
+       "hostLabel": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 615.78.08",
+       "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+       "driver": "615.78.08",
+       "vramMib": 97887,
+       "deviceClass": "gpu",
+       "device": null,
+       "soc": null,
+       "bandwidthGbs": null,
+       "ramGb": null,
+       "engine": "llama.cpp",
+       "build": "llama.cpp b1-b76b133",
+       "source": null
+      },
+      "run": {
+       "id": "20261021-200855-nemotron-3.5-lightning-30b-a3b-darkstar-gguf",
+       "suite": "quick/v1",
+       "kind": "quick",
+       "finished": 1792618614.4299953,
+       "effort": "medium",
+       "harness": "2.2.0+233e006",
+       "contended": [],
+       "failedItems": 0,
+       "notes": null,
+       "reused": null,
+       "stackChange": []
+      },
+      "index": {
+       "value": 66.12818995636326,
+       "unit": "%",
+       "n": 5,
+       "lo": 61.249389602962125,
+       "hi": 70.81609284265126
+      },
+      "tasks": {
+       "supergpqa": {
+        "value": 50.0,
+        "unit": "%",
+        "n": 156,
+        "lo": 42.24858183047757,
+        "hi": 57.75141816952243,
+        "tokens": 8270.115384615385,
+        "latency": 57.265,
+        "truncated": 5.769230769230769,
+        "unreachable": null,
+        "malformed": null,
+        "parts": {}
+       },
+       "math": {
+        "value": 79.36507936507937,
+        "unit": "%",
+        "n": 63,
+        "lo": 67.82995165388411,
+        "hi": 87.52479748437707,
+        "tokens": 28109.777777777777,
+        "latency": 246.68,
+        "truncated": 4.761904761904762,
+        "unreachable": null,
+        "malformed": null,
+        "parts": {
+         "aime": 83.33333333333334,
+         "hmmt": 75.75757575757575
+        }
+       },
+       "lcb": {
+        "value": 77.5,
+        "unit": "%",
+        "n": 40,
+        "lo": 62.496603595906954,
+        "hi": 87.68404674532148,
+        "tokens": 23932.725,
+        "latency": 228.2,
+        "truncated": 5.0,
+        "unreachable": null,
+        "malformed": null,
+        "parts": {}
+       },
+       "mrcr": {
+        "value": 25.15169061269341,
+        "unit": "%",
+        "n": 20,
+        "lo": 8.038669842359154,
+        "hi": 42.26471138302767,
+        "tokens": 3079.5,
+        "latency": 39.46,
+        "truncated": 5.0,
+        "unreachable": null,
+        "malformed": null,
+        "parts": {
+         "131072": 0.0,
+         "16384": 62.731922470511606,
+         "32768": 27.119416248484946,
+         "65536": 10.755423731777089
+        }
+       },
+       "graphwalks": {
+        "value": 38.18952390499103,
+        "unit": "%",
+        "n": 16,
+        "lo": 17.114813414719,
+        "hi": 59.26423439526306,
+        "tokens": 10197.0,
+        "latency": 58.489999999999995,
+        "truncated": 6.25,
+        "unreachable": null,
+        "malformed": null,
+        "parts": {
+         "16384": 18.333333333333336,
+         "32768": 32.327586206896555,
+         "65536": 52.67857142857143,
+         "8192": 49.41860465116279
+        }
+       },
+       "tools": {
+        "value": 92.10526315789474,
+        "unit": "%",
+        "n": 38,
+        "lo": 79.2003210797347,
+        "hi": 97.2785898605735,
+        "tokens": 348.4736842105263,
+        "latency": 6.395,
+        "truncated": 0.0,
+        "unreachable": null,
+        "malformed": 0.0,
+        "parts": {
+         "clarify": 100.0,
+         "conditional": 100.0,
+         "distractor": 100.0,
+         "irrelevant": 75.0,
+         "multi-turn": 100.0,
+         "parallel": 50.0,
+         "policy": 75.0,
+         "recovery": 100.0,
+         "sequential": 100.0,
+         "single": 100.0
+        }
+       }
+      },
+      "qualityFrom": null,
+      "deviceClass": "gpu",
+      "capacity": {
+       "slots": 8,
+       "context": 262144,
+       "pool": 262144
+      },
+      "warnings": [],
+      "energy": {
+       "perCorrect": {
+        "value": 8.038962068004606,
+        "unit": "Wh",
+        "n": 205,
+        "lo": null,
+        "hi": null
+       },
+       "quality": {
+        "value": 1649.118,
+        "unit": "Wh",
+        "n": 6,
+        "lo": null,
+        "hi": null
+       }
+      },
+      "speed": {
+       "conc.1": {
+        "value": 343.2,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 343.2,
+        "hi": 343.2
+       },
+       "conc.4": {
+        "value": 432.6,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 432.6,
+        "hi": 432.6
+       },
+       "decode": {
+        "value": 285.1766666666667,
+        "unit": "tok/s",
+        "n": 3,
+        "lo": null,
+        "hi": null
+       },
+       "decode.code-v1": {
+        "value": 255.45,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 255.45,
+        "hi": 255.45
+       },
+       "decode.prose-v1": {
+        "value": 224.62,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 224.62,
+        "hi": 224.62
+       },
+       "decode.reasoning-v1": {
+        "value": 375.46,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 375.46,
+        "hi": 375.46
+       },
+       "decode_at.1000": {
+        "value": 277.84,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 277.84,
+        "hi": 277.84
+       },
+       "decode_at.120000": {
+        "value": 187.39,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 187.39,
+        "hi": 187.39
+       },
+       "decode_at.32000": {
+        "value": 239.52,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 239.52,
+        "hi": 239.52
+       },
+       "energy": {
+        "value": 1.4002740262282247,
+        "unit": "J/token",
+        "n": 1,
+        "lo": null,
+        "hi": null
+       },
+       "peak": {
+        "value": 432.6,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 432.6,
+        "hi": 432.6
+       },
+       "peak_at": {
+        "value": 4.0,
+        "unit": "requests",
+        "n": 1,
+        "lo": null,
+        "hi": null
+       },
+       "power": {
+        "value": 357.7,
+        "unit": "W",
+        "n": 1,
+        "lo": null,
+        "hi": null
+       },
+       "prefill.1000": {
+        "value": 5130.4,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 5130.4,
+        "hi": 5130.4
+       },
+       "prefill.120000": {
+        "value": 5393.2,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 5393.2,
+        "hi": 5393.2
+       },
+       "prefill.32000": {
+        "value": 6855.9,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 6855.9,
+        "hi": 6855.9
+       },
+       "temp": {
+        "value": 46.0,
+        "unit": "C",
+        "n": 1,
+        "lo": null,
+        "hi": null
+       },
+       "ttft.1000": {
+        "value": 0.2185,
+        "unit": "s",
+        "n": 1,
+        "lo": 0.2185,
+        "hi": 0.2185
+       },
+       "ttft.120000": {
+        "value": 23.32,
+        "unit": "s",
+        "n": 1,
+        "lo": 23.32,
+        "hi": 23.32
+       },
+       "ttft.32000": {
+        "value": 4.933,
+        "unit": "s",
+        "n": 1,
+        "lo": 4.933,
+        "hi": 4.933
+       },
+       "ttft.short": {
+        "value": 81.3,
+        "unit": "ms",
+        "n": 3,
+        "lo": 68.4,
+        "hi": 86.6
+       }
+      },
+      "thermal": {},
+      "battery": {},
+      "verdict": null,
+      "repeats": {
+       "runs": 1,
+       "spread": null
+      },
+      "lmx": {},
+      "submissions": [],
+      "server": {
+       "load_s": 0.1,
+       "model_path": "/mnt/nvme8tb/llama-models/nemotron-lightning/Darkstar-Nemotron-3.5-Lightning-30B-A3B-Abliterated-BF16.Q8_0.gguf",
+       "n_ctx": 262144,
+       "total_slots": 8,
+       "build": {
+        "engine": "llama.cpp",
+        "build": "b1-b76b133"
+       },
+       "capacity": {
+        "slots": 8,
+        "context": 262144,
+        "pool": 262144
+       },
+       "weights": "61664f3cecb1368809e46007522c71bae4b588a7ce6bf86a8cbc7d76bdeeac22",
+       "probe": {
+        "prompt": "List the first eight prime numbers, separated by spaces, and nothing else.",
+        "answer": "Here's a thinking process:\n\n1.  **Analyze User Input:**\n   - \"List the first eight prime numbers\"\n   - \"separated by spaces\"\n   - \"and nothing else\"\n\n2.  **Identify Key Requirements:**\n   - Must list exactly the first 8 prime numbers\n   - Format"
+       }
+      },
+      "history": [
+       {
+        "id": "20261021-200855-nemotron-3.5-lightning-30b-a3b-darkstar-gguf",
+        "suite": "quick/v1",
+        "effort": "medium",
+        "finished": 1792618614.4299953,
+        "index": 66.12818995636326,
+        "decode": 285.1766666666667
+       }
+      ]
+     },
+     {
+      "id": "nemotron-3.5-bolt-74b-a9b-24gb-abliterated-gguf",
+      "name": "Nemotron 3.5 Bolt 74B \u00b7 Uncensored \u00b7 llama.cpp \u00b7 IQ2 \u00b7 DFlash \u00b7 256K",
+      "engine": "llama.cpp",
+      "quantization": "IQ2_XXS",
+      "spec": "DFlash",
+      "context": 262144,
+      "fingerprint": "bc59f91dde7f7086",
+      "stack": {
+       "host": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|615.78.08",
+       "hostLabel": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 615.78.08",
+       "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+       "driver": "615.78.08",
+       "vramMib": 97887,
+       "deviceClass": "gpu",
+       "device": null,
+       "soc": null,
+       "bandwidthGbs": null,
+       "ramGb": null,
+       "engine": "llama.cpp",
+       "build": "llama.cpp b1-b76b133",
+       "source": null
+      },
+      "run": {
+       "id": "20261018-215257-nemotron-3.5-bolt-74b-a9b-24gb-abliterated-gguf",
+       "suite": "quick/v1",
+       "kind": "quick",
+       "finished": 1792359254.4852746,
+       "effort": "medium",
+       "harness": "2.2.0+233e006",
+       "contended": [
+        "ghostty"
+       ],
+       "failedItems": 0,
+       "notes": null,
+       "reused": null,
+       "stackChange": []
+      },
+      "index": {
+       "value": 70.74694186025049,
+       "unit": "%",
+       "n": 5,
+       "lo": 66.34745552040403,
+       "hi": 75.08361547162473
+      },
+      "tasks": {
+       "supergpqa": {
+        "value": 51.28205128205128,
+        "unit": "%",
+        "n": 156,
+        "lo": 43.50230784680234,
+        "hi": 59.0001696058758,
+        "tokens": 1194.4038461538462,
+        "latency": 29.93,
+        "truncated": 0.0,
+        "unreachable": null,
+        "malformed": null,
+        "parts": {}
+       },
+       "math": {
+        "value": 87.3015873015873,
+        "unit": "%",
+        "n": 63,
+        "lo": 76.89273848938224,
+        "hi": 93.42275365921982,
+        "tokens": 8439.952380952382,
+        "latency": 278.53,
+        "truncated": 0.0,
+        "unreachable": null,
+        "malformed": null,
+        "parts": {
+         "aime": 96.66666666666667,
+         "hmmt": 78.78787878787878
+        }
+       },
+       "lcb": {
+        "value": 67.5,
+        "unit": "%",
+        "n": 40,
+        "lo": 52.017458088898,
+        "hi": 79.91568303733828,
+        "tokens": 5080.725,
+        "latency": 96.405,
+        "truncated": 0.0,
+        "unreachable": null,
+        "malformed": null,
+        "parts": {}
+       },
+       "mrcr": {
+        "value": 19.976212861609604,
+        "unit": "%",
+        "n": 20,
+        "lo": 6.052185952140987,
+        "hi": 33.90023977107822,
+        "tokens": 1512.45,
+        "latency": 94.22,
+        "truncated": 0.0,
+        "unreachable": null,
+        "malformed": null,
+        "parts": {
+         "131072": 26.587422183302788,
+         "16384": 21.058865062800542,
+         "32768": 7.549101100717088,
+         "65536": 24.709463099618
+        }
+       },
+       "graphwalks": {
+        "value": 85.85224436309177,
+        "unit": "%",
+        "n": 16,
+        "lo": 69.78873652981045,
+        "hi": 100.0,
+        "tokens": 10518.375,
+        "latency": 336.105,
+        "truncated": 6.25,
+        "unreachable": null,
+        "malformed": null,
+        "parts": {
+         "16384": 72.71570014144272,
+         "32768": 75.0,
+         "65536": 96.42857142857143,
+         "8192": 99.26470588235294
+        }
+       },
+       "tools": {
+        "value": 94.73684210526315,
+        "unit": "%",
+        "n": 38,
+        "lo": 82.71423311893115,
+        "hi": 98.54460975514631,
+        "tokens": 250.26315789473685,
+        "latency": 17.200000000000003,
+        "truncated": 0.0,
+        "unreachable": null,
+        "malformed": 0.0,
+        "parts": {
+         "clarify": 100.0,
+         "conditional": 100.0,
+         "distractor": 100.0,
+         "irrelevant": 100.0,
+         "multi-turn": 100.0,
+         "parallel": 100.0,
+         "policy": 100.0,
+         "recovery": 100.0,
+         "sequential": 81.81818181818183,
+         "single": 100.0
+        }
+       }
+      },
+      "qualityFrom": null,
+      "deviceClass": "gpu",
+      "capacity": {
+       "slots": 16,
+       "context": 262144,
+       "pool": 262144
+      },
+      "warnings": [],
+      "energy": {
+       "perCorrect": {
+        "value": 2.9118775141701607,
+        "unit": "Wh",
+        "n": 216,
+        "lo": null,
+        "hi": null
+       },
+       "quality": {
+        "value": 628.184,
+        "unit": "Wh",
+        "n": 6,
+        "lo": null,
+        "hi": null
+       }
+      },
+      "speed": {
+       "conc.1": {
+        "value": 219.0,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 219.0,
+        "hi": 219.0
+       },
+       "conc.16": {
+        "value": 315.9,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 315.9,
+        "hi": 315.9
+       },
+       "conc.4": {
+        "value": 260.2,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 260.2,
+        "hi": 260.2
+       },
+       "decode": {
+        "value": 236.60666666666668,
+        "unit": "tok/s",
+        "n": 3,
+        "lo": null,
+        "hi": null
+       },
+       "decode.code-v1": {
+        "value": 288.41,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 288.41,
+        "hi": 288.41
+       },
+       "decode.prose-v1": {
+        "value": 192.4,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 192.4,
+        "hi": 192.4
+       },
+       "decode.reasoning-v1": {
+        "value": 229.01,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 229.01,
+        "hi": 229.01
+       },
+       "decode_at.1000": {
+        "value": 185.16,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 185.16,
+        "hi": 185.16
+       },
+       "decode_at.120000": {
+        "value": 178.71,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 178.71,
+        "hi": 178.71
+       },
+       "decode_at.32000": {
+        "value": 219.21,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 219.21,
+        "hi": 219.21
+       },
+       "energy": {
+        "value": 1.1923997087479627,
+        "unit": "J/token",
+        "n": 1,
+        "lo": null,
+        "hi": null
+       },
+       "peak": {
+        "value": 315.9,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 315.9,
+        "hi": 315.9
+       },
+       "peak_at": {
+        "value": 16.0,
+        "unit": "requests",
+        "n": 1,
+        "lo": null,
+        "hi": null
+       },
+       "power": {
+        "value": 343.9,
+        "unit": "W",
+        "n": 1,
+        "lo": null,
+        "hi": null
+       },
+       "prefill.1000": {
+        "value": 2987.4,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 2987.4,
+        "hi": 2987.4
+       },
+       "prefill.120000": {
+        "value": 3026.0,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 3026.0,
+        "hi": 3026.0
+       },
+       "prefill.32000": {
+        "value": 3525.3,
+        "unit": "tok/s",
+        "n": 1,
+        "lo": 3525.3,
+        "hi": 3525.3
+       },
+       "temp": {
+        "value": 49.0,
+        "unit": "C",
+        "n": 1,
+        "lo": null,
+        "hi": null
+       },
+       "ttft.1000": {
+        "value": 0.3796,
+        "unit": "s",
+        "n": 1,
+        "lo": 0.3796,
+        "hi": 0.3796
+       },
+       "ttft.120000": {
+        "value": 41.567,
+        "unit": "s",
+        "n": 1,
+        "lo": 41.567,
+        "hi": 41.567
+       },
+       "ttft.32000": {
+        "value": 9.5971,
+        "unit": "s",
+        "n": 1,
+        "lo": 9.5971,
+        "hi": 9.5971
+       },
+       "ttft.short": {
+        "value": 188.9,
+        "unit": "ms",
+        "n": 3,
+        "lo": 157.4,
+        "hi": 196.8
+       }
+      },
+      "thermal": {},
+      "battery": {},
+      "verdict": null,
+      "repeats": {
+       "runs": 1,
+       "spread": null
+      },
+      "lmx": {},
+      "submissions": [],
+      "server": {
+       "load_s": 15.8,
+       "model_path": "/mnt/nvme8tb/llama-models/nemotron-bolt-abliterated/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-Abliterated-24GB.gguf",
+       "n_ctx": 262144,
+       "total_slots": 16,
+       "build": {
+        "engine": "llama.cpp",
+        "build": "b1-b76b133"
+       },
+       "capacity": {
+        "slots": 16,
+        "context": 262144,
+        "pool": 262144
+       },
+       "weights": "666250fc4f8c07bfbdde5e80785cc69fd1c208f12ccdf8d988d472e3ee24ddcc",
+       "probe": {
+        "prompt": "List the first eight prime numbers, separated by spaces, and nothing else.",
+        "answer": "The user wants the first eight prime numbers separated by spaces and nothing else. First eight primes: 2, 3, 5, 7, 11, 13, 17, 19. Need output exactly that, nothing else. Ensure no extra text.2 3"
+       }
+      },
+      "history": [
+       {
+        "id": "20261018-215257-nemotron-3.5-bolt-74b-a9b-24gb-abliterated-gguf",
+        "suite": "quick/v1",
+        "effort": "medium",
+        "finished": 1792359254.4852746,
+        "index": 70.74694186025049,
+        "decode": 236.60666666666668
+       }
+      ]
+     },
+     {
       "id": "gemma4-e2b-gguf",
-      "name": "Gemma 4 E2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 128k",
+      "name": "Gemma 4 E2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 128K",
       "engine": "llama.cpp",
       "quantization": "Q4_K_M",
       "spec": null,
@@ -486,7 +1215,7 @@
      },
      {
       "id": "lfm2_5-2_6b-gguf",
-      "name": "LFM2.5 2.6B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+      "name": "LFM2.5 2.6B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
       "engine": "llama.cpp",
       "quantization": "Q4_K_M",
       "spec": null,
@@ -833,7 +1562,7 @@
      },
      {
       "id": "qwen3-4b-instruct-gguf",
-      "name": "Qwen3 4B Instruct \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+      "name": "Qwen3 4B Instruct \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
       "engine": "llama.cpp",
       "quantization": "Q4_K_M",
       "spec": null,
@@ -1054,7 +1783,7 @@
      },
      {
       "id": "qwen3.5-2b-gguf",
-      "name": "Qwen3.5 2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+      "name": "Qwen3.5 2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
       "engine": "llama.cpp",
       "quantization": "Q4_K_M",
       "spec": null,
@@ -1275,7 +2004,7 @@
      },
      {
       "id": "lfm2-1_2b-gguf",
-      "name": "LFM2 1.2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+      "name": "LFM2 1.2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
       "engine": "llama.cpp",
       "quantization": "Q4_K_M",
       "spec": null,
@@ -1494,7 +2223,7 @@
      },
      {
       "id": "gemma3-1b-gguf",
-      "name": "Gemma 3 1B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+      "name": "Gemma 3 1B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
       "engine": "llama.cpp",
       "quantization": "Q4_K_M",
       "spec": null,
@@ -1723,7 +2452,7 @@
      },
      {
       "id": "qwen3-0_6b-gguf",
-      "name": "Qwen3 0.6B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+      "name": "Qwen3 0.6B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
       "engine": "llama.cpp",
       "quantization": "Q4_K_M",
       "spec": null,
@@ -1941,7 +2670,7 @@
      },
      {
       "id": "qwen3-1_7b-gguf",
-      "name": "Qwen3 1.7B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+      "name": "Qwen3 1.7B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
       "engine": "llama.cpp",
       "quantization": "Q4_K_M",
       "spec": null,
@@ -2161,7 +2890,7 @@
     "max": [
      {
       "id": "nemotron-3.5-bolt-74b-a9b-24gb-gguf",
-      "name": "Nemotron 3.5 Bolt 74B-A9B \u00b7 llama.cpp \u00b7 IQ2 24GB \u00b7 DFlash",
+      "name": "Nemotron 3.5 Bolt 74B \u00b7 llama.cpp \u00b7 IQ2 \u00b7 DFlash \u00b7 256K",
       "engine": "llama.cpp",
       "quantization": "IQ2_XXS",
       "spec": "DFlash",
@@ -2600,7 +3329,7 @@
      },
      {
       "id": "nemotron-3.5-super-vl-120b-nvfp4",
-      "name": "Nemotron 3.5 Super VL 120B \u00b7 vLLM \u00b7 NVFP4 \u00b7 MTP",
+      "name": "Nemotron 3.5 Super VL 120B \u00b7 vLLM \u00b7 NVFP4 \u00b7 MTP \u00b7 256K",
       "engine": "vllm",
       "quantization": "NVFP4",
       "spec": "MTP",
@@ -3040,7 +3769,7 @@
      },
      {
       "id": "kolibri-1-gguf",
-      "name": "Kolibri 1 78B-A3B \u00b7 llama.cpp \u00b7 Q5_K_M \u00b7 160k",
+      "name": "Kolibri 1 78B-A3B \u00b7 llama.cpp \u00b7 Q5_K_M \u00b7 160K",
       "engine": "llama.cpp",
       "quantization": "Q5_K_M",
       "spec": null,
@@ -3456,7 +4185,7 @@
      },
      {
       "id": "mimo-v2.6-distill-9b-gguf",
-      "name": "MiMo-V2.6 Distill Qwen 9B \u00b7 llama.cpp \u00b7 Q5_K_M \u00b7 262k",
+      "name": "MiMo-V2.6 Distill Qwen 9B \u00b7 llama.cpp \u00b7 Q5_K_M \u00b7 256K",
       "engine": "llama.cpp",
       "quantization": "Q5_K_M",
       "spec": null,
@@ -4308,7 +5037,7 @@
      },
      {
       "id": "pennyroyal",
-      "name": "Qwen 3.8 27B \u00b7 SGLang \u00b7 DFlash2 \u00b7 524K",
+      "name": "Qwen 3.8 27B \u00b7 Uncensored \u00b7 SGLang \u00b7 FP8 \u00b7 DFlash2 \u00b7 512K",
       "engine": "sglang",
       "quantization": "FP8",
       "spec": "DFlash2",
@@ -5191,7 +5920,7 @@
     "none": [
      {
       "id": "qwen3.5-2b-gguf",
-      "name": "Qwen3.5 2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+      "name": "Qwen3.5 2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
       "engine": "llama.cpp",
       "quantization": "Q4_K_M",
       "spec": null,
@@ -5413,9 +6142,7 @@
     ]
    },
    "health": {
-    "medium": {
-     "mrcr": "near the floor for every model"
-    },
+    "medium": {},
     "max": {},
     "none": {}
    },
@@ -5425,6 +6152,11 @@
       "key": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|610.57.04",
       "label": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 610.57.04",
       "models": 7
+     },
+     {
+      "key": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|615.78.08",
+      "label": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 615.78.08",
+      "models": 2
      },
      {
       "key": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|615.71.09",
@@ -5478,8 +6210,737 @@
  "rankings": {
   "medium": [
    {
+    "id": "nemotron-3.5-lightning-30b-a3b-darkstar-gguf",
+    "name": "Nemotron 3.5 Lightning 30B \u00b7 Uncensored \u00b7 llama.cpp \u00b7 Q8 \u00b7 DFlash \u00b7 256K",
+    "engine": "llama.cpp",
+    "quantization": "Q8_0",
+    "spec": "DFlash",
+    "context": 262144,
+    "fingerprint": "316c6d477475424b",
+    "stack": {
+     "host": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|615.78.08",
+     "hostLabel": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 615.78.08",
+     "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+     "driver": "615.78.08",
+     "vramMib": 97887,
+     "deviceClass": "gpu",
+     "device": null,
+     "soc": null,
+     "bandwidthGbs": null,
+     "ramGb": null,
+     "engine": "llama.cpp",
+     "build": "llama.cpp b1-b76b133",
+     "source": null
+    },
+    "run": {
+     "id": "20261021-200855-nemotron-3.5-lightning-30b-a3b-darkstar-gguf",
+     "suite": "quick/v1",
+     "kind": "quick",
+     "finished": 1792618614.4299953,
+     "effort": "medium",
+     "harness": "2.2.0+233e006",
+     "contended": [],
+     "failedItems": 0,
+     "notes": null,
+     "reused": null,
+     "stackChange": []
+    },
+    "index": {
+     "value": 66.12818995636326,
+     "unit": "%",
+     "n": 5,
+     "lo": 61.249389602962125,
+     "hi": 70.81609284265126
+    },
+    "tasks": {
+     "supergpqa": {
+      "value": 50.0,
+      "unit": "%",
+      "n": 156,
+      "lo": 42.24858183047757,
+      "hi": 57.75141816952243,
+      "tokens": 8270.115384615385,
+      "latency": 57.265,
+      "truncated": 5.769230769230769,
+      "unreachable": null,
+      "malformed": null,
+      "parts": {}
+     },
+     "math": {
+      "value": 79.36507936507937,
+      "unit": "%",
+      "n": 63,
+      "lo": 67.82995165388411,
+      "hi": 87.52479748437707,
+      "tokens": 28109.777777777777,
+      "latency": 246.68,
+      "truncated": 4.761904761904762,
+      "unreachable": null,
+      "malformed": null,
+      "parts": {
+       "aime": 83.33333333333334,
+       "hmmt": 75.75757575757575
+      }
+     },
+     "lcb": {
+      "value": 77.5,
+      "unit": "%",
+      "n": 40,
+      "lo": 62.496603595906954,
+      "hi": 87.68404674532148,
+      "tokens": 23932.725,
+      "latency": 228.2,
+      "truncated": 5.0,
+      "unreachable": null,
+      "malformed": null,
+      "parts": {}
+     },
+     "mrcr": {
+      "value": 25.15169061269341,
+      "unit": "%",
+      "n": 20,
+      "lo": 8.038669842359154,
+      "hi": 42.26471138302767,
+      "tokens": 3079.5,
+      "latency": 39.46,
+      "truncated": 5.0,
+      "unreachable": null,
+      "malformed": null,
+      "parts": {
+       "131072": 0.0,
+       "16384": 62.731922470511606,
+       "32768": 27.119416248484946,
+       "65536": 10.755423731777089
+      }
+     },
+     "graphwalks": {
+      "value": 38.18952390499103,
+      "unit": "%",
+      "n": 16,
+      "lo": 17.114813414719,
+      "hi": 59.26423439526306,
+      "tokens": 10197.0,
+      "latency": 58.489999999999995,
+      "truncated": 6.25,
+      "unreachable": null,
+      "malformed": null,
+      "parts": {
+       "16384": 18.333333333333336,
+       "32768": 32.327586206896555,
+       "65536": 52.67857142857143,
+       "8192": 49.41860465116279
+      }
+     },
+     "tools": {
+      "value": 92.10526315789474,
+      "unit": "%",
+      "n": 38,
+      "lo": 79.2003210797347,
+      "hi": 97.2785898605735,
+      "tokens": 348.4736842105263,
+      "latency": 6.395,
+      "truncated": 0.0,
+      "unreachable": null,
+      "malformed": 0.0,
+      "parts": {
+       "clarify": 100.0,
+       "conditional": 100.0,
+       "distractor": 100.0,
+       "irrelevant": 75.0,
+       "multi-turn": 100.0,
+       "parallel": 50.0,
+       "policy": 75.0,
+       "recovery": 100.0,
+       "sequential": 100.0,
+       "single": 100.0
+      }
+     }
+    },
+    "qualityFrom": null,
+    "deviceClass": "gpu",
+    "capacity": {
+     "slots": 8,
+     "context": 262144,
+     "pool": 262144
+    },
+    "warnings": [],
+    "energy": {
+     "perCorrect": {
+      "value": 8.038962068004606,
+      "unit": "Wh",
+      "n": 205,
+      "lo": null,
+      "hi": null
+     },
+     "quality": {
+      "value": 1649.118,
+      "unit": "Wh",
+      "n": 6,
+      "lo": null,
+      "hi": null
+     }
+    },
+    "speed": {
+     "conc.1": {
+      "value": 343.2,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 343.2,
+      "hi": 343.2
+     },
+     "conc.4": {
+      "value": 432.6,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 432.6,
+      "hi": 432.6
+     },
+     "decode": {
+      "value": 285.1766666666667,
+      "unit": "tok/s",
+      "n": 3,
+      "lo": null,
+      "hi": null
+     },
+     "decode.code-v1": {
+      "value": 255.45,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 255.45,
+      "hi": 255.45
+     },
+     "decode.prose-v1": {
+      "value": 224.62,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 224.62,
+      "hi": 224.62
+     },
+     "decode.reasoning-v1": {
+      "value": 375.46,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 375.46,
+      "hi": 375.46
+     },
+     "decode_at.1000": {
+      "value": 277.84,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 277.84,
+      "hi": 277.84
+     },
+     "decode_at.120000": {
+      "value": 187.39,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 187.39,
+      "hi": 187.39
+     },
+     "decode_at.32000": {
+      "value": 239.52,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 239.52,
+      "hi": 239.52
+     },
+     "energy": {
+      "value": 1.4002740262282247,
+      "unit": "J/token",
+      "n": 1,
+      "lo": null,
+      "hi": null
+     },
+     "peak": {
+      "value": 432.6,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 432.6,
+      "hi": 432.6
+     },
+     "peak_at": {
+      "value": 4.0,
+      "unit": "requests",
+      "n": 1,
+      "lo": null,
+      "hi": null
+     },
+     "power": {
+      "value": 357.7,
+      "unit": "W",
+      "n": 1,
+      "lo": null,
+      "hi": null
+     },
+     "prefill.1000": {
+      "value": 5130.4,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 5130.4,
+      "hi": 5130.4
+     },
+     "prefill.120000": {
+      "value": 5393.2,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 5393.2,
+      "hi": 5393.2
+     },
+     "prefill.32000": {
+      "value": 6855.9,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 6855.9,
+      "hi": 6855.9
+     },
+     "temp": {
+      "value": 46.0,
+      "unit": "C",
+      "n": 1,
+      "lo": null,
+      "hi": null
+     },
+     "ttft.1000": {
+      "value": 0.2185,
+      "unit": "s",
+      "n": 1,
+      "lo": 0.2185,
+      "hi": 0.2185
+     },
+     "ttft.120000": {
+      "value": 23.32,
+      "unit": "s",
+      "n": 1,
+      "lo": 23.32,
+      "hi": 23.32
+     },
+     "ttft.32000": {
+      "value": 4.933,
+      "unit": "s",
+      "n": 1,
+      "lo": 4.933,
+      "hi": 4.933
+     },
+     "ttft.short": {
+      "value": 81.3,
+      "unit": "ms",
+      "n": 3,
+      "lo": 68.4,
+      "hi": 86.6
+     }
+    },
+    "thermal": {},
+    "battery": {},
+    "verdict": null,
+    "repeats": {
+     "runs": 1,
+     "spread": null
+    },
+    "lmx": {},
+    "submissions": [],
+    "server": {
+     "load_s": 0.1,
+     "model_path": "/mnt/nvme8tb/llama-models/nemotron-lightning/Darkstar-Nemotron-3.5-Lightning-30B-A3B-Abliterated-BF16.Q8_0.gguf",
+     "n_ctx": 262144,
+     "total_slots": 8,
+     "build": {
+      "engine": "llama.cpp",
+      "build": "b1-b76b133"
+     },
+     "capacity": {
+      "slots": 8,
+      "context": 262144,
+      "pool": 262144
+     },
+     "weights": "61664f3cecb1368809e46007522c71bae4b588a7ce6bf86a8cbc7d76bdeeac22",
+     "probe": {
+      "prompt": "List the first eight prime numbers, separated by spaces, and nothing else.",
+      "answer": "Here's a thinking process:\n\n1.  **Analyze User Input:**\n   - \"List the first eight prime numbers\"\n   - \"separated by spaces\"\n   - \"and nothing else\"\n\n2.  **Identify Key Requirements:**\n   - Must list exactly the first 8 prime numbers\n   - Format"
+     }
+    },
+    "history": [
+     {
+      "id": "20261021-200855-nemotron-3.5-lightning-30b-a3b-darkstar-gguf",
+      "suite": "quick/v1",
+      "effort": "medium",
+      "finished": 1792618614.4299953,
+      "index": 66.12818995636326,
+      "decode": 285.1766666666667
+     }
+    ]
+   },
+   {
+    "id": "nemotron-3.5-bolt-74b-a9b-24gb-abliterated-gguf",
+    "name": "Nemotron 3.5 Bolt 74B \u00b7 Uncensored \u00b7 llama.cpp \u00b7 IQ2 \u00b7 DFlash \u00b7 256K",
+    "engine": "llama.cpp",
+    "quantization": "IQ2_XXS",
+    "spec": "DFlash",
+    "context": 262144,
+    "fingerprint": "bc59f91dde7f7086",
+    "stack": {
+     "host": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|615.78.08",
+     "hostLabel": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 615.78.08",
+     "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+     "driver": "615.78.08",
+     "vramMib": 97887,
+     "deviceClass": "gpu",
+     "device": null,
+     "soc": null,
+     "bandwidthGbs": null,
+     "ramGb": null,
+     "engine": "llama.cpp",
+     "build": "llama.cpp b1-b76b133",
+     "source": null
+    },
+    "run": {
+     "id": "20261018-215257-nemotron-3.5-bolt-74b-a9b-24gb-abliterated-gguf",
+     "suite": "quick/v1",
+     "kind": "quick",
+     "finished": 1792359254.4852746,
+     "effort": "medium",
+     "harness": "2.2.0+233e006",
+     "contended": [
+      "ghostty"
+     ],
+     "failedItems": 0,
+     "notes": null,
+     "reused": null,
+     "stackChange": []
+    },
+    "index": {
+     "value": 70.74694186025049,
+     "unit": "%",
+     "n": 5,
+     "lo": 66.34745552040403,
+     "hi": 75.08361547162473
+    },
+    "tasks": {
+     "supergpqa": {
+      "value": 51.28205128205128,
+      "unit": "%",
+      "n": 156,
+      "lo": 43.50230784680234,
+      "hi": 59.0001696058758,
+      "tokens": 1194.4038461538462,
+      "latency": 29.93,
+      "truncated": 0.0,
+      "unreachable": null,
+      "malformed": null,
+      "parts": {}
+     },
+     "math": {
+      "value": 87.3015873015873,
+      "unit": "%",
+      "n": 63,
+      "lo": 76.89273848938224,
+      "hi": 93.42275365921982,
+      "tokens": 8439.952380952382,
+      "latency": 278.53,
+      "truncated": 0.0,
+      "unreachable": null,
+      "malformed": null,
+      "parts": {
+       "aime": 96.66666666666667,
+       "hmmt": 78.78787878787878
+      }
+     },
+     "lcb": {
+      "value": 67.5,
+      "unit": "%",
+      "n": 40,
+      "lo": 52.017458088898,
+      "hi": 79.91568303733828,
+      "tokens": 5080.725,
+      "latency": 96.405,
+      "truncated": 0.0,
+      "unreachable": null,
+      "malformed": null,
+      "parts": {}
+     },
+     "mrcr": {
+      "value": 19.976212861609604,
+      "unit": "%",
+      "n": 20,
+      "lo": 6.052185952140987,
+      "hi": 33.90023977107822,
+      "tokens": 1512.45,
+      "latency": 94.22,
+      "truncated": 0.0,
+      "unreachable": null,
+      "malformed": null,
+      "parts": {
+       "131072": 26.587422183302788,
+       "16384": 21.058865062800542,
+       "32768": 7.549101100717088,
+       "65536": 24.709463099618
+      }
+     },
+     "graphwalks": {
+      "value": 85.85224436309177,
+      "unit": "%",
+      "n": 16,
+      "lo": 69.78873652981045,
+      "hi": 100.0,
+      "tokens": 10518.375,
+      "latency": 336.105,
+      "truncated": 6.25,
+      "unreachable": null,
+      "malformed": null,
+      "parts": {
+       "16384": 72.71570014144272,
+       "32768": 75.0,
+       "65536": 96.42857142857143,
+       "8192": 99.26470588235294
+      }
+     },
+     "tools": {
+      "value": 94.73684210526315,
+      "unit": "%",
+      "n": 38,
+      "lo": 82.71423311893115,
+      "hi": 98.54460975514631,
+      "tokens": 250.26315789473685,
+      "latency": 17.200000000000003,
+      "truncated": 0.0,
+      "unreachable": null,
+      "malformed": 0.0,
+      "parts": {
+       "clarify": 100.0,
+       "conditional": 100.0,
+       "distractor": 100.0,
+       "irrelevant": 100.0,
+       "multi-turn": 100.0,
+       "parallel": 100.0,
+       "policy": 100.0,
+       "recovery": 100.0,
+       "sequential": 81.81818181818183,
+       "single": 100.0
+      }
+     }
+    },
+    "qualityFrom": null,
+    "deviceClass": "gpu",
+    "capacity": {
+     "slots": 16,
+     "context": 262144,
+     "pool": 262144
+    },
+    "warnings": [],
+    "energy": {
+     "perCorrect": {
+      "value": 2.9118775141701607,
+      "unit": "Wh",
+      "n": 216,
+      "lo": null,
+      "hi": null
+     },
+     "quality": {
+      "value": 628.184,
+      "unit": "Wh",
+      "n": 6,
+      "lo": null,
+      "hi": null
+     }
+    },
+    "speed": {
+     "conc.1": {
+      "value": 219.0,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 219.0,
+      "hi": 219.0
+     },
+     "conc.16": {
+      "value": 315.9,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 315.9,
+      "hi": 315.9
+     },
+     "conc.4": {
+      "value": 260.2,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 260.2,
+      "hi": 260.2
+     },
+     "decode": {
+      "value": 236.60666666666668,
+      "unit": "tok/s",
+      "n": 3,
+      "lo": null,
+      "hi": null
+     },
+     "decode.code-v1": {
+      "value": 288.41,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 288.41,
+      "hi": 288.41
+     },
+     "decode.prose-v1": {
+      "value": 192.4,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 192.4,
+      "hi": 192.4
+     },
+     "decode.reasoning-v1": {
+      "value": 229.01,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 229.01,
+      "hi": 229.01
+     },
+     "decode_at.1000": {
+      "value": 185.16,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 185.16,
+      "hi": 185.16
+     },
+     "decode_at.120000": {
+      "value": 178.71,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 178.71,
+      "hi": 178.71
+     },
+     "decode_at.32000": {
+      "value": 219.21,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 219.21,
+      "hi": 219.21
+     },
+     "energy": {
+      "value": 1.1923997087479627,
+      "unit": "J/token",
+      "n": 1,
+      "lo": null,
+      "hi": null
+     },
+     "peak": {
+      "value": 315.9,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 315.9,
+      "hi": 315.9
+     },
+     "peak_at": {
+      "value": 16.0,
+      "unit": "requests",
+      "n": 1,
+      "lo": null,
+      "hi": null
+     },
+     "power": {
+      "value": 343.9,
+      "unit": "W",
+      "n": 1,
+      "lo": null,
+      "hi": null
+     },
+     "prefill.1000": {
+      "value": 2987.4,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 2987.4,
+      "hi": 2987.4
+     },
+     "prefill.120000": {
+      "value": 3026.0,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 3026.0,
+      "hi": 3026.0
+     },
+     "prefill.32000": {
+      "value": 3525.3,
+      "unit": "tok/s",
+      "n": 1,
+      "lo": 3525.3,
+      "hi": 3525.3
+     },
+     "temp": {
+      "value": 49.0,
+      "unit": "C",
+      "n": 1,
+      "lo": null,
+      "hi": null
+     },
+     "ttft.1000": {
+      "value": 0.3796,
+      "unit": "s",
+      "n": 1,
+      "lo": 0.3796,
+      "hi": 0.3796
+     },
+     "ttft.120000": {
+      "value": 41.567,
+      "unit": "s",
+      "n": 1,
+      "lo": 41.567,
+      "hi": 41.567
+     },
+     "ttft.32000": {
+      "value": 9.5971,
+      "unit": "s",
+      "n": 1,
+      "lo": 9.5971,
+      "hi": 9.5971
+     },
+     "ttft.short": {
+      "value": 188.9,
+      "unit": "ms",
+      "n": 3,
+      "lo": 157.4,
+      "hi": 196.8
+     }
+    },
+    "thermal": {},
+    "battery": {},
+    "verdict": null,
+    "repeats": {
+     "runs": 1,
+     "spread": null
+    },
+    "lmx": {},
+    "submissions": [],
+    "server": {
+     "load_s": 15.8,
+     "model_path": "/mnt/nvme8tb/llama-models/nemotron-bolt-abliterated/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-Abliterated-24GB.gguf",
+     "n_ctx": 262144,
+     "total_slots": 16,
+     "build": {
+      "engine": "llama.cpp",
+      "build": "b1-b76b133"
+     },
+     "capacity": {
+      "slots": 16,
+      "context": 262144,
+      "pool": 262144
+     },
+     "weights": "666250fc4f8c07bfbdde5e80785cc69fd1c208f12ccdf8d988d472e3ee24ddcc",
+     "probe": {
+      "prompt": "List the first eight prime numbers, separated by spaces, and nothing else.",
+      "answer": "The user wants the first eight prime numbers separated by spaces and nothing else. First eight primes: 2, 3, 5, 7, 11, 13, 17, 19. Need output exactly that, nothing else. Ensure no extra text.2 3"
+     }
+    },
+    "history": [
+     {
+      "id": "20261018-215257-nemotron-3.5-bolt-74b-a9b-24gb-abliterated-gguf",
+      "suite": "quick/v1",
+      "effort": "medium",
+      "finished": 1792359254.4852746,
+      "index": 70.74694186025049,
+      "decode": 236.60666666666668
+     }
+    ]
+   },
+   {
     "id": "gemma4-e2b-gguf",
-    "name": "Gemma 4 E2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 128k",
+    "name": "Gemma 4 E2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 128K",
     "engine": "llama.cpp",
     "quantization": "Q4_K_M",
     "spec": null,
@@ -5892,7 +7353,7 @@
    },
    {
     "id": "lfm2_5-2_6b-gguf",
-    "name": "LFM2.5 2.6B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+    "name": "LFM2.5 2.6B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
     "engine": "llama.cpp",
     "quantization": "Q4_K_M",
     "spec": null,
@@ -6239,7 +7700,7 @@
    },
    {
     "id": "qwen3-4b-instruct-gguf",
-    "name": "Qwen3 4B Instruct \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+    "name": "Qwen3 4B Instruct \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
     "engine": "llama.cpp",
     "quantization": "Q4_K_M",
     "spec": null,
@@ -6460,7 +7921,7 @@
    },
    {
     "id": "qwen3.5-2b-gguf",
-    "name": "Qwen3.5 2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+    "name": "Qwen3.5 2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
     "engine": "llama.cpp",
     "quantization": "Q4_K_M",
     "spec": null,
@@ -6681,7 +8142,7 @@
    },
    {
     "id": "lfm2-1_2b-gguf",
-    "name": "LFM2 1.2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+    "name": "LFM2 1.2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
     "engine": "llama.cpp",
     "quantization": "Q4_K_M",
     "spec": null,
@@ -6900,7 +8361,7 @@
    },
    {
     "id": "gemma3-1b-gguf",
-    "name": "Gemma 3 1B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+    "name": "Gemma 3 1B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
     "engine": "llama.cpp",
     "quantization": "Q4_K_M",
     "spec": null,
@@ -7129,7 +8590,7 @@
    },
    {
     "id": "qwen3-0_6b-gguf",
-    "name": "Qwen3 0.6B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+    "name": "Qwen3 0.6B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
     "engine": "llama.cpp",
     "quantization": "Q4_K_M",
     "spec": null,
@@ -7347,7 +8808,7 @@
    },
    {
     "id": "qwen3-1_7b-gguf",
-    "name": "Qwen3 1.7B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+    "name": "Qwen3 1.7B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
     "engine": "llama.cpp",
     "quantization": "Q4_K_M",
     "spec": null,
@@ -7567,7 +9028,7 @@
   "max": [
    {
     "id": "nemotron-3.5-bolt-74b-a9b-24gb-gguf",
-    "name": "Nemotron 3.5 Bolt 74B-A9B \u00b7 llama.cpp \u00b7 IQ2 24GB \u00b7 DFlash",
+    "name": "Nemotron 3.5 Bolt 74B \u00b7 llama.cpp \u00b7 IQ2 \u00b7 DFlash \u00b7 256K",
     "engine": "llama.cpp",
     "quantization": "IQ2_XXS",
     "spec": "DFlash",
@@ -8006,7 +9467,7 @@
    },
    {
     "id": "nemotron-3.5-super-vl-120b-nvfp4",
-    "name": "Nemotron 3.5 Super VL 120B \u00b7 vLLM \u00b7 NVFP4 \u00b7 MTP",
+    "name": "Nemotron 3.5 Super VL 120B \u00b7 vLLM \u00b7 NVFP4 \u00b7 MTP \u00b7 256K",
     "engine": "vllm",
     "quantization": "NVFP4",
     "spec": "MTP",
@@ -8446,7 +9907,7 @@
    },
    {
     "id": "kolibri-1-gguf",
-    "name": "Kolibri 1 78B-A3B \u00b7 llama.cpp \u00b7 Q5_K_M \u00b7 160k",
+    "name": "Kolibri 1 78B-A3B \u00b7 llama.cpp \u00b7 Q5_K_M \u00b7 160K",
     "engine": "llama.cpp",
     "quantization": "Q5_K_M",
     "spec": null,
@@ -8862,7 +10323,7 @@
    },
    {
     "id": "mimo-v2.6-distill-9b-gguf",
-    "name": "MiMo-V2.6 Distill Qwen 9B \u00b7 llama.cpp \u00b7 Q5_K_M \u00b7 262k",
+    "name": "MiMo-V2.6 Distill Qwen 9B \u00b7 llama.cpp \u00b7 Q5_K_M \u00b7 256K",
     "engine": "llama.cpp",
     "quantization": "Q5_K_M",
     "spec": null,
@@ -9714,7 +11175,7 @@
    },
    {
     "id": "pennyroyal",
-    "name": "Qwen 3.8 27B \u00b7 SGLang \u00b7 DFlash2 \u00b7 524K",
+    "name": "Qwen 3.8 27B \u00b7 Uncensored \u00b7 SGLang \u00b7 FP8 \u00b7 DFlash2 \u00b7 512K",
     "engine": "sglang",
     "quantization": "FP8",
     "spec": "DFlash2",
@@ -10597,7 +12058,7 @@
   "none": [
    {
     "id": "qwen3.5-2b-gguf",
-    "name": "Qwen3.5 2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+    "name": "Qwen3.5 2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
     "engine": "llama.cpp",
     "quantization": "Q4_K_M",
     "spec": null,
@@ -10845,7 +12306,7 @@
   {
    "run": "20260911-233400-pennyroyal",
    "model": "pennyroyal",
-   "name": "Qwen 3.8 27B \u00b7 SGLang \u00b7 DFlash2 \u00b7 524K",
+   "name": "Qwen 3.8 27B \u00b7 Uncensored \u00b7 SGLang \u00b7 FP8 \u00b7 DFlash2 \u00b7 512K",
    "effort": "max",
    "suite": "full/v1",
    "version": "1",
@@ -10891,7 +12352,7 @@
   {
    "run": "20260914-201004-lfm2-1_2b-gguf",
    "model": "lfm2-1_2b-gguf",
-   "name": "LFM2 1.2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+   "name": "LFM2 1.2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
    "effort": "medium",
    "suite": "full/v1",
    "version": "1",
@@ -10914,7 +12375,7 @@
   {
    "run": "20260914-214153-gemma3-1b-gguf",
    "model": "gemma3-1b-gguf",
-   "name": "Gemma 3 1B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+   "name": "Gemma 3 1B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
    "effort": "medium",
    "suite": "full/v1",
    "version": "1",
@@ -10937,7 +12398,7 @@
   {
    "run": "20260914-222333-gemma3-1b-gguf",
    "model": "gemma3-1b-gguf",
-   "name": "Gemma 3 1B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+   "name": "Gemma 3 1B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
    "effort": "medium",
    "suite": "full/v1",
    "version": "1",
@@ -10960,7 +12421,7 @@
   {
    "run": "20260914-222334-lfm2-1_2b-gguf",
    "model": "lfm2-1_2b-gguf",
-   "name": "LFM2 1.2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+   "name": "LFM2 1.2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
    "effort": "medium",
    "suite": "full/v1",
    "version": "1",
@@ -10983,7 +12444,7 @@
   {
    "run": "20260915-012817-qwen3-4b-instruct-gguf",
    "model": "qwen3-4b-instruct-gguf",
-   "name": "Qwen3 4B Instruct \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+   "name": "Qwen3 4B Instruct \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
    "effort": "medium",
    "suite": "full/v1",
    "version": "1",
@@ -11006,7 +12467,7 @@
   {
    "run": "20260914-222332-qwen3-0_6b-gguf",
    "model": "qwen3-0_6b-gguf",
-   "name": "Qwen3 0.6B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+   "name": "Qwen3 0.6B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
    "effort": "medium",
    "suite": "full/v1",
    "version": "1",
@@ -11029,7 +12490,7 @@
   {
    "run": "20260914-222331-qwen3-1_7b-gguf",
    "model": "qwen3-1_7b-gguf",
-   "name": "Qwen3 1.7B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+   "name": "Qwen3 1.7B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
    "effort": "medium",
    "suite": "full/v1",
    "version": "1",
@@ -11052,7 +12513,7 @@
   {
    "run": "20260915-012817-qwen3.5-2b-gguf",
    "model": "qwen3.5-2b-gguf",
-   "name": "Qwen3.5 2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+   "name": "Qwen3.5 2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
    "effort": "medium",
    "suite": "full/v1",
    "version": "1",
@@ -11075,7 +12536,7 @@
   {
    "run": "20260915-073524-qwen3.5-2b-gguf",
    "model": "qwen3.5-2b-gguf",
-   "name": "Qwen3.5 2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+   "name": "Qwen3.5 2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
    "effort": "none",
    "suite": "full/v1",
    "version": "1",
@@ -11098,7 +12559,7 @@
   {
    "run": "20260915-095921-qwen3-4b-instruct-gguf",
    "model": "qwen3-4b-instruct-gguf",
-   "name": "Qwen3 4B Instruct \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+   "name": "Qwen3 4B Instruct \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
    "effort": "medium",
    "suite": "full/v1",
    "version": "1",
@@ -11121,7 +12582,7 @@
   {
    "run": "20260916-232854-lfm2_5-2_6b-gguf",
    "model": "lfm2_5-2_6b-gguf",
-   "name": "LFM2.5 2.6B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16k",
+   "name": "LFM2.5 2.6B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 16K",
    "effort": "medium",
    "suite": "full/v1",
    "version": "1",
@@ -11144,7 +12605,7 @@
   {
    "run": "20260918-101339-gemma4-e2b-gguf",
    "model": "gemma4-e2b-gguf",
-   "name": "Gemma 4 E2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 128k",
+   "name": "Gemma 4 E2B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 128K",
    "effort": "medium",
    "suite": "full/v1",
    "version": "1",
@@ -11167,7 +12628,7 @@
   {
    "run": "20260923-124151-mimo-v2.6-distill-9b-gguf",
    "model": "mimo-v2.6-distill-9b-gguf",
-   "name": "MiMo-V2.6 Distill Qwen 9B \u00b7 llama.cpp \u00b7 Q5_K_M \u00b7 262k",
+   "name": "MiMo-V2.6 Distill Qwen 9B \u00b7 llama.cpp \u00b7 Q5_K_M \u00b7 256K",
    "effort": "max",
    "suite": "full/v1",
    "version": "1",
@@ -11190,7 +12651,7 @@
   {
    "run": "20261009-021625-kolibri-1-gguf",
    "model": "kolibri-1-gguf",
-   "name": "Kolibri 1 78B-A3B \u00b7 llama.cpp \u00b7 Q5_K_M \u00b7 160k",
+   "name": "Kolibri 1 78B-A3B \u00b7 llama.cpp \u00b7 Q5_K_M \u00b7 160K",
    "effort": "max",
    "suite": "full/v1",
    "version": "1",
@@ -11213,7 +12674,7 @@
   {
    "run": "20261016-005434-nemotron-3.5-super-vl-120b-nvfp4",
    "model": "nemotron-3.5-super-vl-120b-nvfp4",
-   "name": "Nemotron 3.5 Super VL 120B \u00b7 vLLM \u00b7 NVFP4 \u00b7 MTP",
+   "name": "Nemotron 3.5 Super VL 120B \u00b7 vLLM \u00b7 NVFP4 \u00b7 MTP \u00b7 256K",
    "effort": "max",
    "suite": "full/v1",
    "version": "1",
@@ -11236,7 +12697,7 @@
   {
    "run": "20261016-015458-nemotron-3.5-bolt-74b-a9b-24gb-gguf",
    "model": "nemotron-3.5-bolt-74b-a9b-24gb-gguf",
-   "name": "Nemotron 3.5 Bolt 74B-A9B \u00b7 llama.cpp \u00b7 IQ2 24GB \u00b7 DFlash",
+   "name": "Nemotron 3.5 Bolt 74B \u00b7 llama.cpp \u00b7 IQ2 \u00b7 DFlash \u00b7 256K",
    "effort": "max",
    "suite": "full/v1",
    "version": "1",
@@ -11250,6 +12711,52 @@
    "energyPerCorrect": 6.537874395743929,
    "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
    "driver": "615.71.09",
+   "build": "llama.cpp b1-b76b133",
+   "debut": true,
+   "record": false,
+   "delta": null,
+   "previous": null
+  },
+  {
+   "run": "20261018-215257-nemotron-3.5-bolt-74b-a9b-24gb-abliterated-gguf",
+   "model": "nemotron-3.5-bolt-74b-a9b-24gb-abliterated-gguf",
+   "name": "Nemotron 3.5 Bolt 74B \u00b7 Uncensored \u00b7 llama.cpp \u00b7 IQ2 \u00b7 DFlash \u00b7 256K",
+   "effort": "medium",
+   "suite": "quick/v1",
+   "version": "1",
+   "kind": "quick",
+   "finished": 1792359254.4852746,
+   "index": 70.74694186025049,
+   "lo": 66.34745552040403,
+   "hi": 75.08361547162473,
+   "decode": 236.60666666666668,
+   "peak": 315.9,
+   "energyPerCorrect": 2.9118775141701607,
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+   "driver": "615.78.08",
+   "build": "llama.cpp b1-b76b133",
+   "debut": true,
+   "record": false,
+   "delta": null,
+   "previous": null
+  },
+  {
+   "run": "20261021-200855-nemotron-3.5-lightning-30b-a3b-darkstar-gguf",
+   "model": "nemotron-3.5-lightning-30b-a3b-darkstar-gguf",
+   "name": "Nemotron 3.5 Lightning 30B \u00b7 Uncensored \u00b7 llama.cpp \u00b7 Q8 \u00b7 DFlash \u00b7 256K",
+   "effort": "medium",
+   "suite": "quick/v1",
+   "version": "1",
+   "kind": "quick",
+   "finished": 1792618614.4299953,
+   "index": 66.12818995636326,
+   "lo": 61.249389602962125,
+   "hi": 70.81609284265126,
+   "decode": 285.1766666666667,
+   "peak": 432.6,
+   "energyPerCorrect": 8.038962068004606,
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+   "driver": "615.78.08",
    "build": "llama.cpp b1-b76b133",
    "debut": true,
    "record": false,

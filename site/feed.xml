@@ -3,14 +3,28 @@
   <id>https://guitaripod.github.io/blackwall/</id>
   <title>Blackwall</title>
   <subtitle>New results on one NVIDIA RTX PRO 6000 Blackwell, in the order they finished.</subtitle>
-  <updated>2026-10-17T18:47:51Z</updated>
+  <updated>2026-10-21T21:36:54Z</updated>
   <author><name>Blackwall</name></author>
   <generator version="2.2.0">blackwall</generator>
   <link rel="self" type="application/atom+xml" href="https://guitaripod.github.io/blackwall/feed.xml"/>
   <link rel="alternate" type="text/html" href="https://guitaripod.github.io/blackwall/"/>
   <entry>
+    <id>tag:guitaripod.github.io,2026-10-21:run/20261021-200855-nemotron-3.5-lightning-30b-a3b-darkstar-gguf</id>
+    <title>Nemotron 3.5 Lightning 30B: 66.1 quality (debut)</title>
+    <updated>2026-10-21T21:36:54Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#nemotron-3.5-lightning-30b-a3b-darkstar-gguf~medium"/>
+    <summary>Medium effort, suite quick/v1. Quality index 66.1 (95% interval 61.2 to 70.8). 285 tok/s decoding one request, 433 tok/s at peak, 8.04 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 615.78.08, llama.cpp b1-b76b133. A quick run, ranked as provisional.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-10-18:run/20261018-215257-nemotron-3.5-bolt-74b-a9b-24gb-abliterated-gguf</id>
+    <title>Nemotron 3.5 Bolt 74B: 70.7 quality (debut)</title>
+    <updated>2026-10-18T21:34:14Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#nemotron-3.5-bolt-74b-a9b-24gb-abliterated-gguf~medium"/>
+    <summary>Medium effort, suite quick/v1. Quality index 70.7 (95% interval 66.3 to 75.1). 237 tok/s decoding one request, 316 tok/s at peak, 2.91 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 615.78.08, llama.cpp b1-b76b133. A quick run, ranked as provisional.</summary>
+  </entry>
+  <entry>
     <id>tag:guitaripod.github.io,2026-10-17:run/20261016-015458-nemotron-3.5-bolt-74b-a9b-24gb-gguf</id>
-    <title>Nemotron 3.5 Bolt 74B-A9B: 71.4 quality (debut)</title>
+    <title>Nemotron 3.5 Bolt 74B: 71.4 quality (debut)</title>
     <updated>2026-10-17T18:47:51Z</updated>
     <link rel="alternate" href="https://guitaripod.github.io/blackwall/#nemotron-3.5-bolt-74b-a9b-24gb-gguf~max"/>
     <summary>Max effort, suite full/v1. Quality index 71.4 (95% interval 68.5 to 74.2). 267 tok/s decoding one request, 363 tok/s at peak, 6.54 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 615.71.09, llama.cpp b1-b76b133.</summary>
