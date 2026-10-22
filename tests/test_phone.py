@@ -619,19 +619,21 @@ def test_a_lone_run_always_gives_way(tmp_path, monkeypatch):
     assert worker.MemoryGuard(None, None, None).gives_way()
 
 
-def test_only_one_run_reads_a_question_set_at_a_time(tmp_path, monkeypatch):
+def hold_the_build_lock(cache, order, index):
+    from blackwall import datasets, paths
+    paths.CACHE = cache
+    with datasets.one_builder_at_a_time():
+        order.append(f"in{index}")
+        time.sleep(0.2)
+        order.append(f"out{index}")
+
+
+def test_only_one_run_reads_a_question_set_at_a_time(tmp_path):
     import multiprocessing
-    from blackwall import datasets
-    monkeypatch.setattr("blackwall.paths.CACHE", tmp_path)
     order = multiprocessing.Manager().list()
 
-    def hold(index):
-        with datasets.one_builder_at_a_time():
-            order.append(f"in{index}")
-            time.sleep(0.2)
-            order.append(f"out{index}")
-
-    workers = [multiprocessing.Process(target=hold, args=(index,)) for index in range(3)]
+    workers = [multiprocessing.Process(target=hold_the_build_lock, args=(tmp_path, order, index))
+               for index in range(3)]
     for worker in workers:
         worker.start()
     for worker in workers:
