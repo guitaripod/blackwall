@@ -131,3 +131,24 @@ def test_parking_counts_and_keeps_the_rest_of_the_flags(world):
     run = store.get_run(db, "r")
     assert run["status"] == "scheduled" and run["flags"]["window"] == NIGHT
     assert run["flags"]["not_before"] == 456.0 and run["flags"]["parked"] == "gave the GPU to x"
+
+
+def test_a_run_that_gave_the_gpu_away_keeps_its_place(world):
+    db, actions = world
+    night = datetime(2026, 9, 12, 3, 0)
+    add(db, "parked", "scheduled", datetime(2026, 9, 12, 3, 10), created=1.0, yielded=1, parked="gave the GPU to cs2")
+    add(db, "fresh", "scheduled", night, created=2.0)
+    assert schedule.tick(db, datetime(2026, 9, 12, 3, 0)) is None
+    assert store.get_run(db, "fresh")["status"] == "scheduled"
+    assert schedule.tick(db, datetime(2026, 9, 12, 3, 10)) == "parked"
+    store.update_run(db, "parked", status="complete")
+    assert schedule.tick(db, datetime(2026, 9, 12, 3, 11)) == "fresh"
+    assert actions == [("spawn", "parked"), ("spawn", "fresh"), ("timer off",)]
+
+
+def test_the_hold_expires_so_a_long_game_does_not_idle_the_card(world):
+    db, actions = world
+    night = datetime(2026, 9, 12, 3, 0)
+    add(db, "parked", "scheduled", datetime(2026, 9, 12, 3, 10), created=1.0, yielded=3, parked="gave the GPU to cs2")
+    add(db, "fresh", "scheduled", night, created=2.0)
+    assert schedule.tick(db, datetime(2026, 9, 12, 3, 26)) == "fresh"

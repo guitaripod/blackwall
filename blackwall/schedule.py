@@ -10,6 +10,7 @@ from . import gpu, notify, paths, store, swap, units
 TIMER = "blackwall-tick"
 UNIT_DIR = Path(os.environ.get("XDG_CONFIG_HOME", paths.HOME / ".config")) / "systemd" / "user"
 PASSED_ENV = ("XDG_CACHE_HOME", "XDG_CONFIG_HOME")
+RESUME_HOLD_S = 900
 
 
 def parse_clock(text):
@@ -139,6 +140,16 @@ def due(run, moment):
     return ((run.get("flags") or {}).get("not_before") or 0) <= moment.timestamp()
 
 
+def holds_the_card(run, moment):
+    """A run that gave the card away keeps its place for a while. It has already measured most of a suite, and a run
+    that has never started must not take the card from it over a retry that is minutes away: that is how a queued
+    model jumps one that is three hours in. Past the hold the queue moves on, so a long game still lets fresh work
+    through rather than idling the card."""
+    flags = run.get("flags") or {}
+    return (run["status"] == "scheduled" and bool(flags.get("yielded")) and bool(flags.get("parked"))
+            and (flags.get("not_before") or 0) + RESUME_HOLD_S > moment.timestamp())
+
+
 def tick(db, moment=None):
     """Pauses runs whose window has closed, then starts every due scheduled run whose device is free; returns the
     first one it started. A phone and the card are separate machines, so one never waits for the other."""
@@ -153,7 +164,11 @@ def tick(db, moment=None):
                      key=lambda run: ((run.get("flags") or {}).get("not_before") or 0, run.get("created") or 0))
     contended = None
     for run in waiting:
-        if units.busy(runs, units.device_class(run), speed=units.measures_speed(run)):
+        device = units.device_class(run)
+        if units.busy(runs, device, speed=units.measures_speed(run)):
+            continue
+        if any(other["id"] != run["id"] and units.device_class(other) == device and holds_the_card(other, moment)
+               for other in runs):
             continue
         flags = run.get("flags") or {}
         if not in_window(moment, flags.get("window")):
