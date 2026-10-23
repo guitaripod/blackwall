@@ -18,7 +18,7 @@ GPU_WAIT_S = 1800
 CARD_CHECK_S = 15
 GPU_CHECK_S = 30
 YIELD_STRIKES = 2
-YIELD_RETRY_S = 600
+YIELD_RETRY_S = 300
 MEMORY_RETRY_S = 120
 RAM_SUSTAIN_S = 45
 MEMORY_CHECK_S = 5
@@ -187,7 +187,9 @@ class CardGuard(threading.Thread):
 
 
 class GpuWatch(threading.Thread):
-    """For runs that give way: stops the run once another program has used the GPU for a minute (a game, ComfyUI)."""
+    """For runs that give way: stops the run once another program has used the GPU for a minute. Strict while a speed
+    number is being measured, since anything sharing the card spoils it; relaxed while quality runs, where only work
+    that could starve the server counts."""
 
     def __init__(self, halt, events):
         super().__init__(daemon=True)
@@ -195,11 +197,12 @@ class GpuWatch(threading.Thread):
         self.events = events
         self.stopped = threading.Event()
         self.found = []
+        self.strict = True
 
     def run(self):
         strikes = 0
         while not self.stopped.wait(GPU_CHECK_S):
-            found = gpu.contention(samples=2)
+            found = gpu.contention(samples=2, strict=self.strict)
             strikes = strikes + 1 if found else 0
             if strikes >= YIELD_STRIKES:
                 self.found = found
@@ -333,7 +336,7 @@ def give_way(db, run, events, found, host, retry_s=YIELD_RETRY_S):
     schedule.install_timer()
     events.emit("yielded", to=names, retry=schedule.describe(resumes))
     if count == 1:
-        notify.send("Blackwall gave way", f"{run['model']} paused while {names} uses the GPU; it tries again every ten minutes",
+        notify.send("Blackwall gave way", f"{run['model']} paused while {names} uses the GPU; it tries again every five minutes",
                     run=run["id"], status="yielded")
 
 
@@ -425,7 +428,8 @@ def execute(run_id):
             park_for_window(db, run, events, window, host)
             return
         if schedule.gives_way(flags) and host.kind == "gpu":
-            found = host.contention()
+            measuring_speed = "speed" in tasks and not (run_dir / "speed.json").exists()
+            found = host.contention(strict=measuring_speed)
             if found:
                 give_way(db, run, events, found, host)
                 return
@@ -471,6 +475,8 @@ def execute(run_id):
             levels = [each for each in spec["speed"]["concurrency"] if each <= slots] or [1]
             contention += measure_speed(db, run_id, profile, spec["speed"], level, run_dir, events, halt, levels,
                                         context, host)
+            if watch:
+                watch.strict = False
         sampler = host.sampler(interval_ms=1000)
         runner = engine.QualityRunner(profile, run_dir, level, events.progress, halt, capacity["slots"], capacity["pool"],
                                       deadline)
@@ -512,7 +518,11 @@ def execute(run_id):
         store.set_metrics(db, run_id, metrics.energy_metrics(run_dir))
         if flags.get("submit"):
             which = flags["submit"] if flags["submit"] in lmx.SUBMIT_CHOICES else "all"
+            if watch:
+                watch.strict = True
             submit(db, run_id, profile, level, run_dir, events, which)
+            if watch:
+                watch.strict = False
         flags = {**((store.get_run(db, run_id) or {}).get("flags") or flags),
                  "contended": sorted(set(contention)), "failed_items": failed_items}
         flags.pop("parked", None)

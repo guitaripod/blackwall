@@ -2,6 +2,12 @@
 
 All notable changes to Blackwall are listed here, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the versions follow [Semantic Versioning](https://semver.org/). The published `board.json` carries its own `schema` number, described in [docs/data.md](docs/data.md).
 
+## [Unreleased]
+
+### Changed
+- **A browser no longer parks a quality run.** Yielding is now graded: while a speed number is being measured, anything else using the card still stops the run at 25% of the SMs or 4 GB, but during quality — where the score does not depend on how fast the answer arrives — only work that could starve the server does: 60% of the SMs, 4 GB held, or under 4 GB of VRAM free. A video-calling browser that used to park a three-hour pass every ten minutes now runs alongside it.
+- A parked run retries after five minutes instead of ten.
+
 ## [2.2.0] - 2026-10-17
 
 ### Added

@@ -48,8 +48,8 @@ class GpuHost:
     def sampler(self, interval_ms=1000):
         return gpu.Sampler(interval_ms=interval_ms)
 
-    def contention(self, samples=3):
-        return gpu.contention(samples=samples)
+    def contention(self, samples=3, strict=True):
+        return gpu.contention(samples=samples, strict=strict)
 
     def describe_contention(self, found):
         return gpu.describe_contention(found)

@@ -79,3 +79,37 @@ def test_capacity_from_each_kind_of_server():
     vllm = {"endpoint": "/v1/models", "info": {"data": [{"id": "m", "max_model_len": 32768}]}}
     assert swap.capacity(vllm) == {"slots": None, "context": 32768, "pool": None}
     assert swap.capacity({}) == {"slots": None, "context": None, "pool": None}
+
+
+BROWSER = ("    0    2959442   C+G     32      1      -      -      -      -   600      0    vivaldi-bin\n")
+
+
+def test_a_browser_only_stops_a_speed_measurement(monkeypatch):
+    mixed = PMON + BROWSER
+    monkeypatch.setattr(gpu.subprocess, "run", lambda *args, **kwargs: SimpleNamespace(stdout=mixed, returncode=0))
+    arguments = {777777: ["/mnt/sglang/.venv/bin/python", "-m", "sglang", "serve"], 2959442: [GAME]}
+    monkeypatch.setattr(gpu, "argv", lambda pid: arguments.get(pid, []))
+    monkeypatch.setattr(gpu, "parent_of", lambda pid: 1)
+    monkeypatch.setattr(gpu, "free_mib", lambda: 60_000)
+    strict = [(process["name"], process["severity"]) for process in gpu.contention(strict=True)]
+    relaxed = [(process["name"], process["severity"]) for process in gpu.contention(strict=False)]
+    assert strict == [("Borderlands4.exe", "severe")]
+    assert relaxed == [("Borderlands4.exe", "severe")]
+
+
+def test_a_light_desktop_share_is_mild_and_a_starved_card_is_severe(monkeypatch):
+    light = PMON.replace("    0       1673   C+G      2      0", "    0       1673   C+G     31      0")
+    monkeypatch.setattr(gpu.subprocess, "run", lambda *args, **kwargs: SimpleNamespace(stdout=light, returncode=0))
+    arguments = {1673: ["/opt/vivaldi/vivaldi-bin", "--type=gpu-process"], 777777: ["python", "-m", "sglang", "serve"],
+                 2959442: [GAME]}
+    monkeypatch.setattr(gpu, "argv", lambda pid: arguments.get(pid, []))
+    monkeypatch.setattr(gpu, "parent_of", lambda pid: 1)
+    monkeypatch.setattr(gpu, "free_mib", lambda: 60_000)
+    assert [process["severity"] for process in gpu.contention(strict=True)] == ["mild", "severe"]
+    assert [process["severity"] for process in gpu.contention(strict=False)] == ["severe"]
+    monkeypatch.setattr(gpu, "free_mib", lambda: 2_048)
+    starved = gpu.contention(strict=False)
+    assert [process["name"] for process in starved] == ["Borderlands4.exe"]
+    quiet = PMON.replace("81     40", " 1      0").replace("79     38", " 1      0").replace(" 9085", "    300")
+    monkeypatch.setattr(gpu.subprocess, "run", lambda *args, **kwargs: SimpleNamespace(stdout=quiet, returncode=0))
+    assert gpu.describe_contention(gpu.contention(strict=False)) == "a card with 2.0 GB free"

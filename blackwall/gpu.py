@@ -10,7 +10,9 @@ DISPLAY_PROCESS_NAMES = ("kwin_wayland", "kwin_x11", "Xwayland", "Xorg", "gnome-
                          "niri", "weston")
 INTERPRETERS = ("python", "node", "bun", "deno", "java", "ruby", "perl", "bash", "sh")
 BUSY_SM_PERCENT = 25
+BUSY_SM_SEVERE = 60
 HEAVY_MIB = 4096
+FREE_MIB_FLOOR = 4096
 
 
 class Sampler:
@@ -169,18 +171,50 @@ def processes(samples=3):
              "mib": int(mib[pid]), "server": is_server(pid)} for pid in names]
 
 
-def contention(samples=3):
-    """Other GPU work big enough to matter: a process outside the model servers using a quarter of the GPU or holding
-    4 GB, like a game or ComfyUI. A browser tab stays under both. The compositor and the X server never count, even
-    past a quarter of the GPU while a video plays or an X11 window redraws: whatever keeps them busy that is worth
-    stepping aside for is a GPU process of its own."""
-    return [process for process in processes(samples) if not process["server"]
-            and process["name"] not in DISPLAY_PROCESS_NAMES
-            and (process["sm"] >= BUSY_SM_PERCENT or process["mib"] >= HEAVY_MIB)]
+def free_mib():
+    """VRAM the card can still hand out; below the floor, a co-tenant can fail the model's next request."""
+    completed = subprocess.run(["nvidia-smi", "--query-gpu=memory.total,memory.used", "--format=csv,noheader,nounits"],
+                               capture_output=True, text=True, timeout=15)
+    try:
+        total, used = (float(part) for part in completed.stdout.strip().split(","))
+    except ValueError:
+        return None
+    return total - used
+
+
+def severity(process):
+    """How much another program can move a speed number. Severe means it could take the card or squeeze it dry: a game,
+    ComfyUI with models loaded. Mild is a share of the SMs that a speed run must not measure through but a quality run
+    can live with, because answers do not depend on how fast they arrive."""
+    if process["mib"] >= HEAVY_MIB or process["sm"] >= BUSY_SM_SEVERE:
+        return "severe"
+    if process["sm"] >= BUSY_SM_PERCENT:
+        return "mild"
+    return None
+
+
+def contention(samples=3, strict=True):
+    """Other GPU work big enough to matter. Strict is for speed: anything sharing the card spoils the number. Relaxed
+    is for quality, where only work that could starve the server (most of the SMs, or most of the free VRAM) stops a
+    run, so a browser tab no longer parks a three-hour quality pass for ten minutes a time."""
+    found = []
+    for process in processes(samples):
+        if process["server"] or process["name"] in DISPLAY_PROCESS_NAMES:
+            continue
+        grade = severity(process)
+        if grade is None or (grade == "mild" and not strict):
+            continue
+        found.append({**process, "severity": grade})
+    room = free_mib()
+    if room is not None and room < FREE_MIB_FLOOR and not found:
+        found.append({"name": f"a card with {room / 1024:.1f} GB free", "sm": 0.0, "mib": 0, "pid": 0,
+                      "server": False, "severity": "severe"})
+    return found
 
 
 def describe_contention(found):
-    return ", ".join(f"{process['name']} ({process['sm']:.0f}% GPU, {process['mib'] / 1024:.1f} GB)" for process in found)
+    return ", ".join(f"{process['name']} ({process['sm']:.0f}% GPU, {process['mib'] / 1024:.1f} GB)"
+                     if process["sm"] or process["mib"] else process["name"] for process in found)
 
 
 def health():
