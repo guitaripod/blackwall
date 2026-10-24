@@ -137,6 +137,7 @@ def test_a_run_that_gave_the_gpu_away_keeps_its_place(world):
     db, actions = world
     night = datetime(2026, 9, 12, 3, 0)
     add(db, "parked", "scheduled", datetime(2026, 9, 12, 3, 10), created=1.0, yielded=1, parked="gave the GPU to cs2")
+    store.update_run(db, "parked", started=1.0)
     add(db, "fresh", "scheduled", night, created=2.0)
     assert schedule.tick(db, datetime(2026, 9, 12, 3, 0)) is None
     assert store.get_run(db, "fresh")["status"] == "scheduled"
@@ -146,9 +147,21 @@ def test_a_run_that_gave_the_gpu_away_keeps_its_place(world):
     assert actions == [("spawn", "parked"), ("spawn", "fresh"), ("timer off",)]
 
 
-def test_the_hold_expires_so_a_long_game_does_not_idle_the_card(world):
+def test_a_long_game_does_not_hand_the_card_to_a_queued_run(world):
     db, actions = world
     night = datetime(2026, 9, 12, 3, 0)
-    add(db, "parked", "scheduled", datetime(2026, 9, 12, 3, 10), created=1.0, yielded=3, parked="gave the GPU to cs2")
+    add(db, "parked", "scheduled", night, created=1.0, yielded=9, parked="gave the GPU to cs2")
+    store.update_run(db, "parked", started=1.0)
     add(db, "fresh", "scheduled", night, created=2.0)
-    assert schedule.tick(db, datetime(2026, 9, 12, 3, 26)) == "fresh"
+    assert schedule.tick(db, datetime(2026, 9, 12, 5, 0)) == "parked"
+    store.update_run(db, "parked", status="cancelled")
+    assert schedule.tick(db, datetime(2026, 9, 12, 5, 5)) == "fresh"
+
+
+def test_a_run_waiting_for_its_window_does_not_hold_the_card(world):
+    db, actions = world
+    night = datetime(2026, 9, 12, 3, 0)
+    add(db, "paused", "scheduled", datetime(2026, 9, 13, 3, 0), created=1.0, paused=1, parked="the window closed")
+    store.update_run(db, "paused", started=1.0)
+    add(db, "fresh", "scheduled", night, created=2.0)
+    assert schedule.tick(db, datetime(2026, 9, 12, 3, 0)) == "fresh"

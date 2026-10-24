@@ -7,7 +7,7 @@ All notable changes to Blackwall are listed here, newest first. The format follo
 ### Changed
 - **A browser no longer parks a quality run.** Yielding is now graded: while a speed number is being measured, anything else using the card still stops the run at 25% of the SMs or 4 GB, but during quality — where the score does not depend on how fast the answer arrives — only work that could starve the server does: 60% of the SMs, 4 GB held, or under 4 GB of VRAM free. A video-calling browser that used to park a three-hour pass every ten minutes now runs alongside it.
 - A parked run retries after five minutes instead of ten.
-- **A run that gives the card away keeps its place.** For fifteen minutes of retries a queued run cannot take the card from a run that is three hours into a suite; past the hold the queue moves on, so a long game still does not idle the card.
+- **The queue drains before it fills.** A run that has started and not finished holds its device until it completes, however many times it gives way to a game, so a model queued behind it can no longer take the card while it waits out a retry. Runs parked by their own daily window do not hold the card.
 
 ## [2.2.0] - 2026-10-17
 

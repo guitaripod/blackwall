@@ -10,7 +10,6 @@ from . import gpu, notify, paths, store, swap, units
 TIMER = "blackwall-tick"
 UNIT_DIR = Path(os.environ.get("XDG_CONFIG_HOME", paths.HOME / ".config")) / "systemd" / "user"
 PASSED_ENV = ("XDG_CACHE_HOME", "XDG_CONFIG_HOME")
-RESUME_HOLD_S = 900
 
 
 def parse_clock(text):
@@ -140,14 +139,15 @@ def due(run, moment):
     return ((run.get("flags") or {}).get("not_before") or 0) <= moment.timestamp()
 
 
-def holds_the_card(run, moment):
-    """A run that gave the card away keeps its place for a while. It has already measured most of a suite, and a run
-    that has never started must not take the card from it over a retry that is minutes away: that is how a queued
-    model jumps one that is three hours in. Past the hold the queue moves on, so a long game still lets fresh work
-    through rather than idling the card."""
+def in_flight(run):
+    """A run that has started and has not finished: it is on the device, or waiting out the program that took it.
+    The queue drains before it fills, so a run three hours into a suite is never left half-measured because a model
+    queued behind it happened to be ready while it was giving the card away. A run parked by its own daily window is
+    not in flight: it is waiting for tomorrow, and the card should go to something that can use it tonight."""
     flags = run.get("flags") or {}
-    return (run["status"] == "scheduled" and bool(flags.get("yielded")) and bool(flags.get("parked"))
-            and (flags.get("not_before") or 0) + RESUME_HOLD_S > moment.timestamp())
+    if run["status"] in units.ACTIVE:
+        return True
+    return run["status"] == "scheduled" and bool(flags.get("yielded")) and run.get("started") is not None
 
 
 def tick(db, moment=None):
@@ -167,8 +167,8 @@ def tick(db, moment=None):
         device = units.device_class(run)
         if units.busy(runs, device, speed=units.measures_speed(run)):
             continue
-        if any(other["id"] != run["id"] and units.device_class(other) == device and holds_the_card(other, moment)
-               for other in runs):
+        if not run.get("started") and any(
+                other["id"] != run["id"] and units.device_class(other) == device and in_flight(other) for other in runs):
             continue
         flags = run.get("flags") or {}
         if not in_window(moment, flags.get("window")):
