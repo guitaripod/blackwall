@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -126,12 +127,20 @@ def describe(timestamp):
     return datetime.fromtimestamp(timestamp).strftime("%a %d %b %H:%M")
 
 
+def tick_command():
+    """What the tick unit runs: the installed `blackwall` when there is one, so the unit does not depend on which
+    interpreter happened to write it last. A unit pinned to a system Python that cannot import Blackwall fails every
+    five minutes and starts nothing."""
+    installed = shutil.which("blackwall")
+    return f"{installed} tick" if installed else f"{sys.executable} -m blackwall.cli tick"
+
+
 def unit_files():
     environment = {key: value for key, value in os.environ.items() if key.startswith("BLACKWALL_") or key in PASSED_ENV}
     service = (
         "[Unit]\nDescription=Start due Blackwall runs and pause runs outside their window\n\n[Service]\nType=oneshot\n"
         + "".join(f'Environment="{key}={value}"\n' for key, value in sorted(environment.items()))
-        + f"WorkingDirectory={paths.DATA}\nExecStart={sys.executable} -m blackwall.cli tick\n"
+        + f"WorkingDirectory={paths.DATA}\nExecStart={tick_command()}\n"
     )
     timer = ("[Unit]\nDescription=Check the Blackwall schedule every five minutes\n\n[Timer]\nOnCalendar=*:0/5\n"
              "OnBootSec=90s\nAccuracySec=1s\n\n[Install]\nWantedBy=timers.target\n")

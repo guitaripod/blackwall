@@ -2,6 +2,11 @@
 
 All notable changes to Blackwall are listed here, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the versions follow [Semantic Versioning](https://semver.org/). The published `board.json` carries its own `schema` number, described in [docs/data.md](docs/data.md).
 
+## [Unreleased]
+
+### Fixed
+- **The schedule's timer no longer depends on who wrote it.** The tick unit ran whichever Python last installed it, so one `python -m blackwall.cli` from a system interpreter pinned it to one that cannot import Blackwall, and every tick failed silently: nothing scheduled started and no run recovered. It now runs the installed `blackwall`, and falls back to the interpreter only when there is none.
+
 ## [2.4.0] - 2026-10-24
 
 ### Added

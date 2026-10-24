@@ -90,10 +90,16 @@ def test_a_run_without_an_end_catches_up_whenever_it_is_due(world):
     assert schedule.tick(db, datetime(2026, 9, 12, 14, 0)) == "open"
 
 
-def test_the_timer_unit_runs_this_interpreter():
+def test_the_timer_unit_runs_the_installed_blackwall(monkeypatch):
+    monkeypatch.setattr(schedule.shutil, "which", lambda name: "/home/me/.local/bin/blackwall")
     files = schedule.unit_files()
-    assert "-m blackwall.cli tick" in files["blackwall-tick.service"]
+    assert "ExecStart=/home/me/.local/bin/blackwall tick\n" in files["blackwall-tick.service"]
     assert "OnCalendar=*:0/5" in files["blackwall-tick.timer"]
+
+
+def test_without_an_installed_blackwall_the_unit_falls_back_to_this_interpreter(monkeypatch):
+    monkeypatch.setattr(schedule.shutil, "which", lambda name: None)
+    assert f"ExecStart={schedule.sys.executable} -m blackwall.cli tick\n" in schedule.unit_files()["blackwall-tick.service"]
 
 
 def test_the_deadline_is_the_end_of_the_open_window():
