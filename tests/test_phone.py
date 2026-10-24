@@ -748,15 +748,18 @@ def test_a_run_spawned_a_moment_ago_is_not_declared_dead(tmp_path, monkeypatch):
     assert store.get_run(db, "fresh")["status"] == "queued"
 
 
-def test_a_run_whose_unit_has_been_gone_a_while_is_failed(tmp_path, monkeypatch):
+def test_a_run_whose_unit_has_been_gone_a_while_is_recovered(tmp_path, monkeypatch):
     monkeypatch.setattr("blackwall.paths.DB", tmp_path / "bench.db")
+    monkeypatch.setattr("blackwall.paths.RUNS", tmp_path / "runs")
     monkeypatch.setattr(units, "unit_active", lambda run_id: False)
+    monkeypatch.setattr("blackwall.schedule.notify.send", lambda *args, **kwargs: None)
     db = store.connect()
     store.insert_run(db, {"id": "stale", "model": "m", "name": "m", "suite": suite.label("full"), "effort": "max",
                           "status": "running", "profile": {}, "hardware": {}})
     store.update_run(db, "stale", started=time.time() - units.RECONCILE_GRACE_S - 60)
     units.reconcile(db)
-    assert store.get_run(db, "stale")["status"] == "failed"
+    run = store.get_run(db, "stale")
+    assert run["status"] == "scheduled" and run["flags"]["recovered"] == 1
 
 
 def test_a_phone_that_ran_out_of_room_fails_instead_of_waiting_for_another_turn():

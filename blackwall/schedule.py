@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 import sys
@@ -67,6 +68,60 @@ def first_start(moment, window, at=None):
     return next_start(moment, window["start"])
 
 
+RECOVERY_BUDGET = 6
+RECOVERY_BACKOFF_S = (0, 60, 120, 300)
+
+
+def arm_wake(seconds, run_id):
+    """A tick exactly when a recovering run is due again, so its retry does not sit out the five-minute timer. A
+    failure here only costs that wait: the timer still comes."""
+    delay = max(0, int(seconds))
+    name = "blackwall-wake-" + "".join(character if character.isalnum() or character in "._-" else "_" for character in run_id)
+    subprocess.run(["systemd-run", "--user", "--collect", f"--on-active={delay}s", f"--unit={name}",
+                    sys.executable, "-m", "blackwall.cli", "tick"], capture_output=True)
+
+
+def last_progress(run_id):
+    """Where a vanished worker had got to, read off the events it wrote before it went."""
+    try:
+        with (paths.RUNS / run_id / "events.jsonl").open() as handle:
+            events = [json.loads(line) for line in handle if line.strip()]
+    except (OSError, ValueError):
+        return "the start"
+    for event in reversed(events):
+        if event.get("phase") and event.get("done") is not None:
+            total = event.get("total")
+            return f"{event['phase']} {event['done']}" + (f"/{total}" if total else "")
+    return "the start"
+
+
+def recover(db, run):
+    """Puts a run whose worker vanished back on the schedule instead of burying it: the answers are on disk, so the
+    next worker continues from them. Each try waits longer than the last, so a machine that reboots in a loop does not
+    spin, and past the budget the run stops being retried with the place it got to written down."""
+    flags = run.get("flags") or {}
+    tries = int(flags.get("recovered") or 0)
+    where = last_progress(run["id"])
+    if tries >= RECOVERY_BUDGET:
+        store.update_run(db, run["id"], status="failed", finished=time.time(),
+                         error=f"the worker stopped {tries} times without finishing, the last at {where}")
+        note(run["id"], f"given up after {tries} interruptions, the last at {where}")
+        notify.send("Blackwall gave up", f"{run['model']}: stopped {tries} times, the last at {where}",
+                    run=run["id"], status="failed")
+        return None
+    not_before = time.time() + RECOVERY_BACKOFF_S[min(tries, len(RECOVERY_BACKOFF_S) - 1)]
+    reason = f"recovering after the worker stopped at {where}"
+    store.update_run(db, run["id"], status="scheduled", error=None, finished=None,
+                     flags={**flags, "not_before": not_before, "recovered": tries + 1, "recovered_from": where,
+                            "parked": reason})
+    note(run["id"], f"{reason}; continuing {describe(not_before)}")
+    if not_before > time.time():
+        arm_wake(not_before - time.time() + 1, run["id"])
+    notify.send("Blackwall recovered", f"{run['model']}: the worker stopped at {where}; continuing {describe(not_before)}",
+                run=run["id"], status="scheduled")
+    return not_before
+
+
 def describe(timestamp):
     return datetime.fromtimestamp(timestamp).strftime("%a %d %b %H:%M")
 
@@ -79,7 +134,7 @@ def unit_files():
         + f"WorkingDirectory={paths.DATA}\nExecStart={sys.executable} -m blackwall.cli tick\n"
     )
     timer = ("[Unit]\nDescription=Check the Blackwall schedule every five minutes\n\n[Timer]\nOnCalendar=*:0/5\n"
-             "AccuracySec=1s\n\n[Install]\nWantedBy=timers.target\n")
+             "OnBootSec=90s\nAccuracySec=1s\n\n[Install]\nWantedBy=timers.target\n")
     return {f"{TIMER}.service": service, f"{TIMER}.timer": timer}
 
 
@@ -147,7 +202,8 @@ def in_flight(run):
     flags = run.get("flags") or {}
     if run["status"] in units.ACTIVE:
         return True
-    return run["status"] == "scheduled" and bool(flags.get("yielded")) and run.get("started") is not None
+    return (run["status"] == "scheduled" and run.get("started") is not None
+            and bool(flags.get("yielded") or flags.get("recovered")))
 
 
 def tick(db, moment=None):

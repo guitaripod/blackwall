@@ -2,6 +2,13 @@
 
 All notable changes to Blackwall are listed here, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the versions follow [Semantic Versioning](https://semver.org/). The published `board.json` carries its own `schema` number, described in [docs/data.md](docs/data.md).
 
+## [2.4.0] - 2026-10-24
+
+### Added
+- **A run finishes itself.** A worker that vanishes without writing its verdict — a reboot, a kill, the OOM killer — is no longer written off: the answers it saved are on disk, so the run goes back on the schedule by itself and continues from the exact question it stopped at, up to six times. Each retry waits longer than the last, a retry shows up in `worker.log` and in `blackwall status` as `recovering after the worker stopped at mrcr 31/60`, and past the budget it fails naming where it got to.
+- **Recovery starts within seconds, not minutes.** A worker unit carries `OnFailure=blackwall-tick.service`, so a crash triggers a tick at once, and a recovering run arms its own wake-up for the moment it is due. A reboot is caught by `OnBootSec=90s` on the tick timer and a reconcile grace cut from five minutes to one.
+- `blackwall resume` clears the recovery budget, so a run that gave up gets a fresh set of tries when a person asks for it.
+
 ## [2.3.0] - 2026-10-24
 
 ### Changed

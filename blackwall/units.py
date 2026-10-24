@@ -8,7 +8,7 @@ from . import paths, store
 ACTIVE = ("queued", "running")
 GPU_CLASS = "gpu"
 MAX_SHARED_RUNS = 3
-RECONCILE_GRACE_S = 300
+RECONCILE_GRACE_S = 60
 
 
 def class_of(device):
@@ -46,15 +46,18 @@ def unit_active(run_id):
 
 
 def reconcile(db):
-    """A worker that died without writing its verdict (reboot, kill) leaves a running row; mark it failed so it can be
-    resumed. The age of the row is not evidence of that — a run queued an hour ago and spawned a second ago is young
-    in every way that matters — so a row is only given up on once its unit has been gone for a while."""
+    """A worker that vanished without writing its verdict — a reboot, a kill, the OOM killer — leaves a running row.
+    That is not a failure: the answers it wrote are on disk, so the run goes back on the schedule and continues from
+    them by itself. The age of the row is not evidence of anything — a run queued an hour ago and spawned a second ago
+    is young in every way that matters — so a row is only touched once its unit has been gone for a while."""
+    from . import schedule
+
     for run in store.list_runs(db):
         if run["status"] not in ACTIVE or unit_active(run["id"]):
             continue
         idle = time.time() - (run.get("started") or run.get("created") or 0)
         if idle > RECONCILE_GRACE_S:
-            store.update_run(db, run["id"], status="failed", error="the worker stopped without finishing")
+            schedule.recover(db, run)
 
 
 def spawn(run_id, foreground):
@@ -67,6 +70,7 @@ def spawn(run_id, foreground):
     subprocess.run(["systemctl", "--user", "reset-failed", unit_name(run_id)], capture_output=True)
     subprocess.run(
         ["systemd-run", "--user", "--collect", f"--unit={unit_name(run_id)}", "-p", "MemoryMax=8G",
+         "-p", "OnFailure=blackwall-tick.service",
          f"--working-directory={paths.DATA}", sys.executable, "-m", "blackwall.cli", "worker", run_id],
         check=True, capture_output=True,
     )
