@@ -12,7 +12,6 @@ def world(monkeypatch, tmp_path):
     monkeypatch.setattr(paths, "DB", tmp_path / "bench.db")
     monkeypatch.setattr(paths, "RUNS", tmp_path / "runs")
     monkeypatch.setattr(schedule.notify, "send", lambda *args, **kwargs: None)
-    monkeypatch.setattr(schedule, "arm_wake", lambda seconds, run_id: None)
     return store.connect()
 
 
@@ -42,29 +41,108 @@ def test_a_vanished_worker_leaves_the_run_scheduled_where_it_stopped(world):
     assert before - 1 <= run["flags"]["not_before"] <= time.time() + 1
 
 
-def test_each_retry_waits_longer_and_the_budget_ends_in_a_failure_naming_the_place(world):
+def crash(db, run_id, cause=None):
+    store.update_run(db, run_id, status="running")
+    schedule.recover(db, store.get_run(db, run_id), cause)
+    return store.get_run(db, run_id)
+
+
+def answer(run_id, task, count):
+    folder = paths.RUNS / run_id
+    folder.mkdir(parents=True, exist_ok=True)
+    with (folder / f"{task}.jsonl").open("a") as handle:
+        handle.write('{"id": "q"}\n' * count)
+
+
+def test_each_retry_without_progress_waits_longer_and_the_budget_ends_in_a_failure_naming_the_place(world):
     db = world
     add(db, "run")
     events("run", {"phase": "lcb", "done": 30, "total": 101})
-    run = store.get_run(db, "run")
     delays = []
     for _ in range(len(schedule.RECOVERY_BACKOFF_S)):
         before = time.time()
-        schedule.recover(db, run)
-        run = store.get_run(db, "run")
+        run = crash(db, "run")
         delays.append(round(run["flags"]["not_before"] - before, -1))
     assert delays == [0, 60, 120, 300]
-    for _ in range(schedule.RECOVERY_BUDGET):
-        schedule.recover(db, run)
-        run = store.get_run(db, "run")
+    for _ in range(schedule.RECOVERY_BUDGET - len(schedule.RECOVERY_BACKOFF_S) + 1):
+        run = crash(db, "run")
     assert run["status"] == "failed"
-    assert "stopped 6 times" in run["error"] and "lcb 30/101" in run["error"]
+    assert "stopped 6 times in a row without a new answer" in run["error"] and "lcb 30/101" in run["error"]
 
 
-def test_a_recovered_run_keeps_the_card_while_it_comes_back(world):
+def test_a_worker_that_got_somewhere_before_it_stopped_starts_the_budget_over(world):
     db = world
-    add(db, "flint", started=time.time() - 900)
-    schedule.recover(db, store.get_run(db, "flint"))
-    assert schedule.in_flight(store.get_run(db, "flint"))
-    add(db, "next", status="scheduled", started=None)
-    assert schedule.in_flight(store.get_run(db, "next")) is False
+    add(db, "run")
+    events("run", {"phase": "mrcr", "done": 10, "total": 60})
+    for round_ in range(schedule.RECOVERY_BUDGET * 2):
+        answer("run", "mrcr", 3)
+        run = crash(db, "run")
+        assert run["status"] == "scheduled" and run["flags"]["recovery_streak"] == 1
+        assert run["flags"]["not_before"] <= time.time() + 1
+    assert run["flags"]["recovered"] == schedule.RECOVERY_BUDGET * 2
+
+
+def test_interruptions_that_got_nowhere_are_the_only_ones_that_spend_the_budget(world):
+    db = world
+    add(db, "run")
+    answer("run", "mrcr", 5)
+    streaks = []
+    for _ in range(2):
+        streaks.append(crash(db, "run")["flags"]["recovery_streak"])
+    answer("run", "mrcr", 1)
+    streaks.append(crash(db, "run")["flags"]["recovery_streak"])
+    streaks.append(crash(db, "run")["flags"]["recovery_streak"])
+    assert streaks == [1, 2, 1, 2]
+
+
+def test_the_reason_systemd_gave_is_kept_and_named(world):
+    db = world
+    add(db, "run")
+    events("run", {"phase": "graphwalks", "done": 12, "total": 40})
+    run = crash(db, "run", "oom-kill")
+    assert run["flags"]["recovered_cause"] == "oom-kill"
+    assert run["flags"]["parked"] == "recovering after the worker ran out of memory at graphwalks 12/40"
+    assert crash(db, "run", "something-new")["flags"]["parked"] == "recovering after the worker stopped at graphwalks 12/40"
+
+
+def test_a_run_that_is_no_longer_running_is_not_recovered_twice(world):
+    db = world
+    add(db, "run")
+    assert crash(db, "run")["flags"]["recovered"] == 1
+    schedule.recover(db, store.get_run(db, "run"), "signal")
+    assert store.get_run(db, "run")["flags"]["recovered"] == 1
+
+
+def test_recovery_makes_sure_the_tick_unit_exists_to_bring_the_run_back(world, systemd):
+    db = world
+    add(db, "run")
+    crash(db, "run")
+    assert any("enable" in command for command in systemd)
+
+
+def test_a_worker_systemd_reports_dead_is_recovered_at_once_with_the_reason(world, monkeypatch):
+    db = world
+    monkeypatch.setattr(units, "unit_active", lambda run_id: False)
+    add(db, "young", started=time.time() - 5)
+    units.reconcile(db)
+    assert store.get_run(db, "young")["status"] == "running"
+    units.reconcile(db, {"young": "oom-kill"})
+    run = store.get_run(db, "young")
+    assert run["status"] == "scheduled" and run["flags"]["recovered_cause"] == "oom-kill"
+
+
+def test_the_failed_unit_systemd_hands_a_tick_names_the_run(world):
+    db = world
+    add(db, "20261024-flint")
+    add(db, "other")
+    environment = {"MONITOR_UNIT": "blackwall-20261024-flint.service", "MONITOR_SERVICE_RESULT": "oom-kill"}
+    assert units.failed_runs(db, environment) == {"20261024-flint": "oom-kill"}
+    assert units.failed_runs(db, {}) == {}
+    assert units.failed_runs(db, {"MONITOR_UNIT": "blackwall-tick.service"}) == {}
+
+
+def test_every_flag_recovery_writes_is_one_resume_clears(world):
+    db = world
+    add(db, "run")
+    flags = crash(db, "run", "oom-kill")["flags"]
+    assert set(flags) - {"not_before"} <= set(schedule.TRANSIENT_FLAGS)

@@ -1,3 +1,4 @@
+import time
 from datetime import datetime
 
 import pytest
@@ -63,7 +64,17 @@ def test_due_runs_start_one_at_a_time_in_order(world):
     assert schedule.tick(db, datetime(2026, 9, 12, 3, 5)) is None
     store.update_run(db, "first", status="complete")
     assert schedule.tick(db, datetime(2026, 9, 12, 5, 0)) == "second"
-    assert actions == [("spawn", "first"), ("spawn", "second"), ("timer off",)]
+    assert actions == [("spawn", "first"), ("spawn", "second")]
+    store.update_run(db, "second", status="complete")
+    assert schedule.tick(db, datetime(2026, 9, 12, 6, 0)) is None
+    assert actions[-1] == ("timer off",)
+
+
+def test_the_timer_stays_on_while_a_worker_runs_so_a_reboot_is_caught(world):
+    db, actions = world
+    add(db, "going", "running", datetime(2026, 9, 12, 3, 0), window=None)
+    schedule.tick(db, datetime(2026, 9, 12, 4, 0))
+    assert ("timer off",) not in actions
 
 
 def test_a_run_still_going_when_the_window_closes_pauses_until_the_next_night(world):
@@ -132,11 +143,14 @@ def test_a_run_gives_way_unless_it_asked_to_keep_the_gpu(world, monkeypatch):
 def test_parking_counts_and_keeps_the_rest_of_the_flags(world):
     db, actions = world
     add(db, "r", "running", datetime(2026, 9, 12, 3, 0))
-    assert schedule.park(db, "r", 123.0, "gave the GPU to x", "yielded") == 1
-    assert schedule.park(db, "r", 456.0, "gave the GPU to x", "yielded") == 2
+    assert schedule.park(db, "r", 123.0, "gave the GPU to x", "yielded", True) == 1
+    assert schedule.park(db, "r", 456.0, "gave the GPU to x", "yielded", True) == 2
     run = store.get_run(db, "r")
     assert run["status"] == "scheduled" and run["flags"]["window"] == NIGHT
     assert run["flags"]["not_before"] == 456.0 and run["flags"]["parked"] == "gave the GPU to x"
+    assert run["flags"]["holds_card"] is True
+    schedule.park(db, "r", 789.0, "the window closed", "paused", False)
+    assert store.get_run(db, "r")["flags"]["holds_card"] is False
 
 
 def test_a_run_that_gave_the_gpu_away_keeps_its_place(world):
@@ -150,7 +164,7 @@ def test_a_run_that_gave_the_gpu_away_keeps_its_place(world):
     assert schedule.tick(db, datetime(2026, 9, 12, 3, 10)) == "parked"
     store.update_run(db, "parked", status="complete")
     assert schedule.tick(db, datetime(2026, 9, 12, 3, 11)) == "fresh"
-    assert actions == [("spawn", "parked"), ("spawn", "fresh"), ("timer off",)]
+    assert actions == [("spawn", "parked"), ("spawn", "fresh")]
 
 
 def test_a_long_game_does_not_hand_the_card_to_a_queued_run(world):
@@ -171,3 +185,62 @@ def test_a_run_waiting_for_its_window_does_not_hold_the_card(world):
     store.update_run(db, "paused", started=1.0)
     add(db, "fresh", "scheduled", night, created=2.0)
     assert schedule.tick(db, datetime(2026, 9, 12, 3, 0)) == "fresh"
+
+
+def test_a_run_that_yielded_and_then_paused_for_its_window_lets_the_card_go(world):
+    db, actions = world
+    night = datetime(2026, 9, 12, 3, 0)
+    add(db, "long", "running", night, created=1.0, yielded=3)
+    add(db, "fresh", "scheduled", night, created=2.0)
+    assert schedule.tick(db, datetime(2026, 9, 12, 9, 0)) is None
+    assert store.get_run(db, "long")["flags"]["holds_card"] is False
+    assert schedule.in_flight(store.get_run(db, "long")) is False
+    assert schedule.tick(db, datetime(2026, 9, 13, 3, 0)) == "long"
+
+
+def test_an_explicit_hold_overrides_what_an_older_row_implies(world):
+    db, actions = world
+    add(db, "old", "scheduled", datetime(2026, 9, 12, 3, 0), yielded=2)
+    store.update_run(db, "old", started=1.0)
+    assert schedule.in_flight(store.get_run(db, "old")) is True
+    store.update_run(db, "old", flags={**store.get_run(db, "old")["flags"], "holds_card": False})
+    assert schedule.in_flight(store.get_run(db, "old")) is False
+
+
+def test_only_one_tick_works_at_a_time(world):
+    import fcntl
+    db, actions = world
+    add(db, "due", "scheduled", datetime(2026, 9, 12, 3, 0))
+    with (paths.DATA / "tick.lock").open("w") as handle:
+        fcntl.flock(handle, fcntl.LOCK_EX)
+        assert schedule.tick(db, datetime(2026, 9, 12, 3, 0)) is None
+    assert actions == []
+    assert schedule.tick(db, datetime(2026, 9, 12, 3, 0)) == "due"
+
+
+def test_a_wake_up_is_armed_for_the_earliest_run_that_will_be_due(world, systemd):
+    db, actions = world
+    now = time.time()
+    add(db, "later", "scheduled", datetime.now(), window=None)
+    add(db, "sooner", "scheduled", datetime.now(), window=None)
+    add(db, "distant", "scheduled", datetime.now(), window=None)
+    for run_id, ahead in (("later", 1800), ("sooner", 120), ("distant", 86400)):
+        store.update_run(db, run_id, flags={"not_before": now + ahead})
+    schedule.arm(db)
+    assert len(systemd) == 1
+    command = systemd[0]
+    assert command[0] == "systemd-run" and f"--unit=blackwall-wake-{int(now + 120) + 1}" in command
+    assert command[-4:] == ["--user", "start", "--no-block", "blackwall-tick.service"]
+    expected = datetime.fromtimestamp(int(now + 120) + 1).strftime("%Y-%m-%d %H:%M:%S")
+    assert f"--on-calendar={expected}" in command
+
+
+def test_nothing_is_armed_when_no_run_is_waiting_within_the_hour(world, systemd):
+    db, actions = world
+    add(db, "distant", "scheduled", datetime.now(), window=None)
+    store.update_run(db, "distant", flags={"not_before": time.time() + 86400})
+    schedule.arm(db)
+    add(db, "past", "scheduled", datetime.now(), window=None)
+    store.update_run(db, "past", flags={"not_before": time.time() - 5})
+    schedule.arm(db)
+    assert systemd == []

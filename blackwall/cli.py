@@ -1,6 +1,7 @@
 import argparse
 import asyncio
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -679,8 +680,7 @@ def cmd_resume(args):
         fail(f"{run['id']} was measured under suite v{suite.version_of(run['suite'])} and this Blackwall runs v{suite.VERSION}; "
              f"`blackwall run {run['model']} --reuse {run['id']}` starts a v{suite.VERSION} run that keeps what still applies")
     at, window = window_of(args)
-    flags = {key: value for key, value in (run.get("flags") or {}).items()
-             if key not in ("parked", "stall", "recovered", "recovered_from")}
+    flags = {key: value for key, value in (run.get("flags") or {}).items() if key not in schedule.TRANSIENT_FLAGS}
     flags["yield"] = not args.keep_gpu
     if window:
         begins = schedule.first_start(datetime.now(), window, at).timestamp()
@@ -919,7 +919,8 @@ def cmd_profile(args):
 
 
 def cmd_tick(_args):
-    started = schedule.tick(store.connect())
+    db = store.connect()
+    started = schedule.tick(db, failed=units.failed_runs(db, os.environ))
     if started:
         print(f"started {started}")
 

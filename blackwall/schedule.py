@@ -1,13 +1,16 @@
+import fcntl
 import json
 import os
+import shlex
 import shutil
 import subprocess
 import sys
 import time
+from contextlib import contextmanager
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from . import gpu, notify, paths, store, swap, units
+from . import gpu, notify, paths, store, suite, swap, units
 
 TIMER = "blackwall-tick"
 UNIT_DIR = Path(os.environ.get("XDG_CONFIG_HOME", paths.HOME / ".config")) / "systemd" / "user"
@@ -71,15 +74,41 @@ def first_start(moment, window, at=None):
 
 RECOVERY_BUDGET = 6
 RECOVERY_BACKOFF_S = (0, 60, 120, 300)
+WAKE = "blackwall-wake"
+WAKE_HORIZON_S = 3600
+CAUSES = {"oom-kill": "ran out of memory", "signal": "was killed", "exit-code": "crashed", "core-dump": "crashed",
+          "timeout": "stopped answering systemd", "watchdog": "stopped answering systemd"}
+TRANSIENT_FLAGS = ("parked", "stall", "holds_card", "recovered", "recovered_from", "recovered_cause", "recovery_streak",
+                   "recovery_saved")
 
 
-def arm_wake(seconds, run_id):
-    """A tick exactly when a recovering run is due again, so its retry does not sit out the five-minute timer. A
-    failure here only costs that wait: the timer still comes."""
-    delay = max(0, int(seconds))
-    name = "blackwall-wake-" + "".join(character if character.isalnum() or character in "._-" else "_" for character in run_id)
-    subprocess.run(["systemd-run", "--user", "--collect", f"--on-active={delay}s", f"--unit={name}",
-                    sys.executable, "-m", "blackwall.cli", "tick"], capture_output=True)
+def arm(db):
+    """A tick at the moment the earliest waiting run is due, so a retry does not sit out the rest of the five-minute
+    poll. The unit is named for the second it fires: arming the same moment twice is a no-op, and a tick that arms from
+    inside the unit that woke it cannot collide with itself. It starts the tick unit rather than running Blackwall
+    itself, so there is one definition of how a tick runs. A failure here only costs the wait: the timer still comes."""
+    now = time.time()
+    due = [(run.get("flags") or {}).get("not_before") or 0 for run in store.list_runs(db) if run["status"] == "scheduled"]
+    upcoming = [each for each in due if now < each < now + WAKE_HORIZON_S]
+    if not upcoming:
+        return
+    moment = int(min(upcoming)) + 1
+    subprocess.run(["systemd-run", "--user", "--collect", f"--unit={WAKE}-{moment}",
+                    "--on-calendar=" + datetime.fromtimestamp(moment).strftime("%Y-%m-%d %H:%M:%S"),
+                    shutil.which("systemctl") or "systemctl", "--user", "start", "--no-block", f"{TIMER}.service"],
+                   capture_output=True)
+
+
+def answers_saved(run_id):
+    """How many answers a run has on disk. It only ever grows, so it tells whether a worker that stopped got anywhere."""
+    total = 1 if (paths.RUNS / run_id / "speed.json").exists() else 0
+    for task in suite.QUALITY_TASKS:
+        try:
+            with (paths.RUNS / run_id / f"{task}.jsonl").open("rb") as handle:
+                total += sum(1 for line in handle if line.strip())
+        except OSError:
+            continue
+    return total
 
 
 def last_progress(run_id):
@@ -96,30 +125,44 @@ def last_progress(run_id):
     return "the start"
 
 
-def recover(db, run):
+def stalled_streak(flags, saved):
+    """How many times in a row the worker has stopped without a new answer on disk, counting this one. Interruptions
+    that each got somewhere are not a failing run, they are a machine that keeps rebooting: only the ones that got
+    nowhere spend the budget."""
+    if saved > int(flags.get("recovery_saved", -1)):
+        return 1
+    return int(flags.get("recovery_streak") or 0) + 1
+
+
+def recover(db, run, cause=None):
     """Puts a run whose worker vanished back on the schedule instead of burying it: the answers are on disk, so the
-    next worker continues from them. Each try waits longer than the last, so a machine that reboots in a loop does not
+    next worker continues from them. cause is the result systemd recorded when it knows one (oom-kill, signal,
+    exit-code). Each try without progress waits longer than the last, so a machine that reboots in a loop does not
     spin, and past the budget the run stops being retried with the place it got to written down."""
+    run = store.get_run(db, run["id"])
+    if not run or run["status"] not in units.ACTIVE:
+        return None
     flags = run.get("flags") or {}
-    tries = int(flags.get("recovered") or 0)
+    saved = answers_saved(run["id"])
+    streak = stalled_streak(flags, saved)
     where = last_progress(run["id"])
-    if tries >= RECOVERY_BUDGET:
+    if streak > RECOVERY_BUDGET:
         store.update_run(db, run["id"], status="failed", finished=time.time(),
-                         error=f"the worker stopped {tries} times without finishing, the last at {where}")
-        note(run["id"], f"given up after {tries} interruptions, the last at {where}")
-        notify.send("Blackwall gave up", f"{run['model']}: stopped {tries} times, the last at {where}",
+                         error=f"the worker stopped {streak - 1} times in a row without a new answer, the last at {where}")
+        note(run["id"], f"given up after {streak - 1} interruptions without progress, the last at {where}")
+        notify.send("Blackwall gave up", f"{run['model']}: stopped {streak - 1} times in a row, the last at {where}",
                     run=run["id"], status="failed")
         return None
-    not_before = time.time() + RECOVERY_BACKOFF_S[min(tries, len(RECOVERY_BACKOFF_S) - 1)]
-    reason = f"recovering after the worker stopped at {where}"
+    not_before = time.time() + RECOVERY_BACKOFF_S[min(streak - 1, len(RECOVERY_BACKOFF_S) - 1)]
+    reason = f"recovering after the worker {CAUSES.get(cause, 'stopped')} at {where}"
+    install_timer()
     store.update_run(db, run["id"], status="scheduled", error=None, finished=None,
-                     flags={**flags, "not_before": not_before, "recovered": tries + 1, "recovered_from": where,
-                            "parked": reason})
+                     flags={**flags, "not_before": not_before, "holds_card": True, "parked": reason,
+                            "recovered": int(flags.get("recovered") or 0) + 1, "recovered_from": where,
+                            "recovered_cause": cause, "recovery_streak": streak, "recovery_saved": saved})
     note(run["id"], f"{reason}; continuing {describe(not_before)}")
-    if not_before > time.time():
-        arm_wake(not_before - time.time() + 1, run["id"])
-    notify.send("Blackwall recovered", f"{run['model']}: the worker stopped at {where}; continuing {describe(not_before)}",
-                run=run["id"], status="scheduled")
+    notify.send("Blackwall recovered", f"{run['model']}: the worker {CAUSES.get(cause, 'stopped')} at {where}; "
+                f"continuing {describe(not_before)}", run=run["id"], status="scheduled")
     return not_before
 
 
@@ -132,7 +175,7 @@ def tick_command():
     interpreter happened to write it last. A unit pinned to a system Python that cannot import Blackwall fails every
     five minutes and starts nothing."""
     installed = shutil.which("blackwall")
-    return f"{installed} tick" if installed else f"{sys.executable} -m blackwall.cli tick"
+    return shlex.join([installed, "tick"] if installed else [sys.executable, "-m", "blackwall.cli", "tick"])
 
 
 def unit_files():
@@ -177,13 +220,16 @@ def gives_way(flags):
     return flags.get("yield", True)
 
 
-def park(db, run_id, not_before, reason, counter):
+def park(db, run_id, not_before, reason, counter, holds_card):
     """Puts a run back on the schedule to continue from its saved answers; counter is "paused" for a closing window and
-    "yielded" for giving the GPU away. Returns how many times that has happened to the run."""
+    "yielded" for giving the GPU away. holds_card says whether it keeps its place on the device while it waits: a run
+    that gave way to a game does, a run waiting for tomorrow's window does not, and each park decides it afresh.
+    Returns how many times that has happened to the run."""
     flags = (store.get_run(db, run_id) or {}).get("flags") or {}
     count = flags.get(counter, 0) + 1
     store.update_run(db, run_id, status="scheduled",
-                     flags={**flags, "not_before": not_before, counter: count, "parked": reason})
+                     flags={**flags, "not_before": not_before, counter: count, "parked": reason,
+                            "holds_card": holds_card})
     note(run_id, f"paused: {reason}; continues {describe(not_before)} at the earliest")
     return count
 
@@ -194,7 +240,7 @@ def pause(db, run, moment):
     units.stop(run["id"])
     swap.unload()
     resumes = next_start(moment, window["start"]).timestamp()
-    if park(db, run["id"], resumes, f"the window closed at {window['end']}", "paused") == 1:
+    if park(db, run["id"], resumes, f"the window closed at {window['end']}", "paused", False) == 1:
         notify.send("Blackwall paused", f"{run['model']}: the window closed at {window['end']}; continues {describe(resumes)}",
                     run=run["id"], status="paused")
 
@@ -204,22 +250,42 @@ def due(run, moment):
 
 
 def in_flight(run):
-    """A run that has started and has not finished: it is on the device, or waiting out the program that took it.
-    The queue drains before it fills, so a run three hours into a suite is never left half-measured because a model
-    queued behind it happened to be ready while it was giving the card away. A run parked by its own daily window is
-    not in flight: it is waiting for tomorrow, and the card should go to something that can use it tonight."""
+    """A run that has started and has not finished, and that keeps its place on the device: it is on the card, or
+    waiting out the program that took it, or coming back from a crash. The queue drains before it fills, so a run three
+    hours into a suite is never left half-measured because a model queued behind it happened to be ready. A run parked
+    by its own daily window does not hold the card: it is waiting for tomorrow, and the card should go to something
+    that can use it tonight. Rows written before the flag existed hold it if they gave way or recovered."""
     flags = run.get("flags") or {}
     if run["status"] in units.ACTIVE:
         return True
-    return (run["status"] == "scheduled" and run.get("started") is not None
-            and bool(flags.get("yielded") or flags.get("recovered")))
+    holds = flags.get("holds_card", bool(flags.get("yielded") or flags.get("recovered")))
+    return run["status"] == "scheduled" and run.get("started") is not None and bool(holds)
 
 
-def tick(db, moment=None):
+@contextmanager
+def one_tick_at_a_time():
+    """A tick can now come from the poll, a crashed worker, a wake-up and the end of a run. Two at once could both see
+    the card free and start two runs; the one that finds another already working has nothing left to do."""
+    paths.DATA.mkdir(parents=True, exist_ok=True)
+    with (paths.DATA / "tick.lock").open("w") as handle:
+        try:
+            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            yield False
+            return
+        yield True
+
+
+def tick(db, moment=None, failed=None):
     """Pauses runs whose window has closed, then starts every due scheduled run whose device is free; returns the
-    first one it started. A phone and the card are separate machines, so one never waits for the other."""
-    moment = moment or datetime.now()
-    units.reconcile(db)
+    first one it started. A phone and the card are separate machines, so one never waits for the other. failed names
+    the runs systemd has just reported dead, with why, so they are recovered now instead of after a grace period."""
+    with one_tick_at_a_time() as held:
+        return start_due(db, moment or datetime.now(), failed) if held else None
+
+
+def start_due(db, moment, failed):
+    units.reconcile(db, failed)
     for run in store.list_runs(db):
         if run["status"] in units.ACTIVE and not in_window(moment, (run.get("flags") or {}).get("window")):
             pause(db, run, moment)
@@ -248,6 +314,8 @@ def tick(db, moment=None):
         units.spawn(run["id"], False)
         runs = store.list_runs(db)
         started = started or run["id"]
-    if not any(run["status"] == "scheduled" for run in store.list_runs(db)):
+    if any(run["status"] == "scheduled" or run["status"] in units.ACTIVE for run in store.list_runs(db)):
+        arm(db)
+    else:
         remove_timer()
     return started

@@ -288,7 +288,8 @@ def park_for_window(db, run, events, window, host):
     """Ends this session before the window closes and frees the GPU; the run continues when the window next opens."""
     resumes = schedule.next_start(datetime.now(), window["start"]).timestamp()
     host.unload()
-    count = schedule.park(db, run["id"], resumes, f"the {window['start']}–{window['end']} window was closing", "paused")
+    count = schedule.park(db, run["id"], resumes, f"the {window['start']}–{window['end']} window was closing", "paused",
+                          False)
     events.emit("paused", until=schedule.describe(resumes))
     if count == 1:
         notify.send("Blackwall paused", f"{run['model']}: stopped before {window['end']}; continues {schedule.describe(resumes)}",
@@ -332,7 +333,7 @@ def give_way(db, run, events, found, host, retry_s=YIELD_RETRY_S):
     resumes = time.time() + retry_s
     names = ", ".join(process["name"] for process in found) or "another program"
     host.unload()
-    count = schedule.park(db, run["id"], resumes, f"gave the GPU to {names}", "yielded")
+    count = schedule.park(db, run["id"], resumes, f"gave the GPU to {names}", "yielded", True)
     schedule.install_timer()
     events.emit("yielded", to=names, retry=schedule.describe(resumes))
     if count == 1:

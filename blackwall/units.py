@@ -45,19 +45,31 @@ def unit_active(run_id):
     return subprocess.run(["systemctl", "--user", "is-active", "-q", unit_name(run_id)]).returncode == 0
 
 
-def reconcile(db):
+def failed_runs(db, environment):
+    """The run whose worker unit systemd has just reported failed, with the result it recorded (oom-kill, signal,
+    exit-code), read from what systemd hands a unit started by OnFailure. Empty when this tick was not started that way."""
+    unit = environment.get("MONITOR_UNIT")
+    if not unit:
+        return {}
+    return {run["id"]: environment.get("MONITOR_SERVICE_RESULT", "") for run in store.list_runs(db)
+            if unit == unit_name(run["id"]) + ".service"}
+
+
+def reconcile(db, failed=None):
     """A worker that vanished without writing its verdict — a reboot, a kill, the OOM killer — leaves a running row.
     That is not a failure: the answers it wrote are on disk, so the run goes back on the schedule and continues from
-    them by itself. The age of the row is not evidence of anything — a run queued an hour ago and spawned a second ago
-    is young in every way that matters — so a row is only touched once its unit has been gone for a while."""
+    them by itself. A worker systemd has just reported dead is recovered at once, with the reason. Otherwise the age of
+    the row is not evidence of anything — a run queued an hour ago and spawned a second ago is young in every way that
+    matters — so a row is only touched once it has been running for a while without a unit."""
     from . import schedule
 
+    failed = failed or {}
     for run in store.list_runs(db):
         if run["status"] not in ACTIVE or unit_active(run["id"]):
             continue
         idle = time.time() - (run.get("started") or run.get("created") or 0)
-        if idle > RECONCILE_GRACE_S:
-            schedule.recover(db, run)
+        if run["id"] in failed or idle > RECONCILE_GRACE_S:
+            schedule.recover(db, run, failed.get(run["id"]) or None)
 
 
 def spawn(run_id, foreground):
@@ -67,6 +79,9 @@ def spawn(run_id, foreground):
 
         execute(run_id)
         return
+    from . import schedule
+
+    schedule.install_timer()
     subprocess.run(["systemctl", "--user", "reset-failed", unit_name(run_id)], capture_output=True)
     subprocess.run(
         ["systemd-run", "--user", "--collect", f"--unit={unit_name(run_id)}", "-p", "MemoryMax=8G",
