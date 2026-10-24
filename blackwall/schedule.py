@@ -155,7 +155,7 @@ def recover(db, run, cause=None):
         return None
     not_before = time.time() + RECOVERY_BACKOFF_S[min(streak - 1, len(RECOVERY_BACKOFF_S) - 1)]
     reason = f"recovering after the worker {CAUSES.get(cause, 'stopped')} at {where}"
-    install_timer()
+    ensure_timer(run["id"])
     store.update_run(db, run["id"], status="scheduled", error=None, finished=None,
                      flags={**flags, "not_before": not_before, "holds_card": True, "parked": reason,
                             "recovered": int(flags.get("recovered") or 0) + 1, "recovered_from": where,
@@ -202,6 +202,14 @@ def install_timer():
     if changed:
         subprocess.run(["systemctl", "--user", "daemon-reload"], check=True, capture_output=True)
     subprocess.run(["systemctl", "--user", "enable", "--now", f"{TIMER}.timer"], check=True, capture_output=True)
+
+
+def ensure_timer(run_id):
+    """The unit that brings a recovered run back. Not being able to install it must not leave the run marked running."""
+    try:
+        install_timer()
+    except (subprocess.CalledProcessError, OSError) as error:
+        note(run_id, f"could not install the schedule timer: {error!r}")
 
 
 def remove_timer():

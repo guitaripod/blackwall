@@ -146,3 +146,17 @@ def test_every_flag_recovery_writes_is_one_resume_clears(world):
     add(db, "run")
     flags = crash(db, "run", "oom-kill")["flags"]
     assert set(flags) - {"not_before"} <= set(schedule.TRANSIENT_FLAGS)
+
+
+def test_a_timer_that_cannot_be_installed_does_not_strand_the_run(world, monkeypatch):
+    import subprocess
+    db = world
+    add(db, "run")
+
+    def refuse():
+        raise subprocess.CalledProcessError(1, "systemctl")
+
+    monkeypatch.setattr(schedule, "install_timer", refuse)
+    run = crash(db, "run")
+    assert run["status"] == "scheduled"
+    assert "could not install the schedule timer" in (paths.RUNS / "run" / "worker.log").read_text()

@@ -2,7 +2,7 @@
 
 All notable changes to Blackwall are listed here, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the versions follow [Semantic Versioning](https://semver.org/). The published `board.json` carries its own `schema` number, described in [docs/data.md](docs/data.md).
 
-## [Unreleased]
+## [2.5.0] - 2026-10-24
 
 ### Changed
 - **Yielding counts the whole share, not each program alone.** Four browser tabs at 20% of the SMs each starve a server as surely as one game at 80%, and none of them crossed a line on its own. Programs are now graded one by one and then as a single share of the SMs: 25% stops a speed measurement, 60% stops anything.
