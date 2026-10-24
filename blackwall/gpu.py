@@ -11,6 +11,9 @@ DISPLAY_PROCESS_NAMES = ("kwin_wayland", "kwin_x11", "Xwayland", "Xorg", "gnome-
 INTERPRETERS = ("python", "node", "bun", "deno", "java", "ruby", "perl", "bash", "sh")
 BUSY_SM_PERCENT = 25
 BUSY_SM_SEVERE = 60
+MIN_SHARE_SM = 5
+RANK = {"mild": 1, "severe": 2}
+STRICT_PHASES = ("speed", "submit")
 HEAVY_MIB = 4096
 FREE_MIB_FLOOR = 4096
 
@@ -193,23 +196,40 @@ def severity(process):
     return None
 
 
+def strict_for(phase):
+    """Whether a phase of a run is spoiled by anything sharing the card: a speed number and a submission's timing are,
+    the answers a quality pass collects are not."""
+    return phase in STRICT_PHASES
+
+
+def blocking(candidates, strict):
+    """The programs that should stop a run, given every program sharing the card besides the model servers and the
+    display. Each is graded alone first; then the whole lot is graded as one share of the SMs, because four tabs at
+    20% starve a server as surely as one program at 80%, and no single one of them crosses a line."""
+    graded = [{**process, "severity": severity(process)} for process in candidates]
+    found = [process for process in graded if process["severity"] == "severe" or (process["severity"] and strict)]
+    shared = severity({"sm": sum(process["sm"] for process in candidates), "mib": 0})
+    worst = max((RANK[process["severity"]] for process in found), default=0)
+    if shared and RANK[shared] > worst and (shared == "severe" or strict):
+        found = [{**process, "severity": shared} for process in candidates if process["sm"] >= MIN_SHARE_SM]
+    return found
+
+
+def starved(room):
+    """A card with too little VRAM left, as the single thing keeping a run from carrying on."""
+    if room is None or room >= FREE_MIB_FLOOR:
+        return []
+    return [{"name": f"a card with {room / 1024:.1f} GB free", "sm": 0.0, "mib": 0, "pid": 0, "server": False,
+             "severity": "severe"}]
+
+
 def contention(samples=3, strict=True):
     """Other GPU work big enough to matter. Strict is for speed: anything sharing the card spoils the number. Relaxed
     is for quality, where only work that could starve the server (most of the SMs, or most of the free VRAM) stops a
     run, so a browser tab no longer parks a three-hour quality pass for ten minutes a time."""
-    found = []
-    for process in processes(samples):
-        if process["server"] or process["name"] in DISPLAY_PROCESS_NAMES:
-            continue
-        grade = severity(process)
-        if grade is None or (grade == "mild" and not strict):
-            continue
-        found.append({**process, "severity": grade})
-    room = free_mib()
-    if room is not None and room < FREE_MIB_FLOOR and not found:
-        found.append({"name": f"a card with {room / 1024:.1f} GB free", "sm": 0.0, "mib": 0, "pid": 0,
-                      "server": False, "severity": "severe"})
-    return found
+    candidates = [process for process in processes(samples)
+                  if not process["server"] and process["name"] not in DISPLAY_PROCESS_NAMES]
+    return blocking(candidates, strict) or starved(free_mib())
 
 
 def describe_contention(found):

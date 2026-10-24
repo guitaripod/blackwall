@@ -187,22 +187,22 @@ class CardGuard(threading.Thread):
 
 
 class GpuWatch(threading.Thread):
-    """For runs that give way: stops the run once another program has used the GPU for a minute. Strict while a speed
-    number is being measured, since anything sharing the card spoils it; relaxed while quality runs, where only work
-    that could starve the server counts."""
+    """For runs that give way: stops the run once another program has used the GPU for a minute. What counts depends on
+    the phase the run is in (see gpu.strict_for): anything sharing the card while a speed number is measured, only work
+    that could starve the server while quality runs."""
 
-    def __init__(self, halt, events):
+    def __init__(self, halt, events, phase):
         super().__init__(daemon=True)
         self.halt = halt
         self.events = events
         self.stopped = threading.Event()
         self.found = []
-        self.strict = True
+        self.phase = phase
 
     def run(self):
         strikes = 0
         while not self.stopped.wait(GPU_CHECK_S):
-            found = gpu.contention(samples=2, strict=self.strict)
+            found = gpu.contention(samples=2, strict=gpu.strict_for(self.phase))
             strikes = strikes + 1 if found else 0
             if strikes >= YIELD_STRIKES:
                 self.found = found
@@ -427,9 +427,9 @@ def execute(run_id):
         if deadline and deadline - time.time() < MIN_WINDOW_S:
             park_for_window(db, run, events, window, host)
             return
+        phase = "speed" if "speed" in tasks and not (run_dir / "speed.json").exists() else "quality"
         if schedule.gives_way(flags) and host.kind == "gpu":
-            measuring_speed = "speed" in tasks and not (run_dir / "speed.json").exists()
-            found = host.contention(strict=measuring_speed)
+            found = host.contention(strict=gpu.strict_for(phase))
             if found:
                 give_way(db, run, events, found, host)
                 return
@@ -465,7 +465,7 @@ def execute(run_id):
             detail = "; ".join(f"{check['check']}: {check['detail']}" for check in doctor.failures(checks))
             raise (engine.ServerGone if engine.server_error(detail) else RuntimeError)("doctor: " + detail)
         if schedule.gives_way(flags) and host.kind == "gpu":
-            watch = GpuWatch(halt, events)
+            watch = GpuWatch(halt, events, phase)
             watch.start()
         if "speed" in tasks:
             if deadline and not (run_dir / "speed.json").exists() and deadline - time.time() < SPEED_WINDOW_S:
@@ -476,7 +476,7 @@ def execute(run_id):
             contention += measure_speed(db, run_id, profile, spec["speed"], level, run_dir, events, halt, levels,
                                         context, host)
             if watch:
-                watch.strict = False
+                watch.phase = "quality"
         sampler = host.sampler(interval_ms=1000)
         runner = engine.QualityRunner(profile, run_dir, level, events.progress, halt, capacity["slots"], capacity["pool"],
                                       deadline)
@@ -519,10 +519,12 @@ def execute(run_id):
         if flags.get("submit"):
             which = flags["submit"] if flags["submit"] in lmx.SUBMIT_CHOICES else "all"
             if watch:
-                watch.strict = True
-            submit(db, run_id, profile, level, run_dir, events, which)
-            if watch:
-                watch.strict = False
+                watch.phase = "submit"
+            try:
+                submit(db, run_id, profile, level, run_dir, events, which)
+            finally:
+                if watch:
+                    watch.phase = "quality"
         flags = {**((store.get_run(db, run_id) or {}).get("flags") or flags),
                  "contended": sorted(set(contention)), "failed_items": failed_items}
         flags.pop("parked", None)

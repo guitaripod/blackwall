@@ -113,3 +113,52 @@ def test_a_light_desktop_share_is_mild_and_a_starved_card_is_severe(monkeypatch)
     quiet = PMON.replace("81     40", " 1      0").replace("79     38", " 1      0").replace(" 9085", "    300")
     monkeypatch.setattr(gpu.subprocess, "run", lambda *args, **kwargs: SimpleNamespace(stdout=quiet, returncode=0))
     assert gpu.describe_contention(gpu.contention(strict=False)) == "a card with 2.0 GB free"
+
+
+def wait_for(condition, seconds=5):
+    import time
+    deadline = time.time() + seconds
+    while not condition() and time.time() < deadline:
+        time.sleep(0.005)
+    assert condition()
+
+
+def sharing(*shares):
+    return [{"pid": index, "name": f"tab{index}", "sm": float(share), "mib": 300, "server": False}
+            for index, share in enumerate(shares, start=1)]
+
+
+def test_programs_that_each_stay_under_the_line_are_graded_as_one_share():
+    assert gpu.blocking(sharing(20, 20), strict=True) == [{**process, "severity": "mild"} for process in sharing(20, 20)]
+    assert gpu.blocking(sharing(20, 20), strict=False) == []
+    four = gpu.blocking(sharing(20, 20, 20, 20), strict=False)
+    assert [process["severity"] for process in four] == ["severe"] * 4
+
+
+def test_a_share_too_small_to_name_stays_off_the_list_of_culprits():
+    found = gpu.blocking(sharing(20, 20, 20, 1), strict=False)
+    assert [process["name"] for process in found] == ["tab1", "tab2", "tab3"]
+
+
+def test_one_severe_program_is_not_regraded_by_the_rest():
+    found = gpu.blocking(sharing(70, 10), strict=True)
+    assert [(process["name"], process["severity"]) for process in found] == [("tab1", "severe")]
+
+
+def test_only_speed_and_submission_phases_are_strict():
+    assert [gpu.strict_for(phase) for phase in ("speed", "quality", "submit")] == [True, False, True]
+
+
+def test_the_watch_follows_the_phase_it_is_told_to_be_in(monkeypatch):
+    from blackwall import worker
+    seen = []
+    monkeypatch.setattr(worker, "GPU_CHECK_S", 0.01)
+    monkeypatch.setattr(worker.gpu, "contention", lambda samples, strict: seen.append(strict) or [])
+    watch = worker.GpuWatch(None, None, "quality")
+    watch.start()
+    wait_for(lambda: len(seen) >= 2)
+    watch.phase = "submit"
+    count = len(seen)
+    wait_for(lambda: len(seen) >= count + 2)
+    watch.stop()
+    assert seen[0] is False and seen[-1] is True

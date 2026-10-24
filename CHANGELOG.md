@@ -4,7 +4,11 @@ All notable changes to Blackwall are listed here, newest first. The format follo
 
 ## [Unreleased]
 
+### Changed
+- **Yielding counts the whole share, not each program alone.** Four browser tabs at 20% of the SMs each starve a server as surely as one game at 80%, and none of them crossed a line on its own. Programs are now graded one by one and then as a single share of the SMs: 25% stops a speed measurement, 60% stops anything.
+
 ### Fixed
+- **A quality-only run no longer yields like a speed run.** The watcher started in the strict state and only relaxed once a speed measurement had finished, so a run with no speed task was parked by a browser tab for its whole length. The watcher now takes its phase (speed, quality or submit) from the run, and a failing submission puts it back.
 - **The schedule's timer no longer depends on who wrote it.** The tick unit ran whichever Python last installed it, so one `python -m blackwall.cli` from a system interpreter pinned it to one that cannot import Blackwall, and every tick failed silently: nothing scheduled started and no run recovered. It now runs the installed `blackwall`, and falls back to the interpreter only when there is none.
 
 ## [2.4.0] - 2026-10-24
