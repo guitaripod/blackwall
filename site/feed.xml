@@ -3,11 +3,18 @@
   <id>https://guitaripod.github.io/blackwall/</id>
   <title>Blackwall</title>
   <subtitle>New results on one NVIDIA RTX PRO 6000 Blackwell, in the order they finished.</subtitle>
-  <updated>2026-10-21T21:36:54Z</updated>
+  <updated>2026-10-24T01:23:59Z</updated>
   <author><name>Blackwall</name></author>
-  <generator version="2.2.0">blackwall</generator>
+  <generator version="2.3.0">blackwall</generator>
   <link rel="self" type="application/atom+xml" href="https://guitaripod.github.io/blackwall/feed.xml"/>
   <link rel="alternate" type="text/html" href="https://guitaripod.github.io/blackwall/"/>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-10-24:run/20261022-174432-flint</id>
+    <title>Flint 40B: 71.2 quality (new best)</title>
+    <updated>2026-10-24T01:23:59Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#flint~medium"/>
+    <summary>Medium effort, suite full/v1. Quality index 71.2 (95% interval 68.4 to 73.9). 183 tok/s decoding one request, 686 tok/s at peak, 4.54 Wh per correct answer. The best quality index on this card at this effort so far. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 615.78.08, llama.cpp b1061-d772569.</summary>
+  </entry>
   <entry>
     <id>tag:guitaripod.github.io,2026-10-21:run/20261021-200855-nemotron-3.5-lightning-30b-a3b-darkstar-gguf</id>
     <title>Nemotron 3.5 Lightning 30B: 66.1 quality (debut)</title>
