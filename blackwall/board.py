@@ -1,6 +1,9 @@
 import html
 import json
+import os
 import statistics
+import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -18,6 +21,7 @@ TEMPLATE = paths.PACKAGE / "templates" / "leaderboard.html"
 CARD = paths.PACKAGE / "templates" / "card.html"
 PART_PREFIXES = (".bin.", ".part.")
 LIVE_STATUSES = ("running", "scheduled")
+REBUILD_TIMEOUT_S = 300
 
 
 def kind_of(run):
@@ -317,6 +321,17 @@ def build():
     paths.BOARD.write_text(page(data))
     (paths.BOARD.parent / "card.html").write_text(page(data, CARD))
     return paths.BOARD
+
+
+def rebuild():
+    """Rebuilds the local page in a fresh interpreter. A worker holds the Blackwall it started with for as long as a run
+    takes, and the template it reads from disk can be newer than that code: a placeholder renamed between the two once
+    left a stray marker on the page. Code and template only match when one process reads both at the same moment."""
+    completed = subprocess.run([sys.executable, "-m", "blackwall.cli", "board"], capture_output=True, text=True,
+                               timeout=REBUILD_TIMEOUT_S, env={**os.environ, "BLACKWALL_HOME": str(paths.DATA)})
+    if completed.returncode:
+        raise RuntimeError(completed.stderr.strip()[-300:] or f"exit status {completed.returncode}")
+    return Path(completed.stdout.strip())
 
 
 def addressed(html, site_url):

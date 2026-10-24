@@ -366,7 +366,7 @@ def refresh_board(events):
     """The local page shows a run as it goes: each scored task is on it when the next one starts, not only once the run
     has ended."""
     try:
-        board.build()
+        board.rebuild()
     except Exception as error:
         events.log(f"leaderboard rebuild failed: {error!r}")
 
@@ -559,10 +559,7 @@ def execute(run_id):
             watch.stop()
         if sampler:
             sampler.close()
-        try:
-            board.build()
-        except Exception as error:
-            events.log(f"leaderboard rebuild failed: {error!r}")
+        refresh_board(events)
         try:
             schedule.tick(db)
         except Exception as error:

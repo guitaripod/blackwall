@@ -322,3 +322,25 @@ def test_a_share_link_that_names_its_models_keeps_its_own_card(browser, card_fil
     page.wait_for_function("document.getElementById('show').value === 'two'")
     assert lit_pixels(page, 112, 150, 2176, 260) < 20000
     context.close()
+
+
+def test_the_page_is_rebuilt_by_a_fresh_interpreter_over_the_same_data(monkeypatch, tmp_path):
+    import subprocess
+    import sys
+    seen = {}
+
+    def fake(command, **kwargs):
+        seen.update(command=command, home=kwargs["env"]["BLACKWALL_HOME"])
+        return subprocess.CompletedProcess(command, 0, stdout=f"{tmp_path}/leaderboard.html\n", stderr="")
+
+    monkeypatch.setattr(paths, "DATA", tmp_path)
+    monkeypatch.setattr(board.subprocess, "run", fake)
+    assert board.rebuild() == tmp_path / "leaderboard.html"
+    assert seen == {"command": [sys.executable, "-m", "blackwall.cli", "board"], "home": str(tmp_path)}
+
+
+def test_a_failed_rebuild_says_why(monkeypatch):
+    import subprocess
+    monkeypatch.setattr(board.subprocess, "run", lambda command, **kwargs: subprocess.CompletedProcess(command, 1, stdout="", stderr="boom\n"))
+    with pytest.raises(RuntimeError, match="boom"):
+        board.rebuild()
