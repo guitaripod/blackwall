@@ -3,11 +3,25 @@
   <id>https://guitaripod.github.io/blackwall/</id>
   <title>Blackwall</title>
   <subtitle>New results on one NVIDIA RTX PRO 6000 Blackwell, in the order they finished.</subtitle>
-  <updated>2026-10-24T01:23:59Z</updated>
+  <updated>2026-10-28T11:05:02Z</updated>
   <author><name>Blackwall</name></author>
-  <generator version="2.3.0">blackwall</generator>
+  <generator version="2.5.0">blackwall</generator>
   <link rel="self" type="application/atom+xml" href="https://guitaripod.github.io/blackwall/feed.xml"/>
   <link rel="alternate" type="text/html" href="https://guitaripod.github.io/blackwall/"/>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-10-28:run/20261028-111213-groot-19b-a3b-nvfp4</id>
+    <title>Groot 19B: 78.5 quality (new best)</title>
+    <updated>2026-10-28T11:05:02Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#groot-19b-a3b-nvfp4~medium"/>
+    <summary>Medium effort, suite full/v1. Quality index 78.5 (95% interval 75.7 to 81.1). 379 tok/s decoding one request, 1102 tok/s at peak, 0.79 Wh per correct answer. The best quality index on this card at this effort so far. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 615.78.08, vLLM.</summary>
+  </entry>
+  <entry>
+    <id>tag:guitaripod.github.io,2026-10-24:run/20261023-194119-nemotron-3.5-bolt-e4b-4gb-gguf</id>
+    <title>Nemotron 3.5 Bolt 8B: 49.9 quality (debut)</title>
+    <updated>2026-10-24T15:03:03Z</updated>
+    <link rel="alternate" href="https://guitaripod.github.io/blackwall/#nemotron-3.5-bolt-e4b-4gb-gguf~medium"/>
+    <summary>Medium effort, suite full/v1. Quality index 49.9 (95% interval 46.1 to 53.5). 310 tok/s decoding one request, 872 tok/s at peak, 1.57 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 615.78.08, llama.cpp b1061-d772569.</summary>
+  </entry>
   <entry>
     <id>tag:guitaripod.github.io,2026-10-24:run/20261022-174432-flint</id>
     <title>Flint 40B: 71.2 quality (new best)</title>
