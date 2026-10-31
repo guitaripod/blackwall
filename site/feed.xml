@@ -3,17 +3,17 @@
   <id>https://guitaripod.github.io/blackwall/</id>
   <title>Blackwall</title>
   <subtitle>New results on one NVIDIA RTX PRO 6000 Blackwell, in the order they finished.</subtitle>
-  <updated>2026-10-31T01:28:35Z</updated>
+  <updated>2026-10-31T07:20:07Z</updated>
   <author><name>Blackwall</name></author>
   <generator version="2.5.0">blackwall</generator>
   <link rel="self" type="application/atom+xml" href="https://guitaripod.github.io/blackwall/feed.xml"/>
   <link rel="alternate" type="text/html" href="https://guitaripod.github.io/blackwall/"/>
   <entry>
-    <id>tag:guitaripod.github.io,2026-10-31:run/20261030-205810-groot-uncensored-nvfp4</id>
-    <title>Groot 19B: 75.5 quality (debut)</title>
-    <updated>2026-10-31T01:28:35Z</updated>
+    <id>tag:guitaripod.github.io,2026-10-31:run/20261031-051328-groot-uncensored-nvfp4</id>
+    <title>Groot 19B: 73.6 quality (debut)</title>
+    <updated>2026-10-31T07:20:07Z</updated>
     <link rel="alternate" href="https://guitaripod.github.io/blackwall/#groot-uncensored-nvfp4~medium"/>
-    <summary>Medium effort, suite full/v1. Quality index 75.5 (95% interval 72.5 to 78.4). 238 tok/s decoding one request, 645 tok/s at peak, 1.64 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 615.78.08, vLLM.</summary>
+    <summary>Medium effort, suite full/v1. Quality index 73.6 (95% interval 70.3 to 76.6). 364 tok/s decoding one request, 985 tok/s at peak, 1.98 Wh per correct answer. First time this model is on the board. Measured on NVIDIA RTX PRO 6000 Blackwell Workstation Edition, driver 615.78.08, vLLM.</summary>
   </entry>
   <entry>
     <id>tag:guitaripod.github.io,2026-10-29:run/20261028-143058-lfm3-1.7b-gguf</id>
