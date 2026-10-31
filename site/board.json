@@ -4,7 +4,7 @@
   "name": "blackwall",
   "version": "2.5.0"
  },
- "generated": 1793261289.1213522,
+ "generated": 1793415168.9783454,
  "suite": "full/v1",
  "current": "1",
  "hardware": {
@@ -71,6 +71,444 @@
    ],
    "rankings": {
     "medium": [
+     {
+      "id": "groot-uncensored-nvfp4",
+      "name": "Groot 19B \u00b7 Uncensored \u00b7 vLLM \u00b7 NVFP4 \u00b7 256K",
+      "engine": "vllm",
+      "quantization": "NVFP4",
+      "spec": null,
+      "context": 262144,
+      "fingerprint": "8e9543811bdd800b",
+      "stack": {
+       "host": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|615.78.08",
+       "hostLabel": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 615.78.08",
+       "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+       "driver": "615.78.08",
+       "vramMib": 97887,
+       "deviceClass": "gpu",
+       "device": null,
+       "soc": null,
+       "bandwidthGbs": null,
+       "ramGb": null,
+       "engine": "vllm",
+       "build": "vLLM",
+       "source": null
+      },
+      "run": {
+       "id": "20261030-205810-groot-uncensored-nvfp4",
+       "suite": "full/v1",
+       "kind": "full",
+       "finished": 1793410115.6010778,
+       "effort": "medium",
+       "harness": "2.5.0+d99988a",
+       "contended": [],
+       "failedItems": 0,
+       "notes": null,
+       "reused": null,
+       "stackChange": []
+      },
+      "index": {
+       "value": 75.54158291842221,
+       "unit": "%",
+       "n": 5,
+       "lo": 72.54710442558199,
+       "hi": 78.41413453610512
+      },
+      "tasks": {
+       "supergpqa": {
+        "value": 41.45873320537428,
+        "unit": "%",
+        "n": 521,
+        "lo": 37.30594845635417,
+        "hi": 45.73655427208808,
+        "tokens": 5191.9136276391555,
+        "latency": 23.8,
+        "truncated": 0.5758157389635317,
+        "unreachable": null,
+        "malformed": null,
+        "parts": {}
+       },
+       "math": {
+        "value": 79.36507936507937,
+        "unit": "%",
+        "n": 63,
+        "lo": 70.32056358858682,
+        "hi": 88.40959514157191,
+        "tokens": 16252.039682539682,
+        "latency": 91.35499999999999,
+        "truncated": 0.0,
+        "unreachable": null,
+        "malformed": null,
+        "parts": {
+         "aime": 91.66666666666666,
+         "hmmt": 68.18181818181817
+        }
+       },
+       "lcb": {
+        "value": 70.29702970297029,
+        "unit": "%",
+        "n": 101,
+        "lo": 60.774775180196,
+        "hi": 78.33183898822568,
+        "tokens": 11602.336633663366,
+        "latency": 67.17,
+        "truncated": 0.0,
+        "unreachable": null,
+        "malformed": null,
+        "parts": {}
+       },
+       "mrcr": {
+        "value": 85.42447622311649,
+        "unit": "%",
+        "n": 60,
+        "lo": 77.30190811242201,
+        "hi": 93.54704433381096,
+        "tokens": 7471.95,
+        "latency": 62.845,
+        "truncated": 0.0,
+        "unreachable": null,
+        "malformed": null,
+        "parts": {
+         "131072": 57.777383177104156,
+         "16384": 98.79932377064765,
+         "32768": 99.36423365586687,
+         "65536": 85.75696428884729
+        }
+       },
+       "graphwalks": {
+        "value": 89.50405437917001,
+        "unit": "%",
+        "n": 48,
+        "lo": 81.8150034641312,
+        "hi": 97.19310529420883,
+        "tokens": 15132.3125,
+        "latency": 83.14500000000001,
+        "truncated": 6.25,
+        "unreachable": null,
+        "malformed": null,
+        "parts": {
+         "16384": 83.33333333333334,
+         "32768": 98.80952380952381,
+         "65536": 76.87670485542826,
+         "8192": 98.99665551839465
+        }
+       },
+       "tools": {
+        "value": 99.12280701754386,
+        "unit": "%",
+        "n": 38,
+        "lo": 97.40350877192982,
+        "hi": 100.0,
+        "tokens": 350.6578947368421,
+        "latency": 2.2800000000000002,
+        "truncated": 0.0,
+        "unreachable": null,
+        "malformed": 0.0,
+        "parts": {
+         "clarify": 100.0,
+         "conditional": 100.0,
+         "distractor": 83.33333333333334,
+         "irrelevant": 100.0,
+         "multi-turn": 100.0,
+         "parallel": 100.0,
+         "policy": 100.0,
+         "recovery": 100.0,
+         "sequential": 100.0,
+         "single": 100.0
+        }
+       }
+      },
+      "qualityFrom": null,
+      "deviceClass": "gpu",
+      "capacity": {
+       "slots": null,
+       "context": 262144,
+       "pool": null
+      },
+      "warnings": [],
+      "energy": {
+       "perCorrect": {
+        "value": 1.6383166472339579,
+        "unit": "Wh",
+        "n": 594,
+        "lo": null,
+        "hi": null
+       },
+       "quality": {
+        "value": 973.515,
+        "unit": "Wh",
+        "n": 6,
+        "lo": null,
+        "hi": null
+       }
+      },
+      "speed": {
+       "conc.1": {
+        "value": 233.89999999999998,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 233.6,
+        "hi": 234.2
+       },
+       "conc.2": {
+        "value": 362.9,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 362.0,
+        "hi": 363.8
+       },
+       "conc.4": {
+        "value": 644.7,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 642.5,
+        "hi": 646.9
+       },
+       "decode": {
+        "value": 237.57,
+        "unit": "tok/s",
+        "n": 3,
+        "lo": null,
+        "hi": null
+       },
+       "decode.code-v1": {
+        "value": 237.89,
+        "unit": "tok/s",
+        "n": 3,
+        "lo": 237.18,
+        "hi": 238.85
+       },
+       "decode.prose-v1": {
+        "value": 237.74,
+        "unit": "tok/s",
+        "n": 3,
+        "lo": 237.41,
+        "hi": 237.84
+       },
+       "decode.reasoning-v1": {
+        "value": 237.08,
+        "unit": "tok/s",
+        "n": 3,
+        "lo": 236.6,
+        "hi": 237.39
+       },
+       "decode_at.1000": {
+        "value": 237.475,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 237.31,
+        "hi": 237.64
+       },
+       "decode_at.120000": {
+        "value": 162.09,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 162.05,
+        "hi": 162.13
+       },
+       "decode_at.32000": {
+        "value": 211.58,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 211.55,
+        "hi": 211.61
+       },
+       "decode_at.64000": {
+        "value": 188.485,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 188.35,
+        "hi": 188.62
+       },
+       "decode_at.8000": {
+        "value": 231.39999999999998,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 231.14,
+        "hi": 231.66
+       },
+       "energy": {
+        "value": 0.9853293539030645,
+        "unit": "J/token",
+        "n": 3,
+        "lo": null,
+        "hi": null
+       },
+       "peak": {
+        "value": 644.7,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 642.5,
+        "hi": 646.9
+       },
+       "peak_at": {
+        "value": 4.0,
+        "unit": "requests",
+        "n": 2,
+        "lo": null,
+        "hi": null
+       },
+       "power": {
+        "value": 234.4,
+        "unit": "W",
+        "n": 3,
+        "lo": null,
+        "hi": null
+       },
+       "prefill.1000": {
+        "value": 11262.95,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 5657.2,
+        "hi": 16868.7
+       },
+       "prefill.120000": {
+        "value": 15150.05,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 15117.9,
+        "hi": 15182.2
+       },
+       "prefill.32000": {
+        "value": 26491.8,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 26364.0,
+        "hi": 26619.6
+       },
+       "prefill.64000": {
+        "value": 21929.25,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 21868.2,
+        "hi": 21990.3
+       },
+       "prefill.8000": {
+        "value": 25990.95,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 15868.5,
+        "hi": 36113.4
+       },
+       "temp": {
+        "value": 48.0,
+        "unit": "C",
+        "n": 3,
+        "lo": null,
+        "hi": null
+       },
+       "ttft.1000": {
+        "value": 0.13355,
+        "unit": "s",
+        "n": 2,
+        "lo": 0.0693,
+        "hi": 0.1978
+       },
+       "ttft.120000": {
+        "value": 8.3743,
+        "unit": "s",
+        "n": 2,
+        "lo": 8.3461,
+        "hi": 8.4025
+       },
+       "ttft.32000": {
+        "value": 1.28295,
+        "unit": "s",
+        "n": 2,
+        "lo": 1.2741,
+        "hi": 1.2918
+       },
+       "ttft.64000": {
+        "value": 3.0791,
+        "unit": "s",
+        "n": 2,
+        "lo": 3.0584,
+        "hi": 3.0998
+       },
+       "ttft.8000": {
+        "value": 0.38584999999999997,
+        "unit": "s",
+        "n": 2,
+        "lo": 0.238,
+        "hi": 0.5337
+       },
+       "ttft.short": {
+        "value": 64.0,
+        "unit": "ms",
+        "n": 9,
+        "lo": 61.3,
+        "hi": 69.0
+       }
+      },
+      "thermal": {},
+      "battery": {},
+      "verdict": null,
+      "repeats": {
+       "runs": 1,
+       "spread": null
+      },
+      "lmx": {
+       "gsm8k": {
+        "value": 95.45076923076924,
+        "unit": "%",
+        "n": 13,
+        "lo": null,
+        "hi": null
+       },
+       "hellaswag": {
+        "value": 63.113076923076925,
+        "unit": "%",
+        "n": 13,
+        "lo": null,
+        "hi": null
+       }
+      },
+      "submissions": [
+       {
+        "kind": "speed.code-v1",
+        "id": "cmvvop60d0rxfs6013h6ljhu2",
+        "value": 241.5,
+        "run": "20261030-205810-groot-uncensored-nvfp4",
+        "verified": true
+       },
+       {
+        "kind": "speed.reasoning-v1",
+        "id": "cmvvopdgh0rxis6017kdvkk59",
+        "value": 238.8,
+        "run": "20261030-205810-groot-uncensored-nvfp4",
+        "verified": true
+       }
+      ],
+      "server": {
+       "load_s": 72.0,
+       "model_path": null,
+       "n_ctx": null,
+       "total_slots": null,
+       "build": {
+        "engine": "vllm"
+       },
+       "capacity": {
+        "slots": null,
+        "context": 262144,
+        "pool": null
+       },
+       "weights": null,
+       "probe": {
+        "prompt": "List the first eight prime numbers, separated by spaces, and nothing else.",
+        "answer": "Thinking Process:\n\n1.  **Analyze the Request:** The user wants a list of the first eight prime numbers, separated by spaces, and *nothing else*.\n2.  **Identify Prime Numbers:**\n    *   2 (prime)\n    *   3 (prime)\n   "
+       }
+      },
+      "history": [
+       {
+        "id": "20261030-205810-groot-uncensored-nvfp4",
+        "suite": "full/v1",
+        "effort": "medium",
+        "finished": 1793410115.6010778,
+        "index": 75.54158291842221,
+        "decode": 237.57
+       }
+      ]
+     },
      {
       "id": "lfm3-1.7b-gguf",
       "name": "LFM3 1.7B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 256K",
@@ -7956,14 +8394,14 @@
    "hosts": {
     "medium": [
      {
-      "key": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|610.57.04",
-      "label": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 610.57.04",
+      "key": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|615.78.08",
+      "label": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 615.78.08",
       "models": 7
      },
      {
-      "key": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|615.78.08",
-      "label": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 615.78.08",
-      "models": 6
+      "key": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|610.57.04",
+      "label": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 610.57.04",
+      "models": 7
      },
      {
       "key": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|615.71.09",
@@ -8016,6 +8454,444 @@
  ],
  "rankings": {
   "medium": [
+   {
+    "id": "groot-uncensored-nvfp4",
+    "name": "Groot 19B \u00b7 Uncensored \u00b7 vLLM \u00b7 NVFP4 \u00b7 256K",
+    "engine": "vllm",
+    "quantization": "NVFP4",
+    "spec": null,
+    "context": 262144,
+    "fingerprint": "8e9543811bdd800b",
+    "stack": {
+     "host": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|615.78.08",
+     "hostLabel": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 615.78.08",
+     "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+     "driver": "615.78.08",
+     "vramMib": 97887,
+     "deviceClass": "gpu",
+     "device": null,
+     "soc": null,
+     "bandwidthGbs": null,
+     "ramGb": null,
+     "engine": "vllm",
+     "build": "vLLM",
+     "source": null
+    },
+    "run": {
+     "id": "20261030-205810-groot-uncensored-nvfp4",
+     "suite": "full/v1",
+     "kind": "full",
+     "finished": 1793410115.6010778,
+     "effort": "medium",
+     "harness": "2.5.0+d99988a",
+     "contended": [],
+     "failedItems": 0,
+     "notes": null,
+     "reused": null,
+     "stackChange": []
+    },
+    "index": {
+     "value": 75.54158291842221,
+     "unit": "%",
+     "n": 5,
+     "lo": 72.54710442558199,
+     "hi": 78.41413453610512
+    },
+    "tasks": {
+     "supergpqa": {
+      "value": 41.45873320537428,
+      "unit": "%",
+      "n": 521,
+      "lo": 37.30594845635417,
+      "hi": 45.73655427208808,
+      "tokens": 5191.9136276391555,
+      "latency": 23.8,
+      "truncated": 0.5758157389635317,
+      "unreachable": null,
+      "malformed": null,
+      "parts": {}
+     },
+     "math": {
+      "value": 79.36507936507937,
+      "unit": "%",
+      "n": 63,
+      "lo": 70.32056358858682,
+      "hi": 88.40959514157191,
+      "tokens": 16252.039682539682,
+      "latency": 91.35499999999999,
+      "truncated": 0.0,
+      "unreachable": null,
+      "malformed": null,
+      "parts": {
+       "aime": 91.66666666666666,
+       "hmmt": 68.18181818181817
+      }
+     },
+     "lcb": {
+      "value": 70.29702970297029,
+      "unit": "%",
+      "n": 101,
+      "lo": 60.774775180196,
+      "hi": 78.33183898822568,
+      "tokens": 11602.336633663366,
+      "latency": 67.17,
+      "truncated": 0.0,
+      "unreachable": null,
+      "malformed": null,
+      "parts": {}
+     },
+     "mrcr": {
+      "value": 85.42447622311649,
+      "unit": "%",
+      "n": 60,
+      "lo": 77.30190811242201,
+      "hi": 93.54704433381096,
+      "tokens": 7471.95,
+      "latency": 62.845,
+      "truncated": 0.0,
+      "unreachable": null,
+      "malformed": null,
+      "parts": {
+       "131072": 57.777383177104156,
+       "16384": 98.79932377064765,
+       "32768": 99.36423365586687,
+       "65536": 85.75696428884729
+      }
+     },
+     "graphwalks": {
+      "value": 89.50405437917001,
+      "unit": "%",
+      "n": 48,
+      "lo": 81.8150034641312,
+      "hi": 97.19310529420883,
+      "tokens": 15132.3125,
+      "latency": 83.14500000000001,
+      "truncated": 6.25,
+      "unreachable": null,
+      "malformed": null,
+      "parts": {
+       "16384": 83.33333333333334,
+       "32768": 98.80952380952381,
+       "65536": 76.87670485542826,
+       "8192": 98.99665551839465
+      }
+     },
+     "tools": {
+      "value": 99.12280701754386,
+      "unit": "%",
+      "n": 38,
+      "lo": 97.40350877192982,
+      "hi": 100.0,
+      "tokens": 350.6578947368421,
+      "latency": 2.2800000000000002,
+      "truncated": 0.0,
+      "unreachable": null,
+      "malformed": 0.0,
+      "parts": {
+       "clarify": 100.0,
+       "conditional": 100.0,
+       "distractor": 83.33333333333334,
+       "irrelevant": 100.0,
+       "multi-turn": 100.0,
+       "parallel": 100.0,
+       "policy": 100.0,
+       "recovery": 100.0,
+       "sequential": 100.0,
+       "single": 100.0
+      }
+     }
+    },
+    "qualityFrom": null,
+    "deviceClass": "gpu",
+    "capacity": {
+     "slots": null,
+     "context": 262144,
+     "pool": null
+    },
+    "warnings": [],
+    "energy": {
+     "perCorrect": {
+      "value": 1.6383166472339579,
+      "unit": "Wh",
+      "n": 594,
+      "lo": null,
+      "hi": null
+     },
+     "quality": {
+      "value": 973.515,
+      "unit": "Wh",
+      "n": 6,
+      "lo": null,
+      "hi": null
+     }
+    },
+    "speed": {
+     "conc.1": {
+      "value": 233.89999999999998,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 233.6,
+      "hi": 234.2
+     },
+     "conc.2": {
+      "value": 362.9,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 362.0,
+      "hi": 363.8
+     },
+     "conc.4": {
+      "value": 644.7,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 642.5,
+      "hi": 646.9
+     },
+     "decode": {
+      "value": 237.57,
+      "unit": "tok/s",
+      "n": 3,
+      "lo": null,
+      "hi": null
+     },
+     "decode.code-v1": {
+      "value": 237.89,
+      "unit": "tok/s",
+      "n": 3,
+      "lo": 237.18,
+      "hi": 238.85
+     },
+     "decode.prose-v1": {
+      "value": 237.74,
+      "unit": "tok/s",
+      "n": 3,
+      "lo": 237.41,
+      "hi": 237.84
+     },
+     "decode.reasoning-v1": {
+      "value": 237.08,
+      "unit": "tok/s",
+      "n": 3,
+      "lo": 236.6,
+      "hi": 237.39
+     },
+     "decode_at.1000": {
+      "value": 237.475,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 237.31,
+      "hi": 237.64
+     },
+     "decode_at.120000": {
+      "value": 162.09,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 162.05,
+      "hi": 162.13
+     },
+     "decode_at.32000": {
+      "value": 211.58,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 211.55,
+      "hi": 211.61
+     },
+     "decode_at.64000": {
+      "value": 188.485,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 188.35,
+      "hi": 188.62
+     },
+     "decode_at.8000": {
+      "value": 231.39999999999998,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 231.14,
+      "hi": 231.66
+     },
+     "energy": {
+      "value": 0.9853293539030645,
+      "unit": "J/token",
+      "n": 3,
+      "lo": null,
+      "hi": null
+     },
+     "peak": {
+      "value": 644.7,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 642.5,
+      "hi": 646.9
+     },
+     "peak_at": {
+      "value": 4.0,
+      "unit": "requests",
+      "n": 2,
+      "lo": null,
+      "hi": null
+     },
+     "power": {
+      "value": 234.4,
+      "unit": "W",
+      "n": 3,
+      "lo": null,
+      "hi": null
+     },
+     "prefill.1000": {
+      "value": 11262.95,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 5657.2,
+      "hi": 16868.7
+     },
+     "prefill.120000": {
+      "value": 15150.05,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 15117.9,
+      "hi": 15182.2
+     },
+     "prefill.32000": {
+      "value": 26491.8,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 26364.0,
+      "hi": 26619.6
+     },
+     "prefill.64000": {
+      "value": 21929.25,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 21868.2,
+      "hi": 21990.3
+     },
+     "prefill.8000": {
+      "value": 25990.95,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 15868.5,
+      "hi": 36113.4
+     },
+     "temp": {
+      "value": 48.0,
+      "unit": "C",
+      "n": 3,
+      "lo": null,
+      "hi": null
+     },
+     "ttft.1000": {
+      "value": 0.13355,
+      "unit": "s",
+      "n": 2,
+      "lo": 0.0693,
+      "hi": 0.1978
+     },
+     "ttft.120000": {
+      "value": 8.3743,
+      "unit": "s",
+      "n": 2,
+      "lo": 8.3461,
+      "hi": 8.4025
+     },
+     "ttft.32000": {
+      "value": 1.28295,
+      "unit": "s",
+      "n": 2,
+      "lo": 1.2741,
+      "hi": 1.2918
+     },
+     "ttft.64000": {
+      "value": 3.0791,
+      "unit": "s",
+      "n": 2,
+      "lo": 3.0584,
+      "hi": 3.0998
+     },
+     "ttft.8000": {
+      "value": 0.38584999999999997,
+      "unit": "s",
+      "n": 2,
+      "lo": 0.238,
+      "hi": 0.5337
+     },
+     "ttft.short": {
+      "value": 64.0,
+      "unit": "ms",
+      "n": 9,
+      "lo": 61.3,
+      "hi": 69.0
+     }
+    },
+    "thermal": {},
+    "battery": {},
+    "verdict": null,
+    "repeats": {
+     "runs": 1,
+     "spread": null
+    },
+    "lmx": {
+     "gsm8k": {
+      "value": 95.45076923076924,
+      "unit": "%",
+      "n": 13,
+      "lo": null,
+      "hi": null
+     },
+     "hellaswag": {
+      "value": 63.113076923076925,
+      "unit": "%",
+      "n": 13,
+      "lo": null,
+      "hi": null
+     }
+    },
+    "submissions": [
+     {
+      "kind": "speed.code-v1",
+      "id": "cmvvop60d0rxfs6013h6ljhu2",
+      "value": 241.5,
+      "run": "20261030-205810-groot-uncensored-nvfp4",
+      "verified": true
+     },
+     {
+      "kind": "speed.reasoning-v1",
+      "id": "cmvvopdgh0rxis6017kdvkk59",
+      "value": 238.8,
+      "run": "20261030-205810-groot-uncensored-nvfp4",
+      "verified": true
+     }
+    ],
+    "server": {
+     "load_s": 72.0,
+     "model_path": null,
+     "n_ctx": null,
+     "total_slots": null,
+     "build": {
+      "engine": "vllm"
+     },
+     "capacity": {
+      "slots": null,
+      "context": 262144,
+      "pool": null
+     },
+     "weights": null,
+     "probe": {
+      "prompt": "List the first eight prime numbers, separated by spaces, and nothing else.",
+      "answer": "Thinking Process:\n\n1.  **Analyze the Request:** The user wants a list of the first eight prime numbers, separated by spaces, and *nothing else*.\n2.  **Identify Prime Numbers:**\n    *   2 (prime)\n    *   3 (prime)\n   "
+     }
+    },
+    "history": [
+     {
+      "id": "20261030-205810-groot-uncensored-nvfp4",
+      "suite": "full/v1",
+      "effort": "medium",
+      "finished": 1793410115.6010778,
+      "index": 75.54158291842221,
+      "decode": 237.57
+     }
+    ]
+   },
    {
     "id": "lfm3-1.7b-gguf",
     "name": "LFM3 1.7B \u00b7 llama.cpp \u00b7 Q4_K_M \u00b7 256K",
@@ -16464,6 +17340,29 @@
    "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
    "driver": "615.78.08",
    "build": "llama.cpp b1201-8642541",
+   "debut": true,
+   "record": false,
+   "delta": null,
+   "previous": null
+  },
+  {
+   "run": "20261030-205810-groot-uncensored-nvfp4",
+   "model": "groot-uncensored-nvfp4",
+   "name": "Groot 19B \u00b7 Uncensored \u00b7 vLLM \u00b7 NVFP4 \u00b7 256K",
+   "effort": "medium",
+   "suite": "full/v1",
+   "version": "1",
+   "kind": "full",
+   "finished": 1793410115.6010778,
+   "index": 75.54158291842221,
+   "lo": 72.54710442558199,
+   "hi": 78.41413453610512,
+   "decode": 237.57,
+   "peak": 644.7,
+   "energyPerCorrect": 1.6383166472339579,
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+   "driver": "615.78.08",
+   "build": "vLLM",
    "debut": true,
    "record": false,
    "delta": null,
