@@ -517,6 +517,7 @@ def execute(run_id):
             return
         store.set_metrics(db, run_id, metrics.quality_index(store.metrics_of(db, run_id), run_dir))
         store.set_metrics(db, run_id, metrics.energy_metrics(run_dir))
+        store.set_metrics(db, run_id, metrics.time_metrics(run_dir))
         if flags.get("submit"):
             which = flags["submit"] if flags["submit"] in lmx.SUBMIT_CHOICES else "all"
             if watch:

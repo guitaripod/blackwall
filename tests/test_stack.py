@@ -107,3 +107,18 @@ def test_a_git_install_records_the_commit_it_was_built_from(monkeypatch):
 
 def test_a_directory_outside_any_checkout_has_no_checkout_commit(tmp_path):
     assert stack.checkout_commit(tmp_path) is None
+
+
+def test_a_fork_of_the_engine_is_named_and_an_upstream_build_is_not():
+    fork = stack.of({"profile": {"engine": "llama.cpp", "engine_meta": {
+        "repository": "https://github.com/unslothai/llama.cpp.git", "version": "b12568-mix", "note": "Looped layers are new."}}})
+    assert (fork["repository"], fork["fork"], fork["release"], fork["note"]) == (
+        "unslothai/llama.cpp", True, "b12568-mix", "Looped layers are new.")
+    upstream = stack.of({"profile": {"engine": "llama.cpp", "engine_meta": {"repository": "https://github.com/ggml-org/llama.cpp"}}})
+    assert (upstream["repository"], upstream["fork"], upstream["note"]) == ("ggml-org/llama.cpp", False, None)
+
+
+def test_a_run_that_declared_no_repository_is_not_called_a_fork():
+    assert stack.of({"profile": {"engine": "llama.cpp"}})["fork"] is False
+    assert stack.of({"profile": {"engine": "other", "engine_meta": {"repository": "https://example.com/a/b"}}})["fork"] is False
+    assert stack.of(None)["fork"] is False

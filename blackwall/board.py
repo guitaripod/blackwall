@@ -52,7 +52,7 @@ def task_entry(metrics, task):
     parts = {key.split(".", 2)[2]: entry["value"] for key, entry in metrics.items()
              if key.startswith(task) and any(key.startswith(task + prefix) for prefix in PART_PREFIXES)}
     return {**score, **{field: (metrics.get(f"{task}.{field}") or {}).get("value")
-                        for field in ("tokens", "latency", "truncated", "unreachable", "malformed")},
+                        for field in ("tokens", "latency", "truncated", "unreachable", "malformed", "time")},
             "parts": parts}
 
 
@@ -148,6 +148,7 @@ def model_entry(db, run, history, definition):
         "capacity": capacity,
         "warnings": warnings_for(tasks, capacity, definition["labels"]),
         "energy": {"perCorrect": metrics.get("energy.per_correct"), "quality": metrics.get("energy.quality")},
+        "time": metrics.get("time.suite"),
         "speed": {key.removeprefix("speed."): entry for key, entry in metrics.items() if key.startswith("speed.")},
         "thermal": {key.removeprefix("thermal."): entry for key, entry in metrics.items() if key.startswith("thermal.")},
         "battery": {key.removeprefix("battery."): entry for key, entry in metrics.items() if key.startswith("battery.")},

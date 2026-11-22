@@ -139,3 +139,29 @@ def test_peak_throughput_is_the_best_level():
                               {"concurrency": 16, "aggregate_tps": 850.0}]}
     out = metrics.speed_metrics(result)
     assert out["speed.peak"]["value"] == 900.0 and out["speed.peak_at"]["value"] == 8
+
+
+def test_measuring_time_leaves_out_the_time_a_run_sat_parked(tmp_path):
+    events = [
+        {"t": 0, "phase": "started"},
+        {"t": 10, "phase": "speed", "done": 0, "total": 2},
+        {"t": 70, "phase": "speed", "done": 2, "total": 2},
+        {"t": 80, "phase": "math", "done": 0, "total": 3},
+        {"t": 180, "phase": "math", "done": 1, "total": 3},
+        {"t": 200, "phase": "yielding", "to": "game"},
+        {"t": 5000, "phase": "loaded"},
+        {"t": 5010, "phase": "math", "done": 1, "total": 3},
+        {"t": 5110, "phase": "math", "done": 3, "total": 3},
+        {"t": 5120, "phase": "complete"},
+    ]
+    (tmp_path / "events.jsonl").write_text("\n".join(json.dumps(event) for event in events) + "\nnot json\n")
+    found = metrics.time_metrics(tmp_path)
+    assert found["speed.time"]["value"] == 60
+    assert found["math.time"]["value"] == 210
+    assert found["time.suite"]["value"] == 270
+
+
+def test_a_run_without_a_progress_log_has_no_measuring_time(tmp_path):
+    assert metrics.time_metrics(tmp_path) == {}
+    (tmp_path / "events.jsonl").write_text(json.dumps({"t": 0, "phase": "started"}))
+    assert metrics.time_metrics(tmp_path) == {}

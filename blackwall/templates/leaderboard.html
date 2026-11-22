@@ -653,6 +653,8 @@ const fmt = {
   ctx: value => value == null ? "–" : (value >= 1000 ? Math.round(value / 1024) + "k" : String(value)),
   date: stamp => stamp ? new Date(stamp * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "–",
   sign: value => (value > 0 ? "+" : value < 0 ? "−" : "") + Math.abs(value).toFixed(1),
+  rate: value => value == null ? "–" : value >= 10000 ? (value / 1000).toFixed(1) + "k" : Math.round(value).toLocaleString("en-US"),
+  dur: value => value == null ? "–" : value >= 5400 ? (value / 3600).toFixed(1) + " h" : value >= 90 ? Math.round(value / 60) + " min" : Math.round(value) + " s",
 };
 
 const state = {
@@ -1198,6 +1200,11 @@ function metaText(model) {
   if (tierSetups().length > 1 && model.stack) parts.push(...setupMarks(model));
   return parts.join(" · ");
 }
+function forkText(build) {
+  return `Served by ${build.repository}${build.release ? " " + build.release : ""}, a fork of the engine. Its speed is this build's, not the engine's.`;
+}
+function suiteTime(model) { return val(model.time); }
+function prefillOf(model) { return val((model.speed || {})["prefill.32000"]); }
 function modelTags(model, onWall) {
   const tags = [];
   if (onWall) tags.push(`<span class="tag wall">On the wall</span>`);
@@ -1206,6 +1213,9 @@ function modelTags(model, onWall) {
   if (model.run.failedItems) tags.push(`<span class="tag warn">${model.run.failedItems} requests failed</span>`);
   if (model.warnings && model.warnings.length) tags.push(`<span class="tag warn" title="${esc(model.warnings.join(" "))}">Context capped</span>`);
   if (model.repeats && model.repeats.spread != null && model.repeats.spread > 5) tags.push(`<span class="tag warn" title="Runs of the same configuration landed this far apart.">Repeats differ ${Math.round(model.repeats.spread)}%</span>`);
+  const build = model.stack || {};
+  if (build.note) tags.push(`<span class="tag warn" title="${esc(build.note)}">Early engine build</span>`);
+  else if (build.fork) tags.push(`<span class="tag" title="${esc(forkText(build))}">Fork build</span>`);
   const cut = tasks().filter(task => ((model.tasks[task] || {}).truncated || 0) >= 50);
   if (cut.length) tags.push(`<span class="tag warn" title="Over half of these answers hit the token budget before finishing; the score is a floor, not a ceiling.">${esc(cut.map(taskShort).join(", "))} cut off</span>`);
   return tags.join("");
@@ -1221,6 +1231,10 @@ function columnPlan() {
       { key: "ttft", label: "First token 32k", cls: "cost", get: m => val((m.speed || {})["ttft.32000"]), better: "low", render: m => fmt.secs(val((m.speed || {})["ttft.32000"])) },
       { key: "wh", label: "Wh / correct", cls: "cost", note: "Board energy over the quality tasks per correct answer, idle draw included", get: m => val((m.energy || {}).perCorrect), better: "low",
         render: m => val((m.energy || {}).perCorrect) == null ? "–" : `${val(m.energy.perCorrect).toFixed(2)}<small>Wh</small>` },
+      { key: "prefill", label: "Prefill 32k", cls: "cost", optional: true, note: "Prompt tokens read per second on a 32k-token prompt; it sets how long every long-context question waits", get: prefillOf, better: "high",
+        render: m => prefillOf(m) == null ? "–" : `${fmt.rate(prefillOf(m))}<small>tok/s</small>` },
+      { key: "time", label: "Suite time", cls: "cost", optional: true, note: "Time spent measuring the whole suite, leaving out any time the run sat parked for other GPU work", get: suiteTime, better: "low",
+        render: m => fmt.dur(suiteTime(m)) },
       { key: "tokens", label: "Tokens / answer", cls: "cost", optional: true, get: avgTokens, better: "low", render: m => fmt.int(avgTokens(m)) },
     ];
   }
@@ -1265,7 +1279,7 @@ function renderHead(plan) {
   const table = $("#table");
   const groupCols = plan.length ? `repeat(${plan.filter(c => c.cls === "grp").length || 0}, minmax(4.4rem, 0.62fr))` : "";
   table.style.setProperty("--cols-wide", state.columns === "cost"
-    ? "2.6rem minmax(15rem, 2fr) minmax(11rem, 1.3fr) repeat(5, minmax(4.8rem, 0.7fr)) 4.6rem"
+    ? `2.6rem minmax(15rem, 2fr) minmax(11rem, 1.3fr) repeat(${plan.length}, minmax(4.8rem, 0.7fr)) 4.6rem`
     : `2.6rem minmax(15rem, 2fr) minmax(12rem, 1.5fr) ${groupCols} 4.8rem 4.4rem 4.6rem`);
   table.dataset.mode = state.columns;
 }
@@ -1383,6 +1397,7 @@ function taskFacts(task, entry) {
   notes.push(`${entry.n} ${COUNT_NOUNS[task] || "questions"}`);
   if (entry.tokens != null) notes.push(`${fmt.int(entry.tokens)} tokens per ${task === "tools" ? "episode" : "answer"}`);
   if (entry.latency != null) notes.push(`median ${fmt.secs(entry.latency)}`);
+  if (entry.time != null) notes.push(`took ${fmt.dur(entry.time)}`);
   if (entry.truncated) notes.push(`${entry.truncated.toFixed(0)}% hit the token limit`);
   if (entry.unreachable) notes.push(`${entry.unreachable.toFixed(0)}% longer than the context window`);
   if (entry.malformed) notes.push(`${entry.malformed.toFixed(0)}% with malformed calls`);
@@ -1440,6 +1455,7 @@ function profileHtml(model) {
   const notes = [
     (model.run.stackChange || []).length ? `Changed since this model's previous run: ${esc(model.run.stackChange.join("; "))}. Its older speed and energy numbers no longer compare.` : "",
     model.run.notes ? esc(model.run.notes) : "",
+    (model.stack || {}).note ? esc(model.stack.note) : (model.stack || {}).fork ? esc(forkText(model.stack)) : "",
     model.run.reused ? `Answers for ${esc(model.run.reused.tasks.join(", "))} carried over from ${esc(model.run.reused.run)}.` : "",
     ...(model.warnings || []).map(esc),
   ].filter(Boolean).map(text => `<p class="strip-note">${text}</p>`).join("");
@@ -1454,11 +1470,12 @@ function profileHtml(model) {
       <div class="fact"><b>${peak != null ? fmt.int(peak) : conc4 != null ? fmt.int(conc4) : "–"}</b><span>tok/s ${peak != null && sp.peak_at ? `at ${sp.peak_at.value} at once` : "at best"}</span></div>
       <div class="fact"><b>${val((model.energy || {}).perCorrect) != null ? val(model.energy.perCorrect).toFixed(2) : "–"}</b><span><button class="term" popovertarget="g-wh">Wh per correct</button></span></div>
       <div class="fact"><b>${model.capacity && model.capacity.context ? fmt.ctx(model.capacity.context) : "–"}</b><span>tokens per request${model.capacity && model.capacity.slots ? `, ${model.capacity.slots} at once` : ""}</span></div>
+      <div class="fact"><b>${fmt.dur(suiteTime(model))}</b><span>to run the suite</span></div>
     </div>${ttftMini(model)}${rankDist(model)}</div>
     <div class="deep" data-charts="${esc(model.id)}"></div>
     <div class="prov">
       <div><h3>Run</h3><code>${esc(model.run.id)}</code><br>${esc(fmt.date(model.run.finished))} · ${esc(model.run.suite)} · effort ${esc(model.run.effort || "–")}</div>
-      <div><h3>Measured on</h3>${esc((model.stack && model.stack.hostLabel) || "–")}<br>${esc((model.stack && model.stack.build) || model.engine || "")}</div>
+      <div><h3>Measured on</h3>${esc((model.stack && model.stack.hostLabel) || "–")}<br>${esc((model.stack && model.stack.build) || model.engine || "")}${model.stack && model.stack.repository ? `<br>${esc(model.stack.repository)}${model.stack.fork ? " (fork)" : ""}` : ""}</div>
       <div><h3>Data checks</h3>${model.run.failedItems ? `${model.run.failedItems} failed items` : "0 failed items"}<br>${model.run.contended && model.run.contended.length ? `Shared with ${esc(model.run.contended.join(", "))}` : "GPU to itself"}${model.repeats && model.repeats.runs > 1 ? `<br>${model.repeats.runs} runs${model.repeats.spread != null ? `, ${model.repeats.spread.toFixed(1)}% apart` : ""}` : ""}</div>
       <div><h3>On localmaxxing</h3>${subs || "not submitted"}${lmx ? `<br>${esc(lmx)}` : ""}</div>
       <div><h3>Config</h3><code>${esc(model.fingerprint || "–")}</code><br>harness ${esc(model.run.harness || "–")}</div>
@@ -1607,6 +1624,8 @@ function mountCharts(model) {
     ["Decode, prose prompt", sp["decode.prose-v1"] && fmt.int(sp["decode.prose-v1"].value) + " tok/s"],
     ["Drafter acceptance, code", sp["accept.code-v1"] && sp["accept.code-v1"].value.toFixed(2) + " tokens/step"],
     ["First token, short prompt", sp["ttft.short"] && Math.round(sp["ttft.short"].value) + " ms"],
+    ["Prefill, 32k prompt", sp["prefill.32000"] && fmt.int(sp["prefill.32000"].value) + " tok/s"],
+    ["Time spent measuring", model.time && fmt.dur(model.time.value)],
     levels.length ? [`${levels.join(" / ")} at once`, levels.map(level => fmt.int(sp["conc." + level].value)).join(" / ") + " tok/s"] : null,
     ["Requests the server takes at once", model.capacity && model.capacity.slots],
     ["Tokens per request", model.capacity && model.capacity.context && fmt.int(model.capacity.context)],

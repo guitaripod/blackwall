@@ -190,6 +190,35 @@ def energy_metrics(run_dir):
     return out
 
 
+def time_metrics(run_dir):
+    """How long a run spent measuring, per task and in all: the time between consecutive progress lines. Anything else
+    the worker logs in between (giving way to a game, low memory, a reload after a reboot) breaks the chain, so the
+    minutes a run sat parked never count and two runs compare however often each was interrupted."""
+    try:
+        lines = (run_dir / "events.jsonl").read_text().splitlines()
+    except OSError:
+        return {}
+    timed = ("speed", *suite.QUALITY_TASKS)
+    spent = {}
+    previous = None
+    for line in lines:
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        task = event.get("phase")
+        if task not in timed or "done" not in event or event.get("t") is None:
+            previous = None
+            continue
+        spent[task] = spent.get(task, 0.0) + (event["t"] - previous if previous is not None else 0.0)
+        previous = event["t"]
+    if not spent:
+        return {}
+    out = {f"{task}.time": {"value": seconds, "unit": "s", "n": 1} for task, seconds in spent.items()}
+    out["time.suite"] = {"value": sum(spent.values()), "unit": "s", "n": len(spent)}
+    return out
+
+
 def task_health(models, tasks, minimum=3):
     """Tasks that don't separate the ranked models: all near the ceiling, all near the floor, or spread inside the noise."""
     health = {}

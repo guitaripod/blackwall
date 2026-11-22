@@ -10,6 +10,8 @@ from . import gpu, paths
 
 PLACEHOLDER_VERSIONS = ("", "0.0.0", "0.0.0.dev0", "unknown", "dev")
 ENGINE_LABELS = {"sglang": "SGLang", "llama.cpp": "llama.cpp", "vllm": "vLLM", "mlx": "MLX"}
+UPSTREAMS = {"llama.cpp": ("ggml-org/llama.cpp", "ggerganov/llama.cpp"), "sglang": ("sgl-project/sglang",),
+             "vllm": ("vllm-project/vllm",)}
 ENGINE_PACKAGES = {"sglang": "sglang", "vllm": "vllm"}
 
 
@@ -143,7 +145,26 @@ def of(run):
             "driver": hardware.get("driver"), "vramMib": hardware.get("vram_mib"),
             "deviceClass": hardware.get("class") or "gpu", "device": hardware.get("device"),
             "soc": hardware.get("soc"), "bandwidthGbs": hardware.get("bandwidth_gbs"), "ramGb": hardware.get("ram_gb"),
-            "engine": found.get("engine"), "build": build_label(found), "source": found.get("source")}
+            "engine": found.get("engine"), "build": build_label(found), "source": found.get("source"),
+            **provenance((run or {}).get("profile") or {})}
+
+
+def provenance(profile):
+    """Where the engine's code came from, as models.toml declared it: the repository, whether that is a fork of the
+    engine's own, and a caveat about the build. A fork or days-old support for a new architecture is slower or faster
+    than the engine will be once the work lands upstream, so its speed is the build's, not the model's."""
+    meta = profile.get("engine_meta") or {}
+    repository = repository_slug(meta.get("repository"))
+    upstream = UPSTREAMS.get(profile.get("engine"), ())
+    return {"repository": repository, "release": meta.get("version"),
+            "fork": bool(repository and upstream and repository.lower() not in upstream),
+            "note": meta.get("note")}
+
+
+def repository_slug(url):
+    """`owner/name` from a repository URL, which is how a reader recognises a fork."""
+    parts = [part for part in str(url or "").removesuffix(".git").rstrip("/").split("/") if part]
+    return "/".join(parts[-2:]) if len(parts) >= 2 else None
 
 
 def changed(previous, hardware, found):

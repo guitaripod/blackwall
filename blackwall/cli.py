@@ -114,6 +114,10 @@ def summary(db, run_id):
     show("speed.peak", "Peak throughput", "tok/s")
     show("energy.per_correct", "Energy per correct answer", "Wh")
     show("speed.ttft.32000", "First token, 32k prompt", "s")
+    show("speed.prefill.32000", "Prefill, 32k prompt", "tok/s")
+    hours = (metrics_.get("time.suite") or {}).get("value")
+    if hours:
+        print(f"  {'Time spent measuring':<26} {hours / 3600:>8.1f} h")
 
 
 def follow(run_id):
@@ -431,6 +435,7 @@ def cmd_rescore(args):
     if any(key.endswith(".score") for key in found):
         store.set_metrics(db, run["id"], metrics.quality_index(found, run_dir))
     store.set_metrics(db, run["id"], metrics.energy_metrics(run_dir))
+    store.set_metrics(db, run["id"], metrics.time_metrics(run_dir))
     board.build()
     print(f"{run['id']}: scored again from {run_dir}")
 
