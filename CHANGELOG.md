@@ -2,6 +2,18 @@
 
 All notable changes to Blackwall are listed here, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the versions follow [Semantic Versioning](https://semver.org/). The published `board.json` carries its own `schema` number, described in [docs/data.md](docs/data.md).
 
+## [2.6.0] - 2026-11-22
+
+### Added
+- **Suite time.** Every run records how long it spent measuring, per task and in all, counted between consecutive progress lines so the time it sat parked for a game, low memory or a reboot is left out. The board shows it as a "Suite time" column under "What it cost", as a fact in each model's detail and as "took 5 min" on each task; `blackwall rescore` fills it in for an older run. Two models with the same quality index can differ by a day here: Inkling 2 Mini took 29.5 hours, Qwen 3.8 27B on SGLang 3.8.
+- **Prefill speed on the board.** A "Prefill 32k" column shows the prompt tokens a server reads per second on a 32k-token prompt, the number that decides how long every long-context question waits.
+- **Where the engine came from.** A run served by a fork of its engine is tagged "Fork build" with the repository, and `engine = { ..., note = "..." }` in `models.toml` tags it "Early engine build" and puts the caveat at the top of the model's detail, so speed measured on days-old support for a new architecture is not read as the model's own.
+- Every new column, tag and fact explains itself on hover, and the terms open a glossary entry on a tap.
+- Inkling 2 Mini 26B (llama.cpp, Q8, DSpark) and Qwen 3.8 27B Uncensored (SGLang, FP8, DFlash2) are on the board at medium effort.
+
+### Fixed
+- **A run on SGLang or vLLM no longer fails while recording its weights.** Those servers report the model's directory, and the digest step opened it as a file. A directory is now hashed as its weight files in name order; a single `.gguf` keeps the digest it had.
+
 ## [2.5.0] - 2026-10-24
 
 ### Changed
