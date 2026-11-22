@@ -588,6 +588,8 @@ blackwall status · blackwall logs -f · blackwall ls · blackwall board --open<
 <div popover id="g-wall"><strong>The wall</strong>The set of models that no other model beats on both axes at once. Moving toward it costs you either speed or quality; beyond it nothing exists on this card.</div>
 <div popover id="g-ci"><strong>95% interval</strong>The range the true score very likely sits in, given how many questions were asked. Overlapping intervals mean the order between two models is not settled.</div>
 <div popover id="g-wh"><strong>Watt-hours per correct answer</strong>Energy the card drew, measured at the board, divided by the number of questions answered correctly. Lower is better.</div>
+<div popover id="g-time"><strong>Suite time</strong>How long the model took to answer the whole benchmark on this card: every speed test and all six quality tasks, eight questions at a time where the server allows it. Time the run sat parked for a game or other GPU work is left out. A slow engine and a model that reasons at length both make it longer. Lower is better.</div>
+<div popover id="g-build"><strong>Engine build</strong>The server software that ran the model. A fork is someone's modified copy of the engine, and an early build is support for a new architecture that landed days before the run. Either way decode, prefill, suite time and energy belong to that build and can change a lot once the work reaches the engine's main line. Quality scores depend on it far less.</div>
 <div popover id="g-cut"><strong>Cut off</strong>The share of answers that hit the token limit before the model finished. A cut-off answer scores zero, so the score is a floor.</div>
 <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
 <div class="toast" id="toast" role="status"></div>
@@ -1200,6 +1202,9 @@ function metaText(model) {
   if (tierSetups().length > 1 && model.stack) parts.push(...setupMarks(model));
   return parts.join(" · ");
 }
+const TIME_NOTE = "How long the model took to answer the whole suite on this card, leaving out any time the run sat parked for other GPU work. Lower is better.";
+const PREFILL_NOTE = "Prompt tokens the server reads per second on a 32k-token prompt, before it writes its first word. It sets how long every long-context question waits. Higher is better.";
+const EARLY_BUILD = "Support for this model in the engine was new when it ran, so its speed, prefill, suite time and energy are this build's and are likely to improve.";
 function forkText(build) {
   return `Served by ${build.repository}${build.release ? " " + build.release : ""}, a fork of the engine. Its speed is this build's, not the engine's.`;
 }
@@ -1214,7 +1219,7 @@ function modelTags(model, onWall) {
   if (model.warnings && model.warnings.length) tags.push(`<span class="tag warn" title="${esc(model.warnings.join(" "))}">Context capped</span>`);
   if (model.repeats && model.repeats.spread != null && model.repeats.spread > 5) tags.push(`<span class="tag warn" title="Runs of the same configuration landed this far apart.">Repeats differ ${Math.round(model.repeats.spread)}%</span>`);
   const build = model.stack || {};
-  if (build.note) tags.push(`<span class="tag warn" title="${esc(build.note)}">Early engine build</span>`);
+  if (build.note) tags.push(`<span class="tag warn" title="${esc(EARLY_BUILD + " " + build.note)}">Early engine build</span>`);
   else if (build.fork) tags.push(`<span class="tag" title="${esc(forkText(build))}">Fork build</span>`);
   const cut = tasks().filter(task => ((model.tasks[task] || {}).truncated || 0) >= 50);
   if (cut.length) tags.push(`<span class="tag warn" title="Over half of these answers hit the token budget before finishing; the score is a floor, not a ceiling.">${esc(cut.map(taskShort).join(", "))} cut off</span>`);
@@ -1231,9 +1236,9 @@ function columnPlan() {
       { key: "ttft", label: "First token 32k", cls: "cost", get: m => val((m.speed || {})["ttft.32000"]), better: "low", render: m => fmt.secs(val((m.speed || {})["ttft.32000"])) },
       { key: "wh", label: "Wh / correct", cls: "cost", note: "Board energy over the quality tasks per correct answer, idle draw included", get: m => val((m.energy || {}).perCorrect), better: "low",
         render: m => val((m.energy || {}).perCorrect) == null ? "–" : `${val(m.energy.perCorrect).toFixed(2)}<small>Wh</small>` },
-      { key: "prefill", label: "Prefill 32k", cls: "cost", optional: true, note: "Prompt tokens read per second on a 32k-token prompt; it sets how long every long-context question waits", get: prefillOf, better: "high",
+      { key: "prefill", label: "Prefill 32k", cls: "cost", optional: true, note: PREFILL_NOTE, title: () => PREFILL_NOTE, get: prefillOf, better: "high",
         render: m => prefillOf(m) == null ? "–" : `${fmt.rate(prefillOf(m))}<small>tok/s</small>` },
-      { key: "time", label: "Suite time", cls: "cost", optional: true, note: "Time spent measuring the whole suite, leaving out any time the run sat parked for other GPU work", get: suiteTime, better: "low",
+      { key: "time", label: "Suite time", cls: "cost", optional: true, note: TIME_NOTE, title: () => TIME_NOTE, get: suiteTime, better: "low",
         render: m => fmt.dur(suiteTime(m)) },
       { key: "tokens", label: "Tokens / answer", cls: "cost", optional: true, get: avgTokens, better: "low", render: m => fmt.int(avgTokens(m)) },
     ];
@@ -1414,7 +1419,7 @@ function partsView(model) {
     : `<p class="note">${esc(label(current))} is scored as one number.</p>`;
   const tabs = withTasks.map(k => `<button class="pill" role="tab" aria-pressed="${k === current}" data-tab="${esc(k)}" data-model="${esc(model.id)}">${esc(taskShort(k))}</button>`).join("");
   const note = (view().taskNotes || {})[current];
-  return `<div class="tabs" role="tablist">${tabs}</div><div class="bars">${bars}</div><p class="note">${esc(taskFacts(current, entry))}</p>${note ? `<p class="note">${esc(note)}</p>` : ""}`;
+  return `<div class="tabs" role="tablist">${tabs}</div><div class="bars">${bars}</div><p class="note" title="How many items the task asked, the average answer length, the median wait for one answer, and how long the whole task took with parked time left out.">${esc(taskFacts(current, entry))}</p>${note ? `<p class="note">${esc(note)}</p>` : ""}`;
 }
 function ttftMini(model) {
   const pts = [[1000, "ttft.1000"], [8000, "ttft.8000"], [32000, "ttft.32000"], [64000, "ttft.64000"], [120000, "ttft.120000"]].map(([n, k]) => [n, val((model.speed || {})[k])]).filter(p => p[1] != null);
@@ -1455,7 +1460,8 @@ function profileHtml(model) {
   const notes = [
     (model.run.stackChange || []).length ? `Changed since this model's previous run: ${esc(model.run.stackChange.join("; "))}. Its older speed and energy numbers no longer compare.` : "",
     model.run.notes ? esc(model.run.notes) : "",
-    (model.stack || {}).note ? esc(model.stack.note) : (model.stack || {}).fork ? esc(forkText(model.stack)) : "",
+    (model.stack || {}).note ? `<button class="term" popovertarget="g-build">Early engine build</button>: ${esc(model.stack.note)}`
+      : (model.stack || {}).fork ? `<button class="term" popovertarget="g-build">Fork build</button>: ${esc(forkText(model.stack))}` : "",
     model.run.reused ? `Answers for ${esc(model.run.reused.tasks.join(", "))} carried over from ${esc(model.run.reused.run)}.` : "",
     ...(model.warnings || []).map(esc),
   ].filter(Boolean).map(text => `<p class="strip-note">${text}</p>`).join("");
@@ -1470,12 +1476,12 @@ function profileHtml(model) {
       <div class="fact"><b>${peak != null ? fmt.int(peak) : conc4 != null ? fmt.int(conc4) : "–"}</b><span>tok/s ${peak != null && sp.peak_at ? `at ${sp.peak_at.value} at once` : "at best"}</span></div>
       <div class="fact"><b>${val((model.energy || {}).perCorrect) != null ? val(model.energy.perCorrect).toFixed(2) : "–"}</b><span><button class="term" popovertarget="g-wh">Wh per correct</button></span></div>
       <div class="fact"><b>${model.capacity && model.capacity.context ? fmt.ctx(model.capacity.context) : "–"}</b><span>tokens per request${model.capacity && model.capacity.slots ? `, ${model.capacity.slots} at once` : ""}</span></div>
-      <div class="fact"><b>${fmt.dur(suiteTime(model))}</b><span>to run the suite</span></div>
+      <div class="fact" title="${esc(TIME_NOTE)}"><b>${fmt.dur(suiteTime(model))}</b><span>to run <button class="term" popovertarget="g-time">the suite</button></span></div>
     </div>${ttftMini(model)}${rankDist(model)}</div>
     <div class="deep" data-charts="${esc(model.id)}"></div>
     <div class="prov">
       <div><h3>Run</h3><code>${esc(model.run.id)}</code><br>${esc(fmt.date(model.run.finished))} · ${esc(model.run.suite)} · effort ${esc(model.run.effort || "–")}</div>
-      <div><h3>Measured on</h3>${esc((model.stack && model.stack.hostLabel) || "–")}<br>${esc((model.stack && model.stack.build) || model.engine || "")}${model.stack && model.stack.repository ? `<br>${esc(model.stack.repository)}${model.stack.fork ? " (fork)" : ""}` : ""}</div>
+      <div><h3>Measured on</h3>${esc((model.stack && model.stack.hostLabel) || "–")}<br>${esc((model.stack && model.stack.build) || model.engine || "")}${model.stack && model.stack.repository ? `<br>${esc(model.stack.repository)}${model.stack.fork ? ` (<button class="term" popovertarget="g-build">fork</button>)` : ""}` : ""}</div>
       <div><h3>Data checks</h3>${model.run.failedItems ? `${model.run.failedItems} failed items` : "0 failed items"}<br>${model.run.contended && model.run.contended.length ? `Shared with ${esc(model.run.contended.join(", "))}` : "GPU to itself"}${model.repeats && model.repeats.runs > 1 ? `<br>${model.repeats.runs} runs${model.repeats.spread != null ? `, ${model.repeats.spread.toFixed(1)}% apart` : ""}` : ""}</div>
       <div><h3>On localmaxxing</h3>${subs || "not submitted"}${lmx ? `<br>${esc(lmx)}` : ""}</div>
       <div><h3>Config</h3><code>${esc(model.fingerprint || "–")}</code><br>harness ${esc(model.run.harness || "–")}</div>
@@ -1624,8 +1630,8 @@ function mountCharts(model) {
     ["Decode, prose prompt", sp["decode.prose-v1"] && fmt.int(sp["decode.prose-v1"].value) + " tok/s"],
     ["Drafter acceptance, code", sp["accept.code-v1"] && sp["accept.code-v1"].value.toFixed(2) + " tokens/step"],
     ["First token, short prompt", sp["ttft.short"] && Math.round(sp["ttft.short"].value) + " ms"],
-    ["Prefill, 32k prompt", sp["prefill.32000"] && fmt.int(sp["prefill.32000"].value) + " tok/s"],
-    ["Time spent measuring", model.time && fmt.dur(model.time.value)],
+    ["Prefill, 32k prompt, tokens read per second before the first word", sp["prefill.32000"] && fmt.int(sp["prefill.32000"].value) + " tok/s"],
+    ["Time spent measuring the whole suite, parked time left out", model.time && fmt.dur(model.time.value)],
     levels.length ? [`${levels.join(" / ")} at once`, levels.map(level => fmt.int(sp["conc." + level].value)).join(" / ") + " tok/s"] : null,
     ["Requests the server takes at once", model.capacity && model.capacity.slots],
     ["Tokens per request", model.capacity && model.capacity.context && fmt.int(model.capacity.context)],
