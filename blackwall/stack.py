@@ -189,21 +189,51 @@ def harness():
 
 
 def digest_of(path):
-    """The sha256 of a weights file, cached against its size and modification time. It is what lets a phone run and a
-    desktop run prove they scored the same artifact rather than two files with the same name."""
+    """The sha256 of the weights a server loaded, cached against size and modification time. It is what lets a phone run
+    and a desktop run prove they scored the same artifact rather than two files with the same name. A `.gguf` is one
+    file; SGLang and vLLM report the model's directory, which is hashed as its files in name order."""
     try:
         found = Path(path)
-        stat = found.stat()
+        members = _weight_files(found)
+        stamp = ",".join(f"{member.stat().st_size}:{member.stat().st_mtime_ns}" for member in members)
     except (OSError, TypeError):
         return None
+    if not members:
+        return None
     cache_file = paths.CACHE / "digests.json"
-    key = f"{found}:{stat.st_size}:{stat.st_mtime_ns}"
+    key = f"{found}:{stamp}"
     try:
         cache = json.loads(cache_file.read_text())
     except (OSError, json.JSONDecodeError):
         cache = {}
     if key in cache:
         return cache[key]
+    cache[key] = _sha256_of(members, named=found.is_dir())
+    cache_file.parent.mkdir(parents=True, exist_ok=True)
+    cache_file.write_text(json.dumps(cache))
+    return cache[key]
+
+
+def _weight_files(found):
+    """The files that make up one set of weights: the file itself, or a model directory's own files in name order,
+    leaving out download caches and anything nested."""
+    if not found.is_dir():
+        found.stat()
+        return [found]
+    return sorted(member for member in found.iterdir() if member.is_file() and not member.name.startswith("."))
+
+
+def _sha256_of(members, *, named):
+    """One sha256 over the files' contents. A directory's digest also covers each file's name, so renaming or swapping
+    shards changes it; a single file's digest stays the plain sha256 of its bytes."""
+    digest = hashlib.sha256()
+    for member in members:
+        if named:
+            digest.update(member.name.encode() + b"\0")
+        with member.open("rb") as handle:
+            for block in iter(lambda: handle.read(4 * 1024 * 1024), b""):
+                digest.update(block)
+    return digest.hexdigest()
     digest = hashlib.sha256()
     with found.open("rb") as handle:
         for block in iter(lambda: handle.read(4 * 1024 * 1024), b""):

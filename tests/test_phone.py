@@ -343,6 +343,21 @@ def test_a_digest_is_the_file_not_its_name(tmp_path, monkeypatch):
     assert stack.digest_of(tmp_path / "missing.gguf") is None
 
 
+def test_a_model_directory_digests_as_its_weight_files(tmp_path, monkeypatch):
+    monkeypatch.setattr("blackwall.paths.CACHE", tmp_path / "cache")
+    model = tmp_path / "model"
+    (model / ".cache").mkdir(parents=True)
+    (model / "model-00001-of-00002.safetensors").write_bytes(b"first")
+    (model / "model-00002-of-00002.safetensors").write_bytes(b"second")
+    first = stack.digest_of(model)
+    assert first and stack.digest_of(model) == first
+    (model / ".cache" / "download.lock").write_bytes(b"ignored")
+    assert stack.digest_of(model) == first
+    (model / "model-00002-of-00002.safetensors").write_bytes(b"changed")
+    assert stack.digest_of(model) != first
+    assert stack.digest_of(tmp_path / "empty-model") is None
+
+
 def sustain_rows(speeds):
     return [{"index": index, "decode_tps": tps, "start": 100 + index * 10, "completion_tokens": 512}
             for index, tps in enumerate(speeds)]
