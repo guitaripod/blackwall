@@ -4,6 +4,9 @@ All notable changes to Blackwall are listed here, newest first. The format follo
 
 ## [Unreleased]
 
+### Added
+- **A note on a run shows as a mark on its row.** `blackwall run --note` was stored but never reached the board; the note now follows the run onto it, drawn as an amber asterisk after the quality index with the note as its tooltip and in the model's detail, so a score measured under a caveat says so where it is read.
+
 ### Fixed
 - **An openai-style thinking level now reaches a llama.cpp template.** The level went out as the top-level `reasoning_effort` field, which llama.cpp does not hand to a chat template that reads it, so every level rendered the template's default (0.9) and a `none` run measured the same answers as a `max` one. For llama.cpp it now travels as `chat_template_kwargs.reasoning_effort`, which is what the template reads; an engine that takes the field itself (SGLang, vLLM) still gets it top-level.
 

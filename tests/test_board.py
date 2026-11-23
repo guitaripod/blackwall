@@ -48,6 +48,18 @@ def test_runs_of_unknown_suite_versions_stay_off_the_board(monkeypatch, tmp_path
     assert data["rankings"] == data["suites"][suite.VERSION]["rankings"]
 
 
+def test_a_note_on_a_run_reaches_the_board_so_the_row_can_carry_a_mark(monkeypatch, tmp_path):
+    monkeypatch.setattr(paths, "DATA", tmp_path)
+    monkeypatch.setattr(paths, "DB", tmp_path / "bench.db")
+    db = store.connect()
+    store.insert_run(db, {"id": "a-full", "model": "a", "suite": suite.label("full"), "effort": "medium",
+                          "status": "complete", "created": 1.0, "finished": 1.0,
+                          "note": "measured at the template's default effort, not medium"})
+    store.set_metrics(db, "a-full", {"supergpqa.score": {"value": 50.0}})
+    ranked = board.collect(db)["suites"][suite.VERSION]["rankings"]["medium"]
+    assert ranked[0]["run"]["notes"] == "measured at the template's default effort, not medium"
+
+
 def test_task_entries_carry_their_breakdown():
     metrics = {"mrcr.score": {"value": 60.0}, "mrcr.bin.16384": {"value": 90.0}, "mrcr.bin.131072": {"value": 20.0},
                "mrcr.unreachable": {"value": 5.0}}

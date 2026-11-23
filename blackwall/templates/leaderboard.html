@@ -259,6 +259,7 @@ input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border-radius
 .q-top { display: flex; align-items: baseline; gap: 0.45rem; flex-wrap: wrap; }
 .q-val { font: 600 1.3rem/1 var(--mono); font-variant-numeric: tabular-nums; }
 .q-pm { font: 400 0.76rem var(--mono); color: var(--muted); }
+.q-star { font: 400 0.9rem/1 var(--mono); color: var(--amber); cursor: help; margin-left: -0.15rem; }
 .rank-chip { font: 600 0.7rem var(--mono); border: 1px solid var(--axis); border-radius: 999px; padding: 0 0.45rem; color: var(--ink-2); cursor: help; }
 .rank-chip.sure { border-color: var(--green); color: var(--green-ink); }
 .track { position: relative; height: 10px; background: var(--raise); border-radius: 2px; }
@@ -1304,7 +1305,7 @@ function rowHtml(model, position, ctx) {
   const liveRank = ctx.live[model.id], baseRank = ctx.base[model.id];
   const delta = idx && !weightsAreEqual() && baseRank !== liveRank ? `<span class="delta ${liveRank < baseRank ? "up" : "down"}">${liveRank < baseRank ? "▲" : "▼"}${Math.abs(baseRank - liveRank)}</span>` : "";
   const quality = idx
-    ? `<div class="q-top"><span class="q-val">${idx.v.toFixed(1)}</span><span class="q-pm">±${(idx.s * 1.96).toFixed(1)}</span>${rankChip(model)}</div><div class="track" aria-hidden="true"><span class="fill" style="width:${idx.v}%"></span><span class="ci" style="left:${clamp(idx.v - idx.s * 1.96, 0, 100)}%;width:${Math.max(0.6, clamp(idx.v + idx.s * 1.96, 0, 100) - clamp(idx.v - idx.s * 1.96, 0, 100))}%"></span><span class="tick" style="left:${idx.v}%"></span></div>`
+    ? `<div class="q-top"><span class="q-val">${idx.v.toFixed(1)}</span>${model.run.notes ? `<sup class="q-star" title="${esc(model.run.notes)}">*</sup>` : ""}<span class="q-pm">±${(idx.s * 1.96).toFixed(1)}</span>${rankChip(model)}</div><div class="track" aria-hidden="true"><span class="fill" style="width:${idx.v}%"></span><span class="ci" style="left:${clamp(idx.v - idx.s * 1.96, 0, 100)}%;width:${Math.max(0.6, clamp(idx.v + idx.s * 1.96, 0, 100) - clamp(idx.v - idx.s * 1.96, 0, 100))}%"></span><span class="tick" style="left:${idx.v}%"></span></div>`
     : `<div class="q-top"><span class="q-val">–</span><span class="q-pm">no quality index</span></div>`;
   const cells = ctx.plan.map(col => {
     if (col.cls === "grp") {

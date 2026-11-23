@@ -4,7 +4,7 @@
   "name": "blackwall",
   "version": "2.6.0"
  },
- "generated": 1795421039.5976124,
+ "generated": 1795421871.9873564,
  "suite": "full/v1",
  "current": "1",
  "hardware": {
@@ -630,7 +630,7 @@
         "tailscode"
        ],
        "failedItems": 0,
-       "notes": null,
+       "notes": "Measured before the thinking level reached the template: every level rendered Inkling's default (0.9), so this is not medium (0.7) and a rerun at medium would score lower.",
        "reused": null,
        "stackChange": []
       },
@@ -5996,7 +5996,7 @@
        "harness": "2.0.2+7a48e55",
        "contended": [],
        "failedItems": 0,
-       "notes": null,
+       "notes": "queued behind the Super VL run",
        "reused": null,
        "stackChange": []
       },
@@ -6461,7 +6461,7 @@
         "vivaldi-bin"
        ],
        "failedItems": 0,
-       "notes": null,
+       "notes": "Super VL 120B NVFP4, docker vLLM nightly-3f1bcfd, MTP 3, max (= high) effort",
        "reused": null,
        "stackChange": []
       },
@@ -10984,7 +10984,7 @@
       "tailscode"
      ],
      "failedItems": 0,
-     "notes": null,
+     "notes": "Measured before the thinking level reached the template: every level rendered Inkling's default (0.9), so this is not medium (0.7) and a rerun at medium would score lower.",
      "reused": null,
      "stackChange": []
     },
@@ -16350,7 +16350,7 @@
      "harness": "2.0.2+7a48e55",
      "contended": [],
      "failedItems": 0,
-     "notes": null,
+     "notes": "queued behind the Super VL run",
      "reused": null,
      "stackChange": []
     },
@@ -16815,7 +16815,7 @@
       "vivaldi-bin"
      ],
      "failedItems": 0,
-     "notes": null,
+     "notes": "Super VL 120B NVFP4, docker vLLM nightly-3f1bcfd, MTP 3, max (= high) effort",
      "reused": null,
      "stackChange": []
     },
@@ -21370,7 +21370,87 @@
    "previous": null
   }
  ],
- "live": [],
+ "live": [
+  {
+   "id": "inkling-2-mini-26b-gguf",
+   "name": "Inkling 2 Mini 26B \u00b7 llama.cpp \u00b7 Q8 \u00b7 DSpark \u00b7 256K",
+   "engine": "llama.cpp",
+   "quantization": "UD-Q8_K_XL",
+   "spec": "DSpark",
+   "context": 262144,
+   "fingerprint": "77e657fcbeb1e3bb",
+   "stack": {
+    "host": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|620.73.04",
+    "hostLabel": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 620.73.04",
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+    "driver": "620.73.04",
+    "vramMib": 97887,
+    "deviceClass": "gpu",
+    "device": null,
+    "soc": null,
+    "bandwidthGbs": null,
+    "ramGb": null,
+    "engine": null,
+    "build": null,
+    "source": null,
+    "repository": "unslothai/llama.cpp",
+    "release": "b12568-mix-8eebad4",
+    "fork": true,
+    "note": "Looped-layer support for this architecture was days old at run time and only in Unsloth's llama.cpp fork (ggml-org/llama.cpp#32695 not merged). Decode, prefill and suite time are this build's and should improve as the engine catches up."
+   },
+   "run": {
+    "id": "20261123-101300-inkling-2-mini-26b-gguf",
+    "suite": "full/v1",
+    "kind": "full",
+    "finished": null,
+    "effort": "none",
+    "harness": "2.6.0+59248c2-dirty",
+    "contended": [],
+    "failedItems": 0,
+    "notes": "no thinking: reasoning_effort none via the template",
+    "reused": null,
+    "stackChange": [],
+    "started": null
+   },
+   "index": null,
+   "tasks": {},
+   "qualityFrom": null,
+   "deviceClass": "gpu",
+   "capacity": {},
+   "warnings": [],
+   "energy": {
+    "perCorrect": null,
+    "quality": null
+   },
+   "time": null,
+   "speed": {},
+   "thermal": {},
+   "battery": {},
+   "verdict": null,
+   "repeats": {
+    "runs": 1,
+    "spread": null
+   },
+   "lmx": {},
+   "submissions": [],
+   "server": {},
+   "history": [],
+   "progress": {
+    "plan": [
+     "speed",
+     "supergpqa",
+     "math",
+     "tools",
+     "mrcr",
+     "graphwalks",
+     "lcb"
+    ],
+    "current": null,
+    "parked": null,
+    "yielded": 0
+   }
+  }
+ ],
  "published": {
   "json": "board.json",
   "feed": "feed.xml"

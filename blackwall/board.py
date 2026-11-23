@@ -137,7 +137,7 @@ def model_entry(db, run, history, definition):
         "run": {
             "id": run["id"], "suite": run["suite"], "kind": kind_of(run), "finished": run.get("finished"),
             "effort": effort_of(run), "harness": run.get("harness"), "contended": flags.get("contended") or [],
-            "failedItems": flags.get("failed_items") or 0, "notes": flags.get("notes"),
+            "failedItems": flags.get("failed_items") or 0, "notes": run.get("note") or flags.get("notes"),
             "reused": flags.get("reused"), "stackChange": flags.get("stack_change") or [],
         },
         "index": metrics.get("index.quality") or (linked or {}).get("index"),
