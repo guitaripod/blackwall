@@ -2,6 +2,11 @@
 
 All notable changes to Blackwall are listed here, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the versions follow [Semantic Versioning](https://semver.org/). The published `board.json` carries its own `schema` number, described in [docs/data.md](docs/data.md).
 
+## [Unreleased]
+
+### Fixed
+- **An openai-style thinking level now reaches a llama.cpp template.** The level went out as the top-level `reasoning_effort` field, which llama.cpp does not hand to a chat template that reads it, so every level rendered the template's default (0.9) and a `none` run measured the same answers as a `max` one. For llama.cpp it now travels as `chat_template_kwargs.reasoning_effort`, which is what the template reads; an engine that takes the field itself (SGLang, vLLM) still gets it top-level.
+
 ## [2.6.0] - 2026-11-22
 
 ### Added

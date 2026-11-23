@@ -64,7 +64,9 @@ def nemotron_template_kwargs(effort):
 def request_kwargs(profile, effort, *, greedy=False, seed=None):
     """How each chat template takes a thinking level; sampling stays on the server's model defaults unless greedy."""
     kwargs, extra = {}, {}
-    if profile.thinking == "openai":
+    if profile.thinking == "openai" and profile.engine == "llama.cpp":
+        extra["chat_template_kwargs"] = {"reasoning_effort": effort}
+    elif profile.thinking == "openai":
         kwargs["reasoning_effort"] = effort
     elif profile.thinking == "qwen":
         extra["chat_template_kwargs"] = ({"enable_thinking": False} if effort == EFFORT_OFF

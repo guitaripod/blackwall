@@ -37,6 +37,13 @@ def test_levels_reach_the_request_unchanged():
     assert request_kwargs(profile("none", "llama.cpp"), "medium", seed=7) == {"seed": 7}
 
 
+def test_an_openai_style_llama_cpp_template_takes_its_level_inside_the_template():
+    llama = profile("openai", "llama.cpp", efforts=("none", "minimal", "low", "medium", "high", "max"))
+    assert request_kwargs(llama, "none") == {"extra_body": {"chat_template_kwargs": {"reasoning_effort": "none"}}}
+    assert request_kwargs(llama, "high", seed=7) == {
+        "seed": 7, "extra_body": {"chat_template_kwargs": {"reasoning_effort": "high"}}}
+
+
 def test_muse_takes_its_level_as_reasoning_strength():
     muse = profile("muse", efforts=("low", "medium", "high", "xhigh"))
     assert request_kwargs(muse, "xhigh") == {"extra_body": {"chat_template_kwargs": {"reasoning_strength": "xhigh"}}}
