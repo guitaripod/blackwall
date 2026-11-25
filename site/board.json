@@ -4,7 +4,7 @@
   "name": "blackwall",
   "version": "2.6.0"
  },
- "generated": 1795421871.9873564,
+ "generated": 1795602592.9255304,
  "suite": "full/v1",
  "current": "1",
  "hardware": {
@@ -1024,6 +1024,14 @@
        }
       },
       "history": [
+       {
+        "id": "20261123-101300-inkling-2-mini-26b-gguf",
+        "suite": "full/v1",
+        "effort": "none",
+        "finished": 1795596558.333557,
+        "index": 80.04111965934045,
+        "decode": 66.28
+       },
        {
         "id": "20261120-233941-inkling-2-mini-26b-gguf",
         "suite": "full/v1",
@@ -9175,6 +9183,453 @@
     ],
     "none": [
      {
+      "id": "inkling-2-mini-26b-gguf",
+      "name": "Inkling 2 Mini 26B \u00b7 llama.cpp \u00b7 Q8 \u00b7 DSpark \u00b7 256K",
+      "engine": "llama.cpp",
+      "quantization": "UD-Q8_K_XL",
+      "spec": "DSpark",
+      "context": 262144,
+      "fingerprint": "77e657fcbeb1e3bb",
+      "stack": {
+       "host": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|620.73.04",
+       "hostLabel": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 620.73.04",
+       "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+       "driver": "620.73.04",
+       "vramMib": 97887,
+       "deviceClass": "gpu",
+       "device": null,
+       "soc": null,
+       "bandwidthGbs": null,
+       "ramGb": null,
+       "engine": "llama.cpp",
+       "build": "llama.cpp",
+       "source": null,
+       "repository": "unslothai/llama.cpp",
+       "release": "b12568-mix-8eebad4",
+       "fork": true,
+       "note": "Looped-layer support for this architecture was days old at run time and only in Unsloth's llama.cpp fork (ggml-org/llama.cpp#32695 not merged). Decode, prefill and suite time are this build's and should improve as the engine catches up."
+      },
+      "run": {
+       "id": "20261123-101300-inkling-2-mini-26b-gguf",
+       "suite": "full/v1",
+       "kind": "full",
+       "finished": 1795596558.333557,
+       "effort": "none",
+       "harness": "2.6.0+68ff4f4",
+       "contended": [],
+       "failedItems": 0,
+       "notes": "no thinking: reasoning_effort none via the template",
+       "reused": null,
+       "stackChange": []
+      },
+      "index": {
+       "value": 80.04111965934045,
+       "unit": "%",
+       "n": 5,
+       "lo": 77.38452476731759,
+       "hi": 82.71937313637298
+      },
+      "tasks": {
+       "supergpqa": {
+        "value": 53.74280230326296,
+        "unit": "%",
+        "n": 521,
+        "lo": 49.44960448655499,
+        "hi": 57.98120892457707,
+        "tokens": 3437.58349328215,
+        "latency": 80.89,
+        "truncated": 1.3435700575815739,
+        "unreachable": null,
+        "malformed": null,
+        "time": 16269.299999952316,
+        "parts": {}
+       },
+       "math": {
+        "value": 89.68253968253968,
+        "unit": "%",
+        "n": 63,
+        "lo": 83.3484203827583,
+        "hi": 96.01665898232106,
+        "tokens": 14672.944444444445,
+        "latency": 404.28999999999996,
+        "truncated": 3.968253968253968,
+        "unreachable": null,
+        "malformed": null,
+        "time": 27176.800000190735,
+        "parts": {
+         "aime": 96.66666666666667,
+         "hmmt": 83.33333333333334
+        }
+       },
+       "lcb": {
+        "value": 77.22772277227723,
+        "unit": "%",
+        "n": 101,
+        "lo": 68.1408091811231,
+        "hi": 84.31928299602797,
+        "tokens": 19823.73267326733,
+        "latency": 468.15,
+        "truncated": 12.871287128712872,
+        "unreachable": null,
+        "malformed": null,
+        "time": 34702.700000047684,
+        "parts": {}
+       },
+       "mrcr": {
+        "value": 67.32393011421932,
+        "unit": "%",
+        "n": 60,
+        "lo": 56.28830669436504,
+        "hi": 78.3595535340736,
+        "tokens": 3973.9333333333334,
+        "latency": 689.0999999999999,
+        "truncated": 0.0,
+        "unreachable": null,
+        "malformed": null,
+        "time": 16721.200000047684,
+        "parts": {
+         "131072": 47.08700576806165,
+         "16384": 61.48277640488596,
+         "32768": 74.65860073696382,
+         "65536": 86.06733754696585
+        }
+       },
+       "graphwalks": {
+        "value": 95.28990889285008,
+        "unit": "%",
+        "n": 48,
+        "lo": 89.57560203609489,
+        "hi": 100.0,
+        "tokens": 13848.416666666666,
+        "latency": 600.84,
+        "truncated": 4.166666666666666,
+        "unreachable": null,
+        "malformed": null,
+        "time": 25474.79999947548,
+        "parts": {
+         "16384": 83.33333333333334,
+         "32768": 99.50980392156863,
+         "65536": 98.31649831649831,
+         "8192": 100.0
+        }
+       },
+       "tools": {
+        "value": 98.24561403508771,
+        "unit": "%",
+        "n": 38,
+        "lo": 94.80701754385964,
+        "hi": 100.0,
+        "tokens": 191.69298245614036,
+        "latency": 10.695,
+        "truncated": 0.0,
+        "unreachable": null,
+        "malformed": 0.0,
+        "time": 191.40000009536743,
+        "parts": {
+         "clarify": 100.0,
+         "conditional": 100.0,
+         "distractor": 100.0,
+         "irrelevant": 83.33333333333334,
+         "multi-turn": 100.0,
+         "parallel": 100.0,
+         "policy": 100.0,
+         "recovery": 100.0,
+         "sequential": 100.0,
+         "single": 100.0
+        }
+       }
+      },
+      "qualityFrom": null,
+      "deviceClass": "gpu",
+      "capacity": {
+       "slots": null,
+       "context": null,
+       "pool": null
+      },
+      "warnings": [],
+      "energy": {
+       "perCorrect": {
+        "value": 13.06549711332442,
+        "unit": "Wh",
+        "n": 669,
+        "lo": null,
+        "hi": null
+       },
+       "quality": {
+        "value": 8742.562,
+        "unit": "Wh",
+        "n": 6,
+        "lo": null,
+        "hi": null
+       }
+      },
+      "time": {
+       "value": 122523.19999980927,
+       "unit": "s",
+       "n": 7,
+       "lo": null,
+       "hi": null
+      },
+      "speed": {
+       "conc.1": {
+        "value": 61.85,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 59.3,
+        "hi": 64.4
+       },
+       "conc.2": {
+        "value": 102.45,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 100.9,
+        "hi": 104.0
+       },
+       "conc.4": {
+        "value": 143.60000000000002,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 140.8,
+        "hi": 146.4
+       },
+       "conc.8": {
+        "value": 204.14999999999998,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 201.2,
+        "hi": 207.1
+       },
+       "decode": {
+        "value": 66.28,
+        "unit": "tok/s",
+        "n": 3,
+        "lo": null,
+        "hi": null
+       },
+       "decode.code-v1": {
+        "value": 69.56,
+        "unit": "tok/s",
+        "n": 3,
+        "lo": 67.85,
+        "hi": 70.04
+       },
+       "decode.prose-v1": {
+        "value": 64.66,
+        "unit": "tok/s",
+        "n": 3,
+        "lo": 59.2,
+        "hi": 65.0
+       },
+       "decode.reasoning-v1": {
+        "value": 64.62,
+        "unit": "tok/s",
+        "n": 3,
+        "lo": 62.21,
+        "hi": 67.71
+       },
+       "decode_at.1000": {
+        "value": 62.53,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 61.72,
+        "hi": 63.34
+       },
+       "decode_at.120000": {
+        "value": 36.185,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 35.91,
+        "hi": 36.46
+       },
+       "decode_at.32000": {
+        "value": 62.655,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 48.66,
+        "hi": 76.65
+       },
+       "decode_at.64000": {
+        "value": 39.959999999999994,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 36.55,
+        "hi": 43.37
+       },
+       "decode_at.8000": {
+        "value": 69.75,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 67.86,
+        "hi": 71.64
+       },
+       "energy": {
+        "value": 3.7162162162162162,
+        "unit": "J/token",
+        "n": 3,
+        "lo": null,
+        "hi": null
+       },
+       "peak": {
+        "value": 204.14999999999998,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 201.2,
+        "hi": 207.1
+       },
+       "peak_at": {
+        "value": 8.0,
+        "unit": "requests",
+        "n": 2,
+        "lo": null,
+        "hi": null
+       },
+       "power": {
+        "value": 258.5,
+        "unit": "W",
+        "n": 3,
+        "lo": null,
+        "hi": null
+       },
+       "prefill.1000": {
+        "value": 954.35,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 952.7,
+        "hi": 956.0
+       },
+       "prefill.120000": {
+        "value": 258.4,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 256.8,
+        "hi": 260.0
+       },
+       "prefill.32000": {
+        "value": 650.4,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 564.9,
+        "hi": 735.9
+       },
+       "prefill.64000": {
+        "value": 366.45,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 312.9,
+        "hi": 420.0
+       },
+       "prefill.8000": {
+        "value": 942.1,
+        "unit": "tok/s",
+        "n": 2,
+        "lo": 896.0,
+        "hi": 988.2
+       },
+       "temp": {
+        "value": 47.7,
+        "unit": "C",
+        "n": 3,
+        "lo": null,
+        "hi": null
+       },
+       "time": {
+        "value": 1987.0,
+        "unit": "s",
+        "n": 1,
+        "lo": null,
+        "hi": null
+       },
+       "ttft.1000": {
+        "value": 1.236,
+        "unit": "s",
+        "n": 2,
+        "lo": 1.1977,
+        "hi": 1.2743
+       },
+       "ttft.120000": {
+        "value": 504.3003,
+        "unit": "s",
+        "n": 2,
+        "lo": 501.3683,
+        "hi": 507.2323
+       },
+       "ttft.32000": {
+        "value": 54.709,
+        "unit": "s",
+        "n": 2,
+        "lo": 47.4308,
+        "hi": 61.9872
+       },
+       "ttft.64000": {
+        "value": 194.05900000000003,
+        "unit": "s",
+        "n": 2,
+        "lo": 165.9019,
+        "hi": 222.2161
+       },
+       "ttft.8000": {
+        "value": 9.3241,
+        "unit": "s",
+        "n": 2,
+        "lo": 8.8369,
+        "hi": 9.8113
+       },
+       "ttft.short": {
+        "value": 331.1,
+        "unit": "ms",
+        "n": 9,
+        "lo": 183.4,
+        "hi": 392.6
+       }
+      },
+      "thermal": {},
+      "battery": {},
+      "verdict": null,
+      "repeats": {
+       "runs": 1,
+       "spread": null
+      },
+      "lmx": {},
+      "submissions": [],
+      "server": {
+       "load_s": 25.7,
+       "model_path": null,
+       "n_ctx": null,
+       "total_slots": null,
+       "build": {
+        "engine": "llama.cpp"
+       },
+       "capacity": {
+        "slots": null,
+        "context": null,
+        "pool": null
+       },
+       "weights": null,
+       "probe": {
+        "prompt": "List the first eight prime numbers, separated by spaces, and nothing else.",
+        "answer": "The user wants the first eight prime numbers separated by spaces and nothing else. Need answer only. Primes: 2,3,5,7,11,13,17,19. Ensure no extra words. Final exactly that.2 3 5 7 11 13"
+       }
+      },
+      "history": [
+       {
+        "id": "20261123-101300-inkling-2-mini-26b-gguf",
+        "suite": "full/v1",
+        "effort": "none",
+        "finished": 1795596558.333557,
+        "index": 80.04111965934045,
+        "decode": 66.28
+       },
+       {
+        "id": "20261120-233941-inkling-2-mini-26b-gguf",
+        "suite": "full/v1",
+        "effort": "medium",
+        "finished": 1795322129.453885,
+        "index": 80.79977503541065,
+        "decode": 64.34666666666666
+       }
+      ]
+     },
+     {
       "id": "pennyroyal",
       "name": "Qwen 3.8 27B \u00b7 Uncensored \u00b7 SGLang \u00b7 FP8 \u00b7 DFlash2 \u00b7 256K",
       "engine": "sglang",
@@ -10391,7 +10846,7 @@
      {
       "key": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|620.73.04",
       "label": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 620.73.04",
-      "models": 2
+      "models": 3
      },
      {
       "key": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|610.57.04",
@@ -11378,6 +11833,14 @@
      }
     },
     "history": [
+     {
+      "id": "20261123-101300-inkling-2-mini-26b-gguf",
+      "suite": "full/v1",
+      "effort": "none",
+      "finished": 1795596558.333557,
+      "index": 80.04111965934045,
+      "decode": 66.28
+     },
      {
       "id": "20261120-233941-inkling-2-mini-26b-gguf",
       "suite": "full/v1",
@@ -19529,6 +19992,453 @@
   ],
   "none": [
    {
+    "id": "inkling-2-mini-26b-gguf",
+    "name": "Inkling 2 Mini 26B \u00b7 llama.cpp \u00b7 Q8 \u00b7 DSpark \u00b7 256K",
+    "engine": "llama.cpp",
+    "quantization": "UD-Q8_K_XL",
+    "spec": "DSpark",
+    "context": 262144,
+    "fingerprint": "77e657fcbeb1e3bb",
+    "stack": {
+     "host": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|620.73.04",
+     "hostLabel": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 620.73.04",
+     "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+     "driver": "620.73.04",
+     "vramMib": 97887,
+     "deviceClass": "gpu",
+     "device": null,
+     "soc": null,
+     "bandwidthGbs": null,
+     "ramGb": null,
+     "engine": "llama.cpp",
+     "build": "llama.cpp",
+     "source": null,
+     "repository": "unslothai/llama.cpp",
+     "release": "b12568-mix-8eebad4",
+     "fork": true,
+     "note": "Looped-layer support for this architecture was days old at run time and only in Unsloth's llama.cpp fork (ggml-org/llama.cpp#32695 not merged). Decode, prefill and suite time are this build's and should improve as the engine catches up."
+    },
+    "run": {
+     "id": "20261123-101300-inkling-2-mini-26b-gguf",
+     "suite": "full/v1",
+     "kind": "full",
+     "finished": 1795596558.333557,
+     "effort": "none",
+     "harness": "2.6.0+68ff4f4",
+     "contended": [],
+     "failedItems": 0,
+     "notes": "no thinking: reasoning_effort none via the template",
+     "reused": null,
+     "stackChange": []
+    },
+    "index": {
+     "value": 80.04111965934045,
+     "unit": "%",
+     "n": 5,
+     "lo": 77.38452476731759,
+     "hi": 82.71937313637298
+    },
+    "tasks": {
+     "supergpqa": {
+      "value": 53.74280230326296,
+      "unit": "%",
+      "n": 521,
+      "lo": 49.44960448655499,
+      "hi": 57.98120892457707,
+      "tokens": 3437.58349328215,
+      "latency": 80.89,
+      "truncated": 1.3435700575815739,
+      "unreachable": null,
+      "malformed": null,
+      "time": 16269.299999952316,
+      "parts": {}
+     },
+     "math": {
+      "value": 89.68253968253968,
+      "unit": "%",
+      "n": 63,
+      "lo": 83.3484203827583,
+      "hi": 96.01665898232106,
+      "tokens": 14672.944444444445,
+      "latency": 404.28999999999996,
+      "truncated": 3.968253968253968,
+      "unreachable": null,
+      "malformed": null,
+      "time": 27176.800000190735,
+      "parts": {
+       "aime": 96.66666666666667,
+       "hmmt": 83.33333333333334
+      }
+     },
+     "lcb": {
+      "value": 77.22772277227723,
+      "unit": "%",
+      "n": 101,
+      "lo": 68.1408091811231,
+      "hi": 84.31928299602797,
+      "tokens": 19823.73267326733,
+      "latency": 468.15,
+      "truncated": 12.871287128712872,
+      "unreachable": null,
+      "malformed": null,
+      "time": 34702.700000047684,
+      "parts": {}
+     },
+     "mrcr": {
+      "value": 67.32393011421932,
+      "unit": "%",
+      "n": 60,
+      "lo": 56.28830669436504,
+      "hi": 78.3595535340736,
+      "tokens": 3973.9333333333334,
+      "latency": 689.0999999999999,
+      "truncated": 0.0,
+      "unreachable": null,
+      "malformed": null,
+      "time": 16721.200000047684,
+      "parts": {
+       "131072": 47.08700576806165,
+       "16384": 61.48277640488596,
+       "32768": 74.65860073696382,
+       "65536": 86.06733754696585
+      }
+     },
+     "graphwalks": {
+      "value": 95.28990889285008,
+      "unit": "%",
+      "n": 48,
+      "lo": 89.57560203609489,
+      "hi": 100.0,
+      "tokens": 13848.416666666666,
+      "latency": 600.84,
+      "truncated": 4.166666666666666,
+      "unreachable": null,
+      "malformed": null,
+      "time": 25474.79999947548,
+      "parts": {
+       "16384": 83.33333333333334,
+       "32768": 99.50980392156863,
+       "65536": 98.31649831649831,
+       "8192": 100.0
+      }
+     },
+     "tools": {
+      "value": 98.24561403508771,
+      "unit": "%",
+      "n": 38,
+      "lo": 94.80701754385964,
+      "hi": 100.0,
+      "tokens": 191.69298245614036,
+      "latency": 10.695,
+      "truncated": 0.0,
+      "unreachable": null,
+      "malformed": 0.0,
+      "time": 191.40000009536743,
+      "parts": {
+       "clarify": 100.0,
+       "conditional": 100.0,
+       "distractor": 100.0,
+       "irrelevant": 83.33333333333334,
+       "multi-turn": 100.0,
+       "parallel": 100.0,
+       "policy": 100.0,
+       "recovery": 100.0,
+       "sequential": 100.0,
+       "single": 100.0
+      }
+     }
+    },
+    "qualityFrom": null,
+    "deviceClass": "gpu",
+    "capacity": {
+     "slots": null,
+     "context": null,
+     "pool": null
+    },
+    "warnings": [],
+    "energy": {
+     "perCorrect": {
+      "value": 13.06549711332442,
+      "unit": "Wh",
+      "n": 669,
+      "lo": null,
+      "hi": null
+     },
+     "quality": {
+      "value": 8742.562,
+      "unit": "Wh",
+      "n": 6,
+      "lo": null,
+      "hi": null
+     }
+    },
+    "time": {
+     "value": 122523.19999980927,
+     "unit": "s",
+     "n": 7,
+     "lo": null,
+     "hi": null
+    },
+    "speed": {
+     "conc.1": {
+      "value": 61.85,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 59.3,
+      "hi": 64.4
+     },
+     "conc.2": {
+      "value": 102.45,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 100.9,
+      "hi": 104.0
+     },
+     "conc.4": {
+      "value": 143.60000000000002,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 140.8,
+      "hi": 146.4
+     },
+     "conc.8": {
+      "value": 204.14999999999998,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 201.2,
+      "hi": 207.1
+     },
+     "decode": {
+      "value": 66.28,
+      "unit": "tok/s",
+      "n": 3,
+      "lo": null,
+      "hi": null
+     },
+     "decode.code-v1": {
+      "value": 69.56,
+      "unit": "tok/s",
+      "n": 3,
+      "lo": 67.85,
+      "hi": 70.04
+     },
+     "decode.prose-v1": {
+      "value": 64.66,
+      "unit": "tok/s",
+      "n": 3,
+      "lo": 59.2,
+      "hi": 65.0
+     },
+     "decode.reasoning-v1": {
+      "value": 64.62,
+      "unit": "tok/s",
+      "n": 3,
+      "lo": 62.21,
+      "hi": 67.71
+     },
+     "decode_at.1000": {
+      "value": 62.53,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 61.72,
+      "hi": 63.34
+     },
+     "decode_at.120000": {
+      "value": 36.185,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 35.91,
+      "hi": 36.46
+     },
+     "decode_at.32000": {
+      "value": 62.655,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 48.66,
+      "hi": 76.65
+     },
+     "decode_at.64000": {
+      "value": 39.959999999999994,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 36.55,
+      "hi": 43.37
+     },
+     "decode_at.8000": {
+      "value": 69.75,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 67.86,
+      "hi": 71.64
+     },
+     "energy": {
+      "value": 3.7162162162162162,
+      "unit": "J/token",
+      "n": 3,
+      "lo": null,
+      "hi": null
+     },
+     "peak": {
+      "value": 204.14999999999998,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 201.2,
+      "hi": 207.1
+     },
+     "peak_at": {
+      "value": 8.0,
+      "unit": "requests",
+      "n": 2,
+      "lo": null,
+      "hi": null
+     },
+     "power": {
+      "value": 258.5,
+      "unit": "W",
+      "n": 3,
+      "lo": null,
+      "hi": null
+     },
+     "prefill.1000": {
+      "value": 954.35,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 952.7,
+      "hi": 956.0
+     },
+     "prefill.120000": {
+      "value": 258.4,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 256.8,
+      "hi": 260.0
+     },
+     "prefill.32000": {
+      "value": 650.4,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 564.9,
+      "hi": 735.9
+     },
+     "prefill.64000": {
+      "value": 366.45,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 312.9,
+      "hi": 420.0
+     },
+     "prefill.8000": {
+      "value": 942.1,
+      "unit": "tok/s",
+      "n": 2,
+      "lo": 896.0,
+      "hi": 988.2
+     },
+     "temp": {
+      "value": 47.7,
+      "unit": "C",
+      "n": 3,
+      "lo": null,
+      "hi": null
+     },
+     "time": {
+      "value": 1987.0,
+      "unit": "s",
+      "n": 1,
+      "lo": null,
+      "hi": null
+     },
+     "ttft.1000": {
+      "value": 1.236,
+      "unit": "s",
+      "n": 2,
+      "lo": 1.1977,
+      "hi": 1.2743
+     },
+     "ttft.120000": {
+      "value": 504.3003,
+      "unit": "s",
+      "n": 2,
+      "lo": 501.3683,
+      "hi": 507.2323
+     },
+     "ttft.32000": {
+      "value": 54.709,
+      "unit": "s",
+      "n": 2,
+      "lo": 47.4308,
+      "hi": 61.9872
+     },
+     "ttft.64000": {
+      "value": 194.05900000000003,
+      "unit": "s",
+      "n": 2,
+      "lo": 165.9019,
+      "hi": 222.2161
+     },
+     "ttft.8000": {
+      "value": 9.3241,
+      "unit": "s",
+      "n": 2,
+      "lo": 8.8369,
+      "hi": 9.8113
+     },
+     "ttft.short": {
+      "value": 331.1,
+      "unit": "ms",
+      "n": 9,
+      "lo": 183.4,
+      "hi": 392.6
+     }
+    },
+    "thermal": {},
+    "battery": {},
+    "verdict": null,
+    "repeats": {
+     "runs": 1,
+     "spread": null
+    },
+    "lmx": {},
+    "submissions": [],
+    "server": {
+     "load_s": 25.7,
+     "model_path": null,
+     "n_ctx": null,
+     "total_slots": null,
+     "build": {
+      "engine": "llama.cpp"
+     },
+     "capacity": {
+      "slots": null,
+      "context": null,
+      "pool": null
+     },
+     "weights": null,
+     "probe": {
+      "prompt": "List the first eight prime numbers, separated by spaces, and nothing else.",
+      "answer": "The user wants the first eight prime numbers separated by spaces and nothing else. Need answer only. Primes: 2,3,5,7,11,13,17,19. Ensure no extra words. Final exactly that.2 3 5 7 11 13"
+     }
+    },
+    "history": [
+     {
+      "id": "20261123-101300-inkling-2-mini-26b-gguf",
+      "suite": "full/v1",
+      "effort": "none",
+      "finished": 1795596558.333557,
+      "index": 80.04111965934045,
+      "decode": 66.28
+     },
+     {
+      "id": "20261120-233941-inkling-2-mini-26b-gguf",
+      "suite": "full/v1",
+      "effort": "medium",
+      "finished": 1795322129.453885,
+      "index": 80.79977503541065,
+      "decode": 64.34666666666666
+     }
+    ]
+   },
+   {
     "id": "pennyroyal",
     "name": "Qwen 3.8 27B \u00b7 Uncensored \u00b7 SGLang \u00b7 FP8 \u00b7 DFlash2 \u00b7 256K",
     "engine": "sglang",
@@ -21368,89 +22278,32 @@
    "record": true,
    "delta": null,
    "previous": null
-  }
- ],
- "live": [
+  },
   {
-   "id": "inkling-2-mini-26b-gguf",
+   "run": "20261123-101300-inkling-2-mini-26b-gguf",
+   "model": "inkling-2-mini-26b-gguf",
    "name": "Inkling 2 Mini 26B \u00b7 llama.cpp \u00b7 Q8 \u00b7 DSpark \u00b7 256K",
-   "engine": "llama.cpp",
-   "quantization": "UD-Q8_K_XL",
-   "spec": "DSpark",
-   "context": 262144,
-   "fingerprint": "77e657fcbeb1e3bb",
-   "stack": {
-    "host": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|620.73.04",
-    "hostLabel": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 620.73.04",
-    "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
-    "driver": "620.73.04",
-    "vramMib": 97887,
-    "deviceClass": "gpu",
-    "device": null,
-    "soc": null,
-    "bandwidthGbs": null,
-    "ramGb": null,
-    "engine": null,
-    "build": null,
-    "source": null,
-    "repository": "unslothai/llama.cpp",
-    "release": "b12568-mix-8eebad4",
-    "fork": true,
-    "note": "Looped-layer support for this architecture was days old at run time and only in Unsloth's llama.cpp fork (ggml-org/llama.cpp#32695 not merged). Decode, prefill and suite time are this build's and should improve as the engine catches up."
-   },
-   "run": {
-    "id": "20261123-101300-inkling-2-mini-26b-gguf",
-    "suite": "full/v1",
-    "kind": "full",
-    "finished": null,
-    "effort": "none",
-    "harness": "2.6.0+59248c2-dirty",
-    "contended": [],
-    "failedItems": 0,
-    "notes": "no thinking: reasoning_effort none via the template",
-    "reused": null,
-    "stackChange": [],
-    "started": null
-   },
-   "index": null,
-   "tasks": {},
-   "qualityFrom": null,
-   "deviceClass": "gpu",
-   "capacity": {},
-   "warnings": [],
-   "energy": {
-    "perCorrect": null,
-    "quality": null
-   },
-   "time": null,
-   "speed": {},
-   "thermal": {},
-   "battery": {},
-   "verdict": null,
-   "repeats": {
-    "runs": 1,
-    "spread": null
-   },
-   "lmx": {},
-   "submissions": [],
-   "server": {},
-   "history": [],
-   "progress": {
-    "plan": [
-     "speed",
-     "supergpqa",
-     "math",
-     "tools",
-     "mrcr",
-     "graphwalks",
-     "lcb"
-    ],
-    "current": null,
-    "parked": null,
-    "yielded": 0
-   }
+   "effort": "none",
+   "suite": "full/v1",
+   "version": "1",
+   "kind": "full",
+   "finished": 1795596558.333557,
+   "index": 80.04111965934045,
+   "lo": 77.38452476731759,
+   "hi": 82.71937313637298,
+   "decode": 66.28,
+   "peak": 204.14999999999998,
+   "energyPerCorrect": 13.06549711332442,
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+   "driver": "620.73.04",
+   "build": "llama.cpp",
+   "debut": true,
+   "record": true,
+   "delta": null,
+   "previous": null
   }
  ],
+ "live": [],
  "published": {
   "json": "board.json",
   "feed": "feed.xml"
