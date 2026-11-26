@@ -4,7 +4,7 @@
   "name": "blackwall",
   "version": "2.6.0"
  },
- "generated": 1795602592.9255304,
+ "generated": 1795728194.0727875,
  "suite": "full/v1",
  "current": "1",
  "hardware": {
@@ -1001,8 +1001,38 @@
        "runs": 1,
        "spread": null
       },
-      "lmx": {},
-      "submissions": [],
+      "lmx": {
+       "gsm8k": {
+        "value": 96.74153846153847,
+        "unit": "%",
+        "n": 13,
+        "lo": null,
+        "hi": null
+       },
+       "hellaswag": {
+        "value": 76.88153846153847,
+        "unit": "%",
+        "n": 13,
+        "lo": null,
+        "hi": null
+       }
+      },
+      "submissions": [
+       {
+        "kind": "speed.code-v1",
+        "id": "cmwy14fr70036pd010pszhu8n",
+        "value": 211.8,
+        "run": "20261126-173310-inkling-2-mini-26b-gguf",
+        "verified": true
+       },
+       {
+        "kind": "speed.reasoning-v1",
+        "id": "cmwy14ob20039pd01d9nfkzuk",
+        "value": 208.4,
+        "run": "20261126-173310-inkling-2-mini-26b-gguf",
+        "verified": true
+       }
+      ],
       "server": {
        "load_s": 13.3,
        "model_path": "/mnt/nvme8tb/llama-models/inkling-2-mini/Inkling-2-Mini-UD-Q8_K_XL.gguf",
@@ -1024,6 +1054,14 @@
        }
       },
       "history": [
+       {
+        "id": "20261126-173310-inkling-2-mini-26b-gguf",
+        "suite": "full/v1",
+        "effort": "none",
+        "finished": 1795728149.312695,
+        "index": 78.73273290405378,
+        "decode": 175.60666666666668
+       },
        {
         "id": "20261123-101300-inkling-2-mini-26b-gguf",
         "suite": "full/v1",
@@ -9184,12 +9222,12 @@
     "none": [
      {
       "id": "inkling-2-mini-26b-gguf",
-      "name": "Inkling 2 Mini 26B \u00b7 llama.cpp \u00b7 Q8 \u00b7 DSpark \u00b7 256K",
-      "engine": "llama.cpp",
-      "quantization": "UD-Q8_K_XL",
+      "name": "Inkling 2 Mini 26B \u00b7 SGLang \u00b7 NVFP4 \u00b7 DSpark \u00b7 256K",
+      "engine": "sglang",
+      "quantization": "NVFP4+MXFP8",
       "spec": "DSpark",
       "context": 262144,
-      "fingerprint": "77e657fcbeb1e3bb",
+      "fingerprint": "67bb5971712c54fa",
       "stack": {
        "host": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|620.73.04",
        "hostLabel": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 620.73.04",
@@ -9201,130 +9239,130 @@
        "soc": null,
        "bandwidthGbs": null,
        "ramGb": null,
-       "engine": "llama.cpp",
-       "build": "llama.cpp",
+       "engine": "sglang",
+       "build": "SGLang 0.0.0.dev1+inkling2",
        "source": null,
-       "repository": "unslothai/llama.cpp",
-       "release": "b12568-mix-8eebad4",
-       "fork": true,
-       "note": "Looped-layer support for this architecture was days old at run time and only in Unsloth's llama.cpp fork (ggml-org/llama.cpp#32695 not merged). Decode, prefill and suite time are this build's and should improve as the engine catches up."
+       "repository": "sgl-project/sglang",
+       "release": "lmsysorg/sglang:inkling-2-mini",
+       "fork": false,
+       "note": "Day-0 image from sgl-project/sglang#51926, run on the verified RTX PRO 6000 recipe: fa4 attention backend, DSPARK speculative decoding on the bundled 3-layer MTP head, 8 draft tokens, page size 128, xgrammar, 4 running requests."
       },
       "run": {
-       "id": "20261123-101300-inkling-2-mini-26b-gguf",
+       "id": "20261126-173310-inkling-2-mini-26b-gguf",
        "suite": "full/v1",
        "kind": "full",
-       "finished": 1795596558.333557,
+       "finished": 1795728149.312695,
        "effort": "none",
-       "harness": "2.6.0+68ff4f4",
+       "harness": "2.6.0+613787f",
        "contended": [],
        "failedItems": 0,
-       "notes": "no thinking: reasoning_effort none via the template",
+       "notes": "NVFP4 via SGLang day-0 image on the verified RTX PRO 6000 DSpark recipe; replaces the llama.cpp Q8 measurement of the same weights",
        "reused": null,
        "stackChange": []
       },
       "index": {
-       "value": 80.04111965934045,
+       "value": 78.73273290405378,
        "unit": "%",
        "n": 5,
-       "lo": 77.38452476731759,
-       "hi": 82.71937313637298
+       "lo": 75.817696088616,
+       "hi": 81.5108962015204
       },
       "tasks": {
        "supergpqa": {
-        "value": 53.74280230326296,
+        "value": 54.31861804222648,
         "unit": "%",
         "n": 521,
-        "lo": 49.44960448655499,
-        "hi": 57.98120892457707,
-        "tokens": 3437.58349328215,
-        "latency": 80.89,
-        "truncated": 1.3435700575815739,
+        "lo": 50.02516063331207,
+        "hi": 58.548854841071055,
+        "tokens": 3157.942418426104,
+        "latency": 9.04,
+        "truncated": 1.9193857965451053,
         "unreachable": null,
         "malformed": null,
-        "time": 16269.299999952316,
+        "time": 3279.600000143051,
         "parts": {}
        },
        "math": {
-        "value": 89.68253968253968,
+        "value": 84.12698412698413,
         "unit": "%",
         "n": 63,
-        "lo": 83.3484203827583,
-        "hi": 96.01665898232106,
-        "tokens": 14672.944444444445,
-        "latency": 404.28999999999996,
-        "truncated": 3.968253968253968,
+        "lo": 75.88154562601417,
+        "hi": 92.37242262795408,
+        "tokens": 15705.944444444445,
+        "latency": 58.69,
+        "truncated": 7.936507936507936,
         "unreachable": null,
         "malformed": null,
-        "time": 27176.800000190735,
+        "time": 4882.399999856949,
         "parts": {
-         "aime": 96.66666666666667,
-         "hmmt": 83.33333333333334
+         "aime": 91.66666666666666,
+         "hmmt": 77.27272727272727
         }
        },
        "lcb": {
-        "value": 77.22772277227723,
+        "value": 79.20792079207921,
         "unit": "%",
         "n": 101,
-        "lo": 68.1408091811231,
-        "hi": 84.31928299602797,
-        "tokens": 19823.73267326733,
-        "latency": 468.15,
+        "lo": 70.29607096328665,
+        "hi": 85.97930064492994,
+        "tokens": 18318.68316831683,
+        "latency": 74.37,
         "truncated": 12.871287128712872,
         "unreachable": null,
         "malformed": null,
-        "time": 34702.700000047684,
+        "time": 5037.800000429153,
         "parts": {}
        },
        "mrcr": {
-        "value": 67.32393011421932,
+        "value": 68.37719101269496,
         "unit": "%",
         "n": 60,
-        "lo": 56.28830669436504,
-        "hi": 78.3595535340736,
-        "tokens": 3973.9333333333334,
-        "latency": 689.0999999999999,
+        "lo": 57.17358469400391,
+        "hi": 79.58079733138604,
+        "tokens": 4419.383333333333,
+        "latency": 43.955,
         "truncated": 0.0,
         "unreachable": null,
         "malformed": null,
-        "time": 16721.200000047684,
+        "time": 995.3999998569489,
         "parts": {
-         "131072": 47.08700576806165,
-         "16384": 61.48277640488596,
-         "32768": 74.65860073696382,
-         "65536": 86.06733754696585
+         "131072": 43.502219843358226,
+         "16384": 68.03194097578789,
+         "32768": 80.46859294837486,
+         "65536": 81.50601028325893
         }
        },
        "graphwalks": {
-        "value": 95.28990889285008,
+        "value": 88.90625,
         "unit": "%",
         "n": 48,
-        "lo": 89.57560203609489,
-        "hi": 100.0,
-        "tokens": 13848.416666666666,
-        "latency": 600.84,
-        "truncated": 4.166666666666666,
+        "lo": 80.1867505215495,
+        "hi": 97.6257494784505,
+        "tokens": 16927.833333333332,
+        "latency": 57.325,
+        "truncated": 10.416666666666668,
         "unreachable": null,
         "malformed": null,
-        "time": 25474.79999947548,
+        "time": 1829.9999997615814,
         "parts": {
          "16384": 83.33333333333334,
-         "32768": 99.50980392156863,
-         "65536": 98.31649831649831,
+         "32768": 98.95833333333334,
+         "65536": 73.33333333333334,
          "8192": 100.0
         }
        },
        "tools": {
-        "value": 98.24561403508771,
+        "value": 97.36842105263158,
         "unit": "%",
         "n": 38,
-        "lo": 94.80701754385964,
+        "lo": 93.56574223588176,
         "hi": 100.0,
-        "tokens": 191.69298245614036,
-        "latency": 10.695,
+        "tokens": 200.52631578947367,
+        "latency": 1.8,
         "truncated": 0.0,
         "unreachable": null,
         "malformed": 0.0,
-        "time": 191.40000009536743,
+        "time": 75.30000019073486,
         "parts": {
          "clarify": 100.0,
          "conditional": 100.0,
@@ -9335,28 +9373,28 @@
          "policy": 100.0,
          "recovery": 100.0,
          "sequential": 100.0,
-         "single": 100.0
+         "single": 93.33333333333333
         }
        }
       },
       "qualityFrom": null,
       "deviceClass": "gpu",
       "capacity": {
-       "slots": null,
-       "context": null,
-       "pool": null
+       "slots": 4,
+       "context": 262144,
+       "pool": 589184
       },
       "warnings": [],
       "energy": {
        "perCorrect": {
-        "value": 13.06549711332442,
+        "value": 2.2222436019611784,
         "unit": "Wh",
-        "n": 669,
+        "n": 664,
         "lo": null,
         "hi": null
        },
        "quality": {
-        "value": 8742.562,
+        "value": 1474.906,
         "unit": "Wh",
         "n": 6,
         "lo": null,
@@ -9364,222 +9402,236 @@
        }
       },
       "time": {
-       "value": 122523.19999980927,
+       "value": 16275.600000143051,
        "unit": "s",
        "n": 7,
        "lo": null,
        "hi": null
       },
       "speed": {
+       "accept.code-v1": {
+        "value": 2.626,
+        "unit": "tokens/step",
+        "n": 3,
+        "lo": 2.619,
+        "hi": 2.96
+       },
+       "accept.prose-v1": {
+        "value": 2.301,
+        "unit": "tokens/step",
+        "n": 3,
+        "lo": 2.188,
+        "hi": 2.322
+       },
+       "accept.reasoning-v1": {
+        "value": 2.281,
+        "unit": "tokens/step",
+        "n": 3,
+        "lo": 2.276,
+        "hi": 2.376
+       },
        "conc.1": {
-        "value": 61.85,
+        "value": 175.85,
         "unit": "tok/s",
         "n": 2,
-        "lo": 59.3,
-        "hi": 64.4
+        "lo": 167.7,
+        "hi": 184.0
        },
        "conc.2": {
-        "value": 102.45,
+        "value": 279.0,
         "unit": "tok/s",
         "n": 2,
-        "lo": 100.9,
-        "hi": 104.0
+        "lo": 273.7,
+        "hi": 284.3
        },
        "conc.4": {
-        "value": 143.60000000000002,
+        "value": 430.35,
         "unit": "tok/s",
         "n": 2,
-        "lo": 140.8,
-        "hi": 146.4
-       },
-       "conc.8": {
-        "value": 204.14999999999998,
-        "unit": "tok/s",
-        "n": 2,
-        "lo": 201.2,
-        "hi": 207.1
+        "lo": 414.1,
+        "hi": 446.6
        },
        "decode": {
-        "value": 66.28,
+        "value": 175.60666666666668,
         "unit": "tok/s",
         "n": 3,
         "lo": null,
         "hi": null
        },
        "decode.code-v1": {
-        "value": 69.56,
+        "value": 191.03,
         "unit": "tok/s",
         "n": 3,
-        "lo": 67.85,
-        "hi": 70.04
+        "lo": 189.78,
+        "hi": 215.54
        },
        "decode.prose-v1": {
-        "value": 64.66,
+        "value": 167.36,
         "unit": "tok/s",
         "n": 3,
-        "lo": 59.2,
-        "hi": 65.0
+        "lo": 159.68,
+        "hi": 169.59
        },
        "decode.reasoning-v1": {
-        "value": 64.62,
+        "value": 168.43,
         "unit": "tok/s",
         "n": 3,
-        "lo": 62.21,
-        "hi": 67.71
+        "lo": 168.43,
+        "hi": 177.13
        },
        "decode_at.1000": {
-        "value": 62.53,
+        "value": 179.135,
         "unit": "tok/s",
         "n": 2,
-        "lo": 61.72,
-        "hi": 63.34
+        "lo": 170.35,
+        "hi": 187.92
        },
        "decode_at.120000": {
-        "value": 36.185,
+        "value": 124.125,
         "unit": "tok/s",
         "n": 2,
-        "lo": 35.91,
-        "hi": 36.46
+        "lo": 116.08,
+        "hi": 132.17
        },
        "decode_at.32000": {
-        "value": 62.655,
+        "value": 182.015,
         "unit": "tok/s",
         "n": 2,
-        "lo": 48.66,
-        "hi": 76.65
+        "lo": 138.91,
+        "hi": 225.12
        },
        "decode_at.64000": {
-        "value": 39.959999999999994,
+        "value": 145.625,
         "unit": "tok/s",
         "n": 2,
-        "lo": 36.55,
-        "hi": 43.37
+        "lo": 128.35,
+        "hi": 162.9
        },
        "decode_at.8000": {
-        "value": 69.75,
+        "value": 173.14499999999998,
         "unit": "tok/s",
         "n": 2,
-        "lo": 67.86,
-        "hi": 71.64
+        "lo": 166.15,
+        "hi": 180.14
        },
        "energy": {
-        "value": 3.7162162162162162,
+        "value": 1.6060304664188871,
         "unit": "J/token",
         "n": 3,
         "lo": null,
         "hi": null
        },
        "peak": {
-        "value": 204.14999999999998,
+        "value": 430.35,
         "unit": "tok/s",
         "n": 2,
-        "lo": 201.2,
-        "hi": 207.1
+        "lo": 414.1,
+        "hi": 446.6
        },
        "peak_at": {
-        "value": 8.0,
+        "value": 4.0,
         "unit": "requests",
         "n": 2,
         "lo": null,
         "hi": null
        },
        "power": {
-        "value": 258.5,
+        "value": 306.8,
         "unit": "W",
         "n": 3,
         "lo": null,
         "hi": null
        },
        "prefill.1000": {
-        "value": 954.35,
+        "value": 11315.2,
         "unit": "tok/s",
         "n": 2,
-        "lo": 952.7,
-        "hi": 956.0
+        "lo": 10863.4,
+        "hi": 11767.0
        },
        "prefill.120000": {
-        "value": 258.4,
+        "value": 10770.25,
         "unit": "tok/s",
         "n": 2,
-        "lo": 256.8,
-        "hi": 260.0
+        "lo": 10742.3,
+        "hi": 10798.2
        },
        "prefill.32000": {
-        "value": 650.4,
+        "value": 14307.8,
         "unit": "tok/s",
         "n": 2,
-        "lo": 564.9,
-        "hi": 735.9
+        "lo": 14203.2,
+        "hi": 14412.4
        },
        "prefill.64000": {
-        "value": 366.45,
+        "value": 13086.150000000001,
         "unit": "tok/s",
         "n": 2,
-        "lo": 312.9,
-        "hi": 420.0
+        "lo": 12815.7,
+        "hi": 13356.6
        },
        "prefill.8000": {
-        "value": 942.1,
+        "value": 16099.25,
         "unit": "tok/s",
         "n": 2,
-        "lo": 896.0,
-        "hi": 988.2
+        "lo": 16050.4,
+        "hi": 16148.1
        },
        "temp": {
-        "value": 47.7,
+        "value": 56.0,
         "unit": "C",
         "n": 3,
         "lo": null,
         "hi": null
        },
        "time": {
-        "value": 1987.0,
+        "value": 175.09999990463257,
         "unit": "s",
         "n": 1,
         "lo": null,
         "hi": null
        },
        "ttft.1000": {
-        "value": 1.236,
+        "value": 0.10419999999999999,
         "unit": "s",
         "n": 2,
-        "lo": 1.1977,
-        "hi": 1.2743
+        "lo": 0.103,
+        "hi": 0.1054
        },
        "ttft.120000": {
-        "value": 504.3003,
+        "value": 12.09525,
         "unit": "s",
         "n": 2,
-        "lo": 501.3683,
-        "hi": 507.2323
+        "lo": 12.0597,
+        "hi": 12.1308
        },
        "ttft.32000": {
-        "value": 54.709,
+        "value": 2.4433,
         "unit": "s",
         "n": 2,
-        "lo": 47.4308,
-        "hi": 61.9872
+        "lo": 2.4216,
+        "hi": 2.465
        },
        "ttft.64000": {
-        "value": 194.05900000000003,
+        "value": 5.32085,
         "unit": "s",
         "n": 2,
-        "lo": 165.9019,
-        "hi": 222.2161
+        "lo": 5.205,
+        "hi": 5.4367
        },
        "ttft.8000": {
-        "value": 9.3241,
+        "value": 0.54425,
         "unit": "s",
         "n": 2,
-        "lo": 8.8369,
-        "hi": 9.8113
+        "lo": 0.5441,
+        "hi": 0.5444
        },
        "ttft.short": {
-        "value": 331.1,
+        "value": 56.5,
         "unit": "ms",
         "n": 9,
-        "lo": 183.4,
-        "hi": 392.6
+        "lo": 49.3,
+        "hi": 59.2
        }
       },
       "thermal": {},
@@ -9589,20 +9641,64 @@
        "runs": 1,
        "spread": null
       },
-      "lmx": {},
-      "submissions": [],
+      "lmx": {
+       "gsm8k": {
+        "value": 96.74153846153847,
+        "unit": "%",
+        "n": 13,
+        "lo": null,
+        "hi": null
+       },
+       "hellaswag": {
+        "value": 76.88153846153847,
+        "unit": "%",
+        "n": 13,
+        "lo": null,
+        "hi": null
+       }
+      },
+      "submissions": [
+       {
+        "kind": "speed.code-v1",
+        "id": "cmwy14fr70036pd010pszhu8n",
+        "value": 211.8,
+        "run": "20261126-173310-inkling-2-mini-26b-gguf",
+        "verified": true
+       },
+       {
+        "kind": "speed.reasoning-v1",
+        "id": "cmwy14ob20039pd01d9nfkzuk",
+        "value": 208.4,
+        "run": "20261126-173310-inkling-2-mini-26b-gguf",
+        "verified": true
+       }
+      ],
       "server": {
-       "load_s": 25.7,
-       "model_path": null,
-       "n_ctx": null,
-       "total_slots": null,
+       "load_s": 99.7,
+       "model_path": "/models/inkling-2-mini",
+       "served_model_name": "inkling-2-mini-26b-gguf",
+       "context_length": 262144,
+       "attention_backend": "fa4",
+       "mem_fraction_static": 0.7,
+       "max_running_requests": 4,
+       "chunked_prefill_size": 8192,
+       "kv_cache_dtype": "auto",
+       "dtype": "bfloat16",
+       "tp_size": 1,
+       "page_size": 128,
+       "sampling_backend": "flashinfer",
+       "moe_runner_backend": "auto",
+       "speculative_algorithm": "DSPARK",
+       "speculative_draft_model_path": "/models/inkling-2-mini",
+       "speculative_num_draft_tokens": 8,
        "build": {
-        "engine": "llama.cpp"
+        "engine": "sglang",
+        "version": "0.0.0.dev1+inkling2"
        },
        "capacity": {
-        "slots": null,
-        "context": null,
-        "pool": null
+        "slots": 4,
+        "context": 262144,
+        "pool": 589184
        },
        "weights": null,
        "probe": {
@@ -9611,6 +9707,14 @@
        }
       },
       "history": [
+       {
+        "id": "20261126-173310-inkling-2-mini-26b-gguf",
+        "suite": "full/v1",
+        "effort": "none",
+        "finished": 1795728149.312695,
+        "index": 78.73273290405378,
+        "decode": 175.60666666666668
+       },
        {
         "id": "20261123-101300-inkling-2-mini-26b-gguf",
         "suite": "full/v1",
@@ -11810,8 +11914,38 @@
      "runs": 1,
      "spread": null
     },
-    "lmx": {},
-    "submissions": [],
+    "lmx": {
+     "gsm8k": {
+      "value": 96.74153846153847,
+      "unit": "%",
+      "n": 13,
+      "lo": null,
+      "hi": null
+     },
+     "hellaswag": {
+      "value": 76.88153846153847,
+      "unit": "%",
+      "n": 13,
+      "lo": null,
+      "hi": null
+     }
+    },
+    "submissions": [
+     {
+      "kind": "speed.code-v1",
+      "id": "cmwy14fr70036pd010pszhu8n",
+      "value": 211.8,
+      "run": "20261126-173310-inkling-2-mini-26b-gguf",
+      "verified": true
+     },
+     {
+      "kind": "speed.reasoning-v1",
+      "id": "cmwy14ob20039pd01d9nfkzuk",
+      "value": 208.4,
+      "run": "20261126-173310-inkling-2-mini-26b-gguf",
+      "verified": true
+     }
+    ],
     "server": {
      "load_s": 13.3,
      "model_path": "/mnt/nvme8tb/llama-models/inkling-2-mini/Inkling-2-Mini-UD-Q8_K_XL.gguf",
@@ -11833,6 +11967,14 @@
      }
     },
     "history": [
+     {
+      "id": "20261126-173310-inkling-2-mini-26b-gguf",
+      "suite": "full/v1",
+      "effort": "none",
+      "finished": 1795728149.312695,
+      "index": 78.73273290405378,
+      "decode": 175.60666666666668
+     },
      {
       "id": "20261123-101300-inkling-2-mini-26b-gguf",
       "suite": "full/v1",
@@ -19993,12 +20135,12 @@
   "none": [
    {
     "id": "inkling-2-mini-26b-gguf",
-    "name": "Inkling 2 Mini 26B \u00b7 llama.cpp \u00b7 Q8 \u00b7 DSpark \u00b7 256K",
-    "engine": "llama.cpp",
-    "quantization": "UD-Q8_K_XL",
+    "name": "Inkling 2 Mini 26B \u00b7 SGLang \u00b7 NVFP4 \u00b7 DSpark \u00b7 256K",
+    "engine": "sglang",
+    "quantization": "NVFP4+MXFP8",
     "spec": "DSpark",
     "context": 262144,
-    "fingerprint": "77e657fcbeb1e3bb",
+    "fingerprint": "67bb5971712c54fa",
     "stack": {
      "host": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition|620.73.04",
      "hostLabel": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition \u00b7 driver 620.73.04",
@@ -20010,130 +20152,130 @@
      "soc": null,
      "bandwidthGbs": null,
      "ramGb": null,
-     "engine": "llama.cpp",
-     "build": "llama.cpp",
+     "engine": "sglang",
+     "build": "SGLang 0.0.0.dev1+inkling2",
      "source": null,
-     "repository": "unslothai/llama.cpp",
-     "release": "b12568-mix-8eebad4",
-     "fork": true,
-     "note": "Looped-layer support for this architecture was days old at run time and only in Unsloth's llama.cpp fork (ggml-org/llama.cpp#32695 not merged). Decode, prefill and suite time are this build's and should improve as the engine catches up."
+     "repository": "sgl-project/sglang",
+     "release": "lmsysorg/sglang:inkling-2-mini",
+     "fork": false,
+     "note": "Day-0 image from sgl-project/sglang#51926, run on the verified RTX PRO 6000 recipe: fa4 attention backend, DSPARK speculative decoding on the bundled 3-layer MTP head, 8 draft tokens, page size 128, xgrammar, 4 running requests."
     },
     "run": {
-     "id": "20261123-101300-inkling-2-mini-26b-gguf",
+     "id": "20261126-173310-inkling-2-mini-26b-gguf",
      "suite": "full/v1",
      "kind": "full",
-     "finished": 1795596558.333557,
+     "finished": 1795728149.312695,
      "effort": "none",
-     "harness": "2.6.0+68ff4f4",
+     "harness": "2.6.0+613787f",
      "contended": [],
      "failedItems": 0,
-     "notes": "no thinking: reasoning_effort none via the template",
+     "notes": "NVFP4 via SGLang day-0 image on the verified RTX PRO 6000 DSpark recipe; replaces the llama.cpp Q8 measurement of the same weights",
      "reused": null,
      "stackChange": []
     },
     "index": {
-     "value": 80.04111965934045,
+     "value": 78.73273290405378,
      "unit": "%",
      "n": 5,
-     "lo": 77.38452476731759,
-     "hi": 82.71937313637298
+     "lo": 75.817696088616,
+     "hi": 81.5108962015204
     },
     "tasks": {
      "supergpqa": {
-      "value": 53.74280230326296,
+      "value": 54.31861804222648,
       "unit": "%",
       "n": 521,
-      "lo": 49.44960448655499,
-      "hi": 57.98120892457707,
-      "tokens": 3437.58349328215,
-      "latency": 80.89,
-      "truncated": 1.3435700575815739,
+      "lo": 50.02516063331207,
+      "hi": 58.548854841071055,
+      "tokens": 3157.942418426104,
+      "latency": 9.04,
+      "truncated": 1.9193857965451053,
       "unreachable": null,
       "malformed": null,
-      "time": 16269.299999952316,
+      "time": 3279.600000143051,
       "parts": {}
      },
      "math": {
-      "value": 89.68253968253968,
+      "value": 84.12698412698413,
       "unit": "%",
       "n": 63,
-      "lo": 83.3484203827583,
-      "hi": 96.01665898232106,
-      "tokens": 14672.944444444445,
-      "latency": 404.28999999999996,
-      "truncated": 3.968253968253968,
+      "lo": 75.88154562601417,
+      "hi": 92.37242262795408,
+      "tokens": 15705.944444444445,
+      "latency": 58.69,
+      "truncated": 7.936507936507936,
       "unreachable": null,
       "malformed": null,
-      "time": 27176.800000190735,
+      "time": 4882.399999856949,
       "parts": {
-       "aime": 96.66666666666667,
-       "hmmt": 83.33333333333334
+       "aime": 91.66666666666666,
+       "hmmt": 77.27272727272727
       }
      },
      "lcb": {
-      "value": 77.22772277227723,
+      "value": 79.20792079207921,
       "unit": "%",
       "n": 101,
-      "lo": 68.1408091811231,
-      "hi": 84.31928299602797,
-      "tokens": 19823.73267326733,
-      "latency": 468.15,
+      "lo": 70.29607096328665,
+      "hi": 85.97930064492994,
+      "tokens": 18318.68316831683,
+      "latency": 74.37,
       "truncated": 12.871287128712872,
       "unreachable": null,
       "malformed": null,
-      "time": 34702.700000047684,
+      "time": 5037.800000429153,
       "parts": {}
      },
      "mrcr": {
-      "value": 67.32393011421932,
+      "value": 68.37719101269496,
       "unit": "%",
       "n": 60,
-      "lo": 56.28830669436504,
-      "hi": 78.3595535340736,
-      "tokens": 3973.9333333333334,
-      "latency": 689.0999999999999,
+      "lo": 57.17358469400391,
+      "hi": 79.58079733138604,
+      "tokens": 4419.383333333333,
+      "latency": 43.955,
       "truncated": 0.0,
       "unreachable": null,
       "malformed": null,
-      "time": 16721.200000047684,
+      "time": 995.3999998569489,
       "parts": {
-       "131072": 47.08700576806165,
-       "16384": 61.48277640488596,
-       "32768": 74.65860073696382,
-       "65536": 86.06733754696585
+       "131072": 43.502219843358226,
+       "16384": 68.03194097578789,
+       "32768": 80.46859294837486,
+       "65536": 81.50601028325893
       }
      },
      "graphwalks": {
-      "value": 95.28990889285008,
+      "value": 88.90625,
       "unit": "%",
       "n": 48,
-      "lo": 89.57560203609489,
-      "hi": 100.0,
-      "tokens": 13848.416666666666,
-      "latency": 600.84,
-      "truncated": 4.166666666666666,
+      "lo": 80.1867505215495,
+      "hi": 97.6257494784505,
+      "tokens": 16927.833333333332,
+      "latency": 57.325,
+      "truncated": 10.416666666666668,
       "unreachable": null,
       "malformed": null,
-      "time": 25474.79999947548,
+      "time": 1829.9999997615814,
       "parts": {
        "16384": 83.33333333333334,
-       "32768": 99.50980392156863,
-       "65536": 98.31649831649831,
+       "32768": 98.95833333333334,
+       "65536": 73.33333333333334,
        "8192": 100.0
       }
      },
      "tools": {
-      "value": 98.24561403508771,
+      "value": 97.36842105263158,
       "unit": "%",
       "n": 38,
-      "lo": 94.80701754385964,
+      "lo": 93.56574223588176,
       "hi": 100.0,
-      "tokens": 191.69298245614036,
-      "latency": 10.695,
+      "tokens": 200.52631578947367,
+      "latency": 1.8,
       "truncated": 0.0,
       "unreachable": null,
       "malformed": 0.0,
-      "time": 191.40000009536743,
+      "time": 75.30000019073486,
       "parts": {
        "clarify": 100.0,
        "conditional": 100.0,
@@ -20144,28 +20286,28 @@
        "policy": 100.0,
        "recovery": 100.0,
        "sequential": 100.0,
-       "single": 100.0
+       "single": 93.33333333333333
       }
      }
     },
     "qualityFrom": null,
     "deviceClass": "gpu",
     "capacity": {
-     "slots": null,
-     "context": null,
-     "pool": null
+     "slots": 4,
+     "context": 262144,
+     "pool": 589184
     },
     "warnings": [],
     "energy": {
      "perCorrect": {
-      "value": 13.06549711332442,
+      "value": 2.2222436019611784,
       "unit": "Wh",
-      "n": 669,
+      "n": 664,
       "lo": null,
       "hi": null
      },
      "quality": {
-      "value": 8742.562,
+      "value": 1474.906,
       "unit": "Wh",
       "n": 6,
       "lo": null,
@@ -20173,222 +20315,236 @@
      }
     },
     "time": {
-     "value": 122523.19999980927,
+     "value": 16275.600000143051,
      "unit": "s",
      "n": 7,
      "lo": null,
      "hi": null
     },
     "speed": {
+     "accept.code-v1": {
+      "value": 2.626,
+      "unit": "tokens/step",
+      "n": 3,
+      "lo": 2.619,
+      "hi": 2.96
+     },
+     "accept.prose-v1": {
+      "value": 2.301,
+      "unit": "tokens/step",
+      "n": 3,
+      "lo": 2.188,
+      "hi": 2.322
+     },
+     "accept.reasoning-v1": {
+      "value": 2.281,
+      "unit": "tokens/step",
+      "n": 3,
+      "lo": 2.276,
+      "hi": 2.376
+     },
      "conc.1": {
-      "value": 61.85,
+      "value": 175.85,
       "unit": "tok/s",
       "n": 2,
-      "lo": 59.3,
-      "hi": 64.4
+      "lo": 167.7,
+      "hi": 184.0
      },
      "conc.2": {
-      "value": 102.45,
+      "value": 279.0,
       "unit": "tok/s",
       "n": 2,
-      "lo": 100.9,
-      "hi": 104.0
+      "lo": 273.7,
+      "hi": 284.3
      },
      "conc.4": {
-      "value": 143.60000000000002,
+      "value": 430.35,
       "unit": "tok/s",
       "n": 2,
-      "lo": 140.8,
-      "hi": 146.4
-     },
-     "conc.8": {
-      "value": 204.14999999999998,
-      "unit": "tok/s",
-      "n": 2,
-      "lo": 201.2,
-      "hi": 207.1
+      "lo": 414.1,
+      "hi": 446.6
      },
      "decode": {
-      "value": 66.28,
+      "value": 175.60666666666668,
       "unit": "tok/s",
       "n": 3,
       "lo": null,
       "hi": null
      },
      "decode.code-v1": {
-      "value": 69.56,
+      "value": 191.03,
       "unit": "tok/s",
       "n": 3,
-      "lo": 67.85,
-      "hi": 70.04
+      "lo": 189.78,
+      "hi": 215.54
      },
      "decode.prose-v1": {
-      "value": 64.66,
+      "value": 167.36,
       "unit": "tok/s",
       "n": 3,
-      "lo": 59.2,
-      "hi": 65.0
+      "lo": 159.68,
+      "hi": 169.59
      },
      "decode.reasoning-v1": {
-      "value": 64.62,
+      "value": 168.43,
       "unit": "tok/s",
       "n": 3,
-      "lo": 62.21,
-      "hi": 67.71
+      "lo": 168.43,
+      "hi": 177.13
      },
      "decode_at.1000": {
-      "value": 62.53,
+      "value": 179.135,
       "unit": "tok/s",
       "n": 2,
-      "lo": 61.72,
-      "hi": 63.34
+      "lo": 170.35,
+      "hi": 187.92
      },
      "decode_at.120000": {
-      "value": 36.185,
+      "value": 124.125,
       "unit": "tok/s",
       "n": 2,
-      "lo": 35.91,
-      "hi": 36.46
+      "lo": 116.08,
+      "hi": 132.17
      },
      "decode_at.32000": {
-      "value": 62.655,
+      "value": 182.015,
       "unit": "tok/s",
       "n": 2,
-      "lo": 48.66,
-      "hi": 76.65
+      "lo": 138.91,
+      "hi": 225.12
      },
      "decode_at.64000": {
-      "value": 39.959999999999994,
+      "value": 145.625,
       "unit": "tok/s",
       "n": 2,
-      "lo": 36.55,
-      "hi": 43.37
+      "lo": 128.35,
+      "hi": 162.9
      },
      "decode_at.8000": {
-      "value": 69.75,
+      "value": 173.14499999999998,
       "unit": "tok/s",
       "n": 2,
-      "lo": 67.86,
-      "hi": 71.64
+      "lo": 166.15,
+      "hi": 180.14
      },
      "energy": {
-      "value": 3.7162162162162162,
+      "value": 1.6060304664188871,
       "unit": "J/token",
       "n": 3,
       "lo": null,
       "hi": null
      },
      "peak": {
-      "value": 204.14999999999998,
+      "value": 430.35,
       "unit": "tok/s",
       "n": 2,
-      "lo": 201.2,
-      "hi": 207.1
+      "lo": 414.1,
+      "hi": 446.6
      },
      "peak_at": {
-      "value": 8.0,
+      "value": 4.0,
       "unit": "requests",
       "n": 2,
       "lo": null,
       "hi": null
      },
      "power": {
-      "value": 258.5,
+      "value": 306.8,
       "unit": "W",
       "n": 3,
       "lo": null,
       "hi": null
      },
      "prefill.1000": {
-      "value": 954.35,
+      "value": 11315.2,
       "unit": "tok/s",
       "n": 2,
-      "lo": 952.7,
-      "hi": 956.0
+      "lo": 10863.4,
+      "hi": 11767.0
      },
      "prefill.120000": {
-      "value": 258.4,
+      "value": 10770.25,
       "unit": "tok/s",
       "n": 2,
-      "lo": 256.8,
-      "hi": 260.0
+      "lo": 10742.3,
+      "hi": 10798.2
      },
      "prefill.32000": {
-      "value": 650.4,
+      "value": 14307.8,
       "unit": "tok/s",
       "n": 2,
-      "lo": 564.9,
-      "hi": 735.9
+      "lo": 14203.2,
+      "hi": 14412.4
      },
      "prefill.64000": {
-      "value": 366.45,
+      "value": 13086.150000000001,
       "unit": "tok/s",
       "n": 2,
-      "lo": 312.9,
-      "hi": 420.0
+      "lo": 12815.7,
+      "hi": 13356.6
      },
      "prefill.8000": {
-      "value": 942.1,
+      "value": 16099.25,
       "unit": "tok/s",
       "n": 2,
-      "lo": 896.0,
-      "hi": 988.2
+      "lo": 16050.4,
+      "hi": 16148.1
      },
      "temp": {
-      "value": 47.7,
+      "value": 56.0,
       "unit": "C",
       "n": 3,
       "lo": null,
       "hi": null
      },
      "time": {
-      "value": 1987.0,
+      "value": 175.09999990463257,
       "unit": "s",
       "n": 1,
       "lo": null,
       "hi": null
      },
      "ttft.1000": {
-      "value": 1.236,
+      "value": 0.10419999999999999,
       "unit": "s",
       "n": 2,
-      "lo": 1.1977,
-      "hi": 1.2743
+      "lo": 0.103,
+      "hi": 0.1054
      },
      "ttft.120000": {
-      "value": 504.3003,
+      "value": 12.09525,
       "unit": "s",
       "n": 2,
-      "lo": 501.3683,
-      "hi": 507.2323
+      "lo": 12.0597,
+      "hi": 12.1308
      },
      "ttft.32000": {
-      "value": 54.709,
+      "value": 2.4433,
       "unit": "s",
       "n": 2,
-      "lo": 47.4308,
-      "hi": 61.9872
+      "lo": 2.4216,
+      "hi": 2.465
      },
      "ttft.64000": {
-      "value": 194.05900000000003,
+      "value": 5.32085,
       "unit": "s",
       "n": 2,
-      "lo": 165.9019,
-      "hi": 222.2161
+      "lo": 5.205,
+      "hi": 5.4367
      },
      "ttft.8000": {
-      "value": 9.3241,
+      "value": 0.54425,
       "unit": "s",
       "n": 2,
-      "lo": 8.8369,
-      "hi": 9.8113
+      "lo": 0.5441,
+      "hi": 0.5444
      },
      "ttft.short": {
-      "value": 331.1,
+      "value": 56.5,
       "unit": "ms",
       "n": 9,
-      "lo": 183.4,
-      "hi": 392.6
+      "lo": 49.3,
+      "hi": 59.2
      }
     },
     "thermal": {},
@@ -20398,20 +20554,64 @@
      "runs": 1,
      "spread": null
     },
-    "lmx": {},
-    "submissions": [],
+    "lmx": {
+     "gsm8k": {
+      "value": 96.74153846153847,
+      "unit": "%",
+      "n": 13,
+      "lo": null,
+      "hi": null
+     },
+     "hellaswag": {
+      "value": 76.88153846153847,
+      "unit": "%",
+      "n": 13,
+      "lo": null,
+      "hi": null
+     }
+    },
+    "submissions": [
+     {
+      "kind": "speed.code-v1",
+      "id": "cmwy14fr70036pd010pszhu8n",
+      "value": 211.8,
+      "run": "20261126-173310-inkling-2-mini-26b-gguf",
+      "verified": true
+     },
+     {
+      "kind": "speed.reasoning-v1",
+      "id": "cmwy14ob20039pd01d9nfkzuk",
+      "value": 208.4,
+      "run": "20261126-173310-inkling-2-mini-26b-gguf",
+      "verified": true
+     }
+    ],
     "server": {
-     "load_s": 25.7,
-     "model_path": null,
-     "n_ctx": null,
-     "total_slots": null,
+     "load_s": 99.7,
+     "model_path": "/models/inkling-2-mini",
+     "served_model_name": "inkling-2-mini-26b-gguf",
+     "context_length": 262144,
+     "attention_backend": "fa4",
+     "mem_fraction_static": 0.7,
+     "max_running_requests": 4,
+     "chunked_prefill_size": 8192,
+     "kv_cache_dtype": "auto",
+     "dtype": "bfloat16",
+     "tp_size": 1,
+     "page_size": 128,
+     "sampling_backend": "flashinfer",
+     "moe_runner_backend": "auto",
+     "speculative_algorithm": "DSPARK",
+     "speculative_draft_model_path": "/models/inkling-2-mini",
+     "speculative_num_draft_tokens": 8,
      "build": {
-      "engine": "llama.cpp"
+      "engine": "sglang",
+      "version": "0.0.0.dev1+inkling2"
      },
      "capacity": {
-      "slots": null,
-      "context": null,
-      "pool": null
+      "slots": 4,
+      "context": 262144,
+      "pool": 589184
      },
      "weights": null,
      "probe": {
@@ -20420,6 +20620,14 @@
      }
     },
     "history": [
+     {
+      "id": "20261126-173310-inkling-2-mini-26b-gguf",
+      "suite": "full/v1",
+      "effort": "none",
+      "finished": 1795728149.312695,
+      "index": 78.73273290405378,
+      "decode": 175.60666666666668
+     },
      {
       "id": "20261123-101300-inkling-2-mini-26b-gguf",
       "suite": "full/v1",
@@ -22301,6 +22509,29 @@
    "record": true,
    "delta": null,
    "previous": null
+  },
+  {
+   "run": "20261126-173310-inkling-2-mini-26b-gguf",
+   "model": "inkling-2-mini-26b-gguf",
+   "name": "Inkling 2 Mini 26B \u00b7 SGLang \u00b7 NVFP4 \u00b7 DSpark \u00b7 256K",
+   "effort": "none",
+   "suite": "full/v1",
+   "version": "1",
+   "kind": "full",
+   "finished": 1795728149.312695,
+   "index": 78.73273290405378,
+   "lo": 75.817696088616,
+   "hi": 81.5108962015204,
+   "decode": 175.60666666666668,
+   "peak": 430.35,
+   "energyPerCorrect": 2.2222436019611784,
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+   "driver": "620.73.04",
+   "build": "SGLang 0.0.0.dev1+inkling2",
+   "debut": false,
+   "record": false,
+   "delta": -1.3,
+   "previous": "20261123-101300-inkling-2-mini-26b-gguf"
   }
  ],
  "live": [],
